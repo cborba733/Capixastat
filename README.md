@@ -85,7 +85,7 @@ Vídeo demonstrando o funcionamento do protótipo e explicação do projeto:
 
 O relatório completo da 1ª entrega do PI3 está disponível no repositório:
 
-📎 [Baixar Relatório PI3](./Relatorio_PI3_CapixaStat.pdf)
+📎 [Baixar Relatório](./relatorio_pi3_capixastat.pdf)
 
 
 
