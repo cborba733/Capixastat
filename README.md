@@ -85,7 +85,7 @@ Vídeo demonstrando o funcionamento do protótipo e explicação do projeto:
 
 O relatório completo da 1ª entrega do PI3 está disponível no repositório:
 
-📎 Relatorio_PI3_CapixaStat.pdf
+📎 [Relatório PI3 CapixaStat](./Relatorio_PI3_CapixaStat(1).pdf)
 
 
 
@@ -128,7 +128,7 @@ O projeto encontra-se em fase inicial, com foco em:
 - Definição do problema  
 - Estruturação da solução  
 - Protótipo funcional (Figma)  
-- Planejamento da arquitetura  
+- Planejamento da arquitetura do sistema  
 
 ---
 
