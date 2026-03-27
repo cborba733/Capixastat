@@ -27,7 +27,7 @@ Desenvolver uma plataforma web que utilize ciência de dados para analisar o des
 - Patrocinadores e investidores  
 - Federação de Futebol do Espírito Santo (FES)  
 
----
+
 
 ## 🌍 ODS (Objetivos de Desenvolvimento Sustentável)
 
