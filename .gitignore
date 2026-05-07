@@ -1,0 +1,39 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Claude Code local config
+.claude/
+
+# Temp/geração de documentos
+criar_relatorio.cjs
+fix.cjs
+force_dom.js
+refactor.cjs
+test.js
+*.docx
+fig1_dashboard.png
+fig2_perfil.png
+fig3_antropometria.png
+fig4_carga.png
