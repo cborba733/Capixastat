@@ -68,7 +68,7 @@ Para visualizar:
 > Recomendado visualizar em desktop para melhor experiência.
 
 🔗 Protótipo Figma (Entrega 1):
-👉 https://www.figma.com/proto/P6cKkNpznRsC6hGaXzQQo3/Sem-título?node-id=1-2&p=f&t=bDsslCgpTqMGOiU9-1
+👉 https://www.figma.com/proto/P6cKkNpznRsC6hGaXzQQo3/Sem-título?node-id=1-2&p=f&t=bDsslCgpTqMGOiU9-1  (Não está atualizado, continua sendo o mesmo da C1, atualizarei em breve)
 
 🎥 Exibição em Vídeo
 Vídeo demonstrando o funcionamento e a explicação do projeto:
