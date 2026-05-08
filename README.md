@@ -79,7 +79,7 @@ Vídeo demonstrando o funcionamento e a explicação do projeto:
 📄 Relatório
 O relatório completo do PI3 está disponível no repositório:
 
-📎 [Baixar Relatório](https://github.com/cborba733/Capixastat/raw/main/relatorio_pi3_capixastat.pdf)
+📎 [Baixar Relatório](https://github.com/cborba733/Capixastat/raw/main/relatorio_pi3_capixastat.pdf) · [Visualizar no GitHub](https://github.com/cborba733/Capixastat/blob/main/relatorio_pi3_capixastat.pdf)
 
 📊 Ciência de Dados no Projeto
 O sistema aplica conceitos de ciência de dados para:
