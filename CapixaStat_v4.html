@@ -632,24 +632,50 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .cmp-metric-lbl { font-size:10px; color:var(--text-3); text-align:center; text-transform:uppercase; letter-spacing:.4px }
 
 /* ═══════════════════════════════════════════
-   ★ SPONSOR / PATROCÍNIO
+   ★ MEU TIME
 ═══════════════════════════════════════════ */
-.sponsor-hero {
+.team-hero {
   background:linear-gradient(135deg, rgba(34,197,94,.05) 0%, rgba(6,182,212,.03) 50%, rgba(167,139,250,.04) 100%);
-  border:1px solid rgba(34,197,94,.10);
-  border-radius:var(--radius-lg); padding:36px; text-align:center; margin-bottom:20px;
+  border:1px solid rgba(34,197,94,.12); border-radius:var(--radius-lg);
+  padding:28px; margin-bottom:20px; display:flex; align-items:center; gap:28px;
   position:relative; overflow:hidden;
 }
-.sponsor-hero::before {
-  content:''; position:absolute; top:-100px; right:-100px; width:300px; height:300px;
+.team-hero::before {
+  content:''; position:absolute; top:-80px; right:-80px; width:260px; height:260px;
   background:radial-gradient(circle, rgba(34,197,94,.06) 0%, transparent 70%);
   pointer-events:none;
 }
-.sponsor-hero h2 { font-family:var(--font-display); font-size:24px; font-weight:700; color:var(--green); margin-bottom:6px; text-shadow:0 0 20px rgba(34,197,94,.15) }
-.sponsor-hero p  { color:var(--text-3); font-size:13px; max-width:480px; margin:0 auto 20px }
-.sponsor-nums { display:flex; justify-content:center; gap:36px }
-.sponsor-num-val { font-family:var(--font-display); font-size:30px; font-weight:700; color:var(--green); text-shadow:0 0 16px rgba(34,197,94,.2) }
-.sponsor-num-lbl { font-size:11px; color:var(--text-3) }
+.team-hero-badge { width:90px; height:90px; flex-shrink:0; background:var(--bg-raised); border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid rgba(34,197,94,.15); overflow:hidden; box-shadow:0 0 20px rgba(34,197,94,.1) }
+.team-hero-badge img { width:80%; height:80%; object-fit:contain }
+.team-hero-info { flex:1 }
+.team-hero-info h2 { font-family:var(--font-display); font-size:22px; font-weight:700; color:var(--text-1); margin-bottom:4px }
+.team-hero-meta { font-size:12px; color:var(--text-3); margin-bottom:10px }
+.team-hero-comps { display:flex; gap:6px; flex-wrap:wrap }
+.team-hero-stats { display:flex; gap:28px; flex-shrink:0; text-align:center }
+.team-stat-val { font-family:var(--font-display); font-size:18px; font-weight:700; color:var(--green) }
+.team-stat-lbl { font-size:10px; color:var(--text-3); margin-top:2px }
+.comp-tab-active { background:var(--bg-card) !important; color:var(--text-1) !important; box-shadow:0 1px 3px rgba(0,0,0,.3) }
+.class-table { width:100%; border-collapse:collapse; font-size:12px; margin-top:10px }
+.class-table th { padding:6px 10px; color:var(--text-3); font-weight:500; text-align:center; border-bottom:1px solid var(--border) }
+.class-table th:first-child,.class-table td:first-child { text-align:left; padding-left:4px }
+.class-table td { padding:8px 10px; border-bottom:1px solid rgba(255,255,255,.03); text-align:center; color:var(--text-2) }
+.class-table tbody tr:hover td { background:rgba(34,197,94,.03); color:var(--text-1) }
+.class-table .my-row td { background:rgba(34,197,94,.06); color:var(--text-1); font-weight:600 }
+.class-pos { font-weight:700; color:var(--text-3); width:24px }
+.class-pos.top { color:var(--green) }
+.jogo-row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,.04) }
+.jogo-row:last-child { border-bottom:none }
+.jogo-data { font-size:11px; color:var(--text-3); width:38px; flex-shrink:0 }
+.jogo-teams { flex:1; display:flex; align-items:center; gap:8px; font-size:13px }
+.jogo-score { font-family:var(--font-display); font-weight:700; font-size:14px; color:var(--text-1); background:var(--bg-raised); padding:2px 8px; border-radius:6px; flex-shrink:0 }
+.jogo-fase { font-size:10px; color:var(--text-3) }
+.jogo-w { color:var(--green) } .jogo-d { color:var(--amber) } .jogo-l { color:var(--red) }
+.elenco-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:10px; margin-top:12px }
+.elenco-card { background:var(--bg-raised); border-radius:var(--radius); padding:12px; display:flex; align-items:center; gap:10px; border:1px solid var(--border); transition:all .2s }
+.elenco-card:hover { border-color:rgba(34,197,94,.2); background:rgba(34,197,94,.03); cursor:pointer }
+.elenco-avatar { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; background:rgba(34,197,94,.12); color:var(--green) }
+.elenco-nome { font-size:12px; font-weight:600; color:var(--text-1); line-height:1.2 }
+.elenco-pos { font-size:10px; color:var(--text-3); margin-top:2px }
 .club-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px }
 .club-card {
   background: linear-gradient(145deg, rgba(15,25,35,.95), rgba(10,16,26,1));
@@ -1239,9 +1265,9 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
         Formação
       </div>
-      <div class="nav-item" data-screen="patrocinio" onclick="goTo('patrocinio',this)">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
-        Patrocínio
+      <div class="nav-item" data-screen="time" onclick="goTo('time',this)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V7L12 2z"/></svg>
+        Meu Time
       </div>
 
       <div class="sidebar-bottom">
@@ -1861,24 +1887,43 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
       </div>
 
       <!-- ══ PATROCÍNIO ══ -->
-      <div id="screen-patrocinio" class="screen">
+      <div id="screen-time" class="screen">
         <div class="topbar">
-          <div class="topbar-left"><h1>Captação de Patrocínio</h1><p>Conectando marcas ao futebol capixaba</p></div>
-          <div class="topbar-right"><button class="btn btn-primary btn-sm">Quero Patrocinar</button></div>
+          <div class="topbar-left">
+            <h1 id="time-topbar-nome">Meu Time</h1>
+            <p id="time-topbar-sub">Informações, elenco e competições</p>
+          </div>
         </div>
         <div class="content">
-          <div class="sponsor-hero">
-            <h2>Invista no futebol do Espírito Santo</h2>
-            <p>Conecte sua marca a atletas e clubes capixabas com dados reais de audiência e visibilidade para embasar sua decisão.</p>
-            <div class="sponsor-nums">
-              <div><div class="sponsor-num-val" id="sponsor-total-clubes">6</div><div class="sponsor-num-lbl">clubes ativos</div></div>
-              <div><div class="sponsor-num-val" id="sponsor-total-atletas">247</div><div class="sponsor-num-lbl">atletas</div></div>
-              <div><div class="sponsor-num-val">14k+</div><div class="sponsor-num-lbl">torcedores / jogo</div></div>
+          <!-- Hero do Clube -->
+          <div class="team-hero">
+            <div class="team-hero-badge">
+              <img id="time-escudo" src="" alt="Escudo" onerror="this.style.display='none'">
+            </div>
+            <div class="team-hero-info">
+              <h2 id="time-nome">—</h2>
+              <div class="team-hero-meta" id="time-meta">—</div>
+              <div class="team-hero-comps" id="time-comps"></div>
+            </div>
+            <div class="team-hero-stats">
+              <div><div class="team-stat-val" id="time-fundacao">—</div><div class="team-stat-lbl">Fundação</div></div>
+              <div><div class="team-stat-val" id="time-estadio-val">—</div><div class="team-stat-lbl">Estádio</div></div>
+              <div><div class="team-stat-val" id="time-atletas-val">—</div><div class="team-stat-lbl">Atletas</div></div>
             </div>
           </div>
-          <div class="club-grid" id="patrocinio-club-grid">
-            <!-- Rendered dynamically -->
+
+          <!-- Tabs de competições -->
+          <div style="margin-bottom:18px">
+            <div class="tab-nav" id="time-comp-tabs" style="width:100%;box-sizing:border-box"></div>
           </div>
+
+          <!-- Conteúdo da competição -->
+          <div id="time-comp-content"></div>
+
+          <!-- Elenco -->
+          <div class="card" style="margin-top:20px">
+            <div class="card-title">Elenco <span id="time-elenco-count" class="text-muted"></span></div>
+            <div class="elenco-grid" id="time-elenco-grid"></div>
           </div>
         </div>
       </div>
@@ -2426,35 +2471,55 @@ function salvarNovoAtleta() {
 // ── Banco de Dados de Clubes (CLUBS) ───────────────
 const CLUBS = {
   'Porto Vitória': { nome: 'Porto Vitória', cidade: 'Vitória · ES', divisao: 'Campeão 2026', divisaoClasse: 'badge-atk',
-    escudo: 'https://upload.wikimedia.org/wikipedia/pt/e/e8/Porto_Vit%C3%B3ria_FC.png',
-    sigla: 'PVF', torcida: '10k', potencial: 'A+', atletasBase: 27 },
+    escudo: 'https://r2.thesportsdb.com/images/media/team/badge/6q80921733810436.png',
+    sigla: 'PVF', torcida: '10k', potencial: 'A+', atletasBase: 27,
+    estadio: 'Kleber Andrade', fundacao: 2014, sportsdb_id: 150125,
+    site: '', instagram: '', competicoes: ['capixabao','copa-es'] },
   'Serra FC': { nome: 'Serra FC', cidade: 'Serra · ES', divisao: 'Vice-campeão 2026', divisaoClasse: 'badge-mid',
-    escudo: 'https://upload.wikimedia.org/wikipedia/pt/a/ac/Serra_FC.png',
-    sigla: 'SFC', torcida: '8k', potencial: 'A', atletasBase: 20 },
+    escudo: 'https://r2.thesportsdb.com/images/media/team/badge/wfi4ek1713439343.png',
+    sigla: 'SFC', torcida: '8k', potencial: 'A', atletasBase: 20,
+    estadio: 'Roberto Siqueira Costa', fundacao: 1930, sportsdb_id: 148214,
+    site: '', instagram: '', competicoes: ['capixabao','copa-es'] },
   'Vitória ES': { nome: 'Vitória ES', cidade: 'Vitória · ES', divisao: 'Capixabão 2026', divisaoClasse: 'badge-mid',
-    escudo: 'https://upload.wikimedia.org/wikipedia/commons/f/fc/Vit%C3%B3riaFCES.png',
-    sigla: 'VFC', torcida: '12k', potencial: 'A', atletasBase: 28 },
+    escudo: 'https://r2.thesportsdb.com/images/media/team/badge/n7l4on1767219879.png',
+    sigla: 'VFC', torcida: '12k', potencial: 'A', atletasBase: 28,
+    estadio: 'Salvador Venâncio da Costa', fundacao: 1912, sportsdb_id: 147154,
+    site: '', instagram: '', competicoes: ['capixabao','copa-es'] },
   'Rio Branco ES': { nome: 'Rio Branco ES', cidade: 'Vitória · ES', divisao: 'Capixabão 2026', divisaoClasse: 'badge-mid',
-    escudo: 'https://upload.wikimedia.org/wikipedia/pt/9/98/Rio_Branco_EC_Vit%C3%B3ria.png',
-    sigla: 'RBES', torcida: '15k', potencial: 'A', atletasBase: 28 },
+    escudo: 'https://r2.thesportsdb.com/images/media/team/badge/tkx23p1625423235.png',
+    sigla: 'RBES', torcida: '15k', potencial: 'A', atletasBase: 28,
+    estadio: 'Kleber Andrade', fundacao: 1913, sportsdb_id: 142286,
+    site: 'site.riobrancoes.com.br', instagram: 'riobrancoes', competicoes: ['capixabao','copa-es','serie-d','copa-verde'] },
   'Vilavelhense': { nome: 'Vilavelhense', cidade: 'Vila Velha · ES', divisao: 'Capixabão 2026', divisaoClasse: 'badge-mid',
-    escudo: 'https://upload.wikimedia.org/wikipedia/pt/b/b2/Esporte_Clube_Vilavelhense.png',
-    sigla: 'VVE', torcida: '6k', potencial: 'B+', atletasBase: 31 },
+    escudo: 'https://r2.thesportsdb.com/images/media/team/badge/atebuv1754116314.png',
+    sigla: 'VVE', torcida: '6k', potencial: 'B+', atletasBase: 31,
+    estadio: 'Gil Bernardes', fundacao: 2002, sportsdb_id: 152617,
+    site: '', instagram: '', competicoes: ['capixabao','copa-es'] },
   'Desportiva Ferroviária': { nome: 'Desportiva Ferroviária', cidade: 'Cariacica · ES', divisao: 'Capixabão 2026', divisaoClasse: 'badge-mid',
-    escudo: 'https://upload.wikimedia.org/wikipedia/en/e/e0/Desportiva_Ferrovi%C3%A1ria.png',
-    sigla: 'TIVA', torcida: '7k', potencial: 'B+', atletasBase: 23 },
+    escudo: 'https://r2.thesportsdb.com/images/media/team/badge/i4di121763680174.png',
+    sigla: 'TIVA', torcida: '7k', potencial: 'B+', atletasBase: 23,
+    estadio: 'Engenheiro Araripe', fundacao: 1920, sportsdb_id: 152615,
+    site: '', instagram: '', competicoes: ['capixabao','copa-es'] },
   'Real Noroeste': { nome: 'Real Noroeste', cidade: 'Água Doce do Norte · ES', divisao: 'Capixabão 2026', divisaoClasse: 'badge-mid',
-    escudo: 'https://upload.wikimedia.org/wikipedia/pt/f/f7/Real_Noroeste_Capixaba_Futebol_Clube.png',
-    sigla: 'RN', torcida: '3k', potencial: 'B', atletasBase: 25 },
+    escudo: 'https://r2.thesportsdb.com/images/media/team/badge/gbkic71754115924.png',
+    sigla: 'RN', torcida: '3k', potencial: 'B', atletasBase: 25,
+    estadio: 'José Olímpio da Rocha', fundacao: 2008, sportsdb_id: 144968,
+    site: '', instagram: '', competicoes: ['capixabao','copa-es'] },
   'Forte FC': { nome: 'Forte FC', cidade: 'Cariacica · ES', divisao: 'Capixabão 2026', divisaoClasse: 'badge-mid',
-    escudo: 'https://upload.wikimedia.org/wikipedia/pt/6/6a/Forte_Futebol_Clube.png',
-    sigla: 'FFC', torcida: '4k', potencial: 'B', atletasBase: 22 },
+    escudo: 'https://r2.thesportsdb.com/images/media/team/badge/1irf1f1767219678.png',
+    sigla: 'FFC', torcida: '4k', potencial: 'B', atletasBase: 22,
+    estadio: 'Emílio Nemer', fundacao: 2006, sportsdb_id: 154128,
+    site: '', instagram: '', competicoes: ['capixabao'] },
   'Capixaba SC': { nome: 'Capixaba SC', cidade: 'Cachoeiro · ES', divisao: 'Capixabão 2026', divisaoClasse: 'badge-mid',
-    escudo: 'https://upload.wikimedia.org/wikipedia/pt/4/47/Capixaba_Sport_Club.png',
-    sigla: 'CSC', torcida: '3k', potencial: 'B', atletasBase: 23 },
+    escudo: 'https://r2.thesportsdb.com/images/media/team/badge/n6t2p61754060121.png',
+    sigla: 'CSC', torcida: '3k', potencial: 'B', atletasBase: 23,
+    estadio: 'Emílio Nemer', fundacao: 1917, sportsdb_id: 152616,
+    site: '', instagram: '', competicoes: ['capixabao'] },
   'Rio Branco-VN': { nome: 'Rio Branco-VN', cidade: 'Venda Nova do Imigrante · ES', divisao: 'Capixabão 2026', divisaoClasse: 'badge-gk',
-    escudo: 'https://upload.wikimedia.org/wikipedia/pt/8/8e/Rio_Branco_EC_VN.png',
-    sigla: 'RBVN', torcida: '2k', potencial: 'B', atletasBase: 21 }
+    escudo: 'https://r2.thesportsdb.com/images/media/team/badge/n4uzha1754116117.png',
+    sigla: 'RBVN', torcida: '2k', potencial: 'B', atletasBase: 21,
+    estadio: 'Olímpio Perim', fundacao: 1945, sportsdb_id: 142293,
+    site: '', instagram: '', competicoes: ['capixabao'] }
 };
 
 // ── Gerar dados de IA automaticamente por posição ──
@@ -2815,6 +2880,86 @@ const MATCHES = [
     ]
   }
 ];
+
+// ── Competições ──────────────────────────────
+const COMPETITIONS = {
+  'capixabao': {
+    nome: 'Campeonato Capixaba', edicao: '2026', sigla: 'CAP',
+    cor: '#22c55e', corClasse: 'badge-mid',
+    fase: 'Encerrado · Campeão: Porto Vitória',
+    times: ['Porto Vitória','Serra FC','Vitória ES','Rio Branco ES','Vilavelhense','Desportiva Ferroviária','Real Noroeste','Forte FC','Capixaba SC','Rio Branco-VN'],
+    classificacao: [
+      { pos:1, time:'Vitória ES',          pts:20, pj:11, v:6, e:2, d:3, gp:18, gs:10, sg:'+8' },
+      { pos:2, time:'Serra FC',            pts:18, pj:11, v:5, e:3, d:3, gp:15, gs:11, sg:'+4' },
+      { pos:3, time:'Porto Vitória',       pts:17, pj:11, v:5, e:2, d:4, gp:14, gs:13, sg:'+1' },
+      { pos:4, time:'Rio Branco ES',       pts:15, pj:11, v:4, e:3, d:4, gp:13, gs:14, sg:'-1' },
+      { pos:5, time:'Vilavelhense',        pts:14, pj:11, v:4, e:2, d:5, gp:11, gs:14, sg:'-3' },
+      { pos:6, time:'Desportiva Ferroviária', pts:12, pj:11, v:3, e:3, d:5, gp:10, gs:15, sg:'-5' },
+      { pos:7, time:'Real Noroeste',       pts:11, pj:11, v:3, e:2, d:6, gp:11, gs:17, sg:'-6' },
+      { pos:8, time:'Forte FC',            pts:10, pj:11, v:3, e:1, d:7, gp:10, gs:18, sg:'-8' },
+      { pos:9, time:'Capixaba SC',         pts:7,  pj:11, v:2, e:1, d:8, gp:8,  gs:20, sg:'-12' },
+      { pos:10, time:'Rio Branco-VN',      pts:5,  pj:11, v:1, e:2, d:8, gp:7,  gs:21, sg:'-14' }
+    ],
+    jogos: [
+      { data:'06/04', home:'Porto Vitória', away:'Serra FC', gh:3, ga:1, fase:'Final (Volta)' },
+      { data:'30/03', home:'Serra FC', away:'Porto Vitória', gh:1, ga:2, fase:'Final (Ida)' },
+      { data:'23/03', home:'Vitória ES', away:'Porto Vitória', gh:0, ga:2, fase:'Semi (Volta)' },
+      { data:'16/03', home:'Porto Vitória', away:'Vitória ES', gh:1, ga:0, fase:'Semi (Ida)' },
+      { data:'09/03', home:'Vitória ES', away:'Serra FC', gh:1, ga:1, fase:'Rodada 11' },
+      { data:'02/03', home:'Porto Vitória', away:'Desportiva Ferroviária', gh:2, ga:0, fase:'Rodada 10' },
+      { data:'23/02', home:'Serra FC', away:'Rio Branco ES', gh:2, ga:0, fase:'Rodada 9' },
+      { data:'16/02', home:'Real Noroeste', away:'Vitória ES', gh:0, ga:2, fase:'Rodada 8' }
+    ]
+  },
+  'copa-es': {
+    nome: 'Copa ES', edicao: '2026', sigla: 'CES',
+    cor: '#38bdf8', corClasse: 'badge-gk',
+    fase: 'Em andamento',
+    times: ['Rio Branco ES','Vitória ES','Serra FC','Porto Vitória','Desportiva Ferroviária','Real Noroeste','Vilavelhense'],
+    classificacao: [
+      { pos:1, time:'Rio Branco ES',   pts:9, pj:3, v:3, e:0, d:0, gp:7, gs:2, sg:'+5' },
+      { pos:2, time:'Serra FC',        pts:6, pj:3, v:2, e:0, d:1, gp:5, gs:3, sg:'+2' },
+      { pos:3, time:'Vitória ES',      pts:6, pj:3, v:2, e:0, d:1, gp:6, gs:4, sg:'+2' },
+      { pos:4, time:'Porto Vitória',   pts:3, pj:3, v:1, e:0, d:2, gp:4, gs:5, sg:'-1' },
+      { pos:5, time:'Vilavelhense',    pts:3, pj:3, v:1, e:0, d:2, gp:3, gs:6, sg:'-3' },
+      { pos:6, time:'Desportiva Ferroviária', pts:1, pj:3, v:0, e:1, d:2, gp:2, gs:6, sg:'-4' },
+      { pos:7, time:'Real Noroeste',   pts:0, pj:3, v:0, e:0, d:3, gp:1, gs:7, sg:'-6' }
+    ],
+    jogos: [
+      { data:'12/04', home:'Rio Branco ES', away:'Serra FC', gh:2, ga:1, fase:'Fase de Grupos' },
+      { data:'05/04', home:'Vitória ES', away:'Porto Vitória', gh:2, ga:1, fase:'Fase de Grupos' },
+      { data:'29/03', home:'Rio Branco ES', away:'Vilavelhense', gh:3, ga:0, fase:'Fase de Grupos' }
+    ]
+  },
+  'serie-d': {
+    nome: 'Brasileirão Série D', edicao: '2026', sigla: 'SÉR.D',
+    cor: '#f87171', corClasse: 'badge-atk',
+    fase: 'Fase 1 — Grupo A8',
+    times: ['Rio Branco ES'],
+    classificacao: [
+      { pos:1, time:'Rio Branco ES', pts:7, pj:4, v:2, e:1, d:1, gp:5, gs:3, sg:'+2' },
+      { pos:2, time:'Tuna Luso',     pts:6, pj:4, v:2, e:0, d:2, gp:4, gs:4, sg:'0'  },
+      { pos:3, time:'Fast Clube',    pts:4, pj:4, v:1, e:1, d:2, gp:3, gs:5, sg:'-2' },
+      { pos:4, time:'Princesa do Solimões', pts:2, pj:4, v:0, e:2, d:2, gp:2, gs:5, sg:'-3' }
+    ],
+    jogos: [
+      { data:'19/04', home:'Rio Branco ES', away:'Tuna Luso', gh:1, ga:1, fase:'Série D — Rodada 4' },
+      { data:'13/04', home:'Fast Clube', away:'Rio Branco ES', gh:0, ga:2, fase:'Série D — Rodada 3' },
+      { data:'06/04', home:'Rio Branco ES', away:'Princesa do Solimões', gh:2, ga:0, fase:'Série D — Rodada 2' }
+    ]
+  },
+  'copa-verde': {
+    nome: 'Copa Verde', edicao: '2026', sigla: 'C.VRD',
+    cor: '#a78bfa', corClasse: 'badge-def',
+    fase: '2ª Fase',
+    times: ['Rio Branco ES'],
+    classificacao: [],
+    jogos: [
+      { data:'23/04', home:'Rio Branco ES', away:'Independente-PA', gh:2, ga:0, fase:'Copa Verde — 2ª Fase (Ida)' },
+      { data:'09/04', home:'Rio Branco ES', away:'Galvez AC', gh:3, ga:1, fase:'Copa Verde — 1ª Fase' }
+    ]
+  }
+};
 
 // ── Renderizar lista de partidas ──
 function renderMatchList() {
@@ -3409,7 +3554,7 @@ function goTo(screenId, navEl) {
   if (screenId === 'comparativo')  setTimeout(renderComparativo, 60);
   if (screenId === 'formacao')     { initEvolucaoDropdown(); setTimeout(initFormCharts, 60); }
   if (screenId === 'partidas')     { showMatchList(); renderMatchList(); }
-  if (screenId === 'patrocinio')   renderPatrocinio();
+  if (screenId === 'time')         renderTeamScreen();
   if (screenId === 'jogadores')    renderVitrineJogadores();
 }
 function switchTab(e, paneId) {
@@ -4174,43 +4319,153 @@ function toggleTrainingDesc(el) {
 function initEvolucaoDropdown() {}
 function renderEvolucaoValores() {}
 
-// ── Patrocínio logic ─────────────────────────
-function renderPatrocinio() {
-  const gridEl = document.getElementById('patrocinio-club-grid');
-  if (!gridEl) return;
-  
-  let totalAtletas = 0;
-  let html = '';
-  
-  Object.values(CLUBS).forEach(c => {
-    // Conta quantos jogadores reais no banco PLAYERS pertencem a este clube
-    let countReais = 0;
-    Object.values(PLAYERS).forEach(p => {
-      if (p.clube === c.nome) countReais++;
+// ── Meu Time ─────────────────────────────────
+let _activeCompTab = null;
+
+function renderTeamScreen() {
+  const user = getCurrentUser();
+  const clubeNome = user ? user.clube : Object.keys(CLUBS)[0];
+  const c = CLUBS[clubeNome] || Object.values(CLUBS)[0];
+  if (!c) return;
+
+  // Topbar
+  document.getElementById('time-topbar-nome').textContent = c.nome;
+  document.getElementById('time-topbar-sub').textContent = c.cidade + ' · ' + c.estadio;
+
+  // Hero
+  const escEl = document.getElementById('time-escudo');
+  escEl.src = c.escudo; escEl.style.display = '';
+  document.getElementById('time-nome').textContent = c.nome;
+  document.getElementById('time-meta').textContent = c.cidade + ' · Fundado em ' + c.fundacao + ' · ' + c.estadio;
+  document.getElementById('time-fundacao').textContent = c.fundacao;
+  document.getElementById('time-estadio-val').textContent = c.estadio.split(' ').slice(-1)[0]; // Last word of stadium name
+  const atletasCount = c.atletasBase + Object.values(PLAYERS).filter(p => p.clube === c.nome).length;
+  document.getElementById('time-atletas-val').textContent = atletasCount;
+
+  // Badges de competições
+  const compsEl = document.getElementById('time-comps');
+  compsEl.innerHTML = (c.competicoes || []).map(id => {
+    const comp = COMPETITIONS[id];
+    if (!comp) return '';
+    return '<span class="badge ' + comp.corClasse + '" style="font-size:10px;cursor:pointer" onclick="switchCompTab(\'' + id + '\')">' + comp.sigla + '</span>';
+  }).join('');
+
+  // Tabs de competições
+  const tabsEl = document.getElementById('time-comp-tabs');
+  tabsEl.innerHTML = (c.competicoes || []).map((id, i) => {
+    const comp = COMPETITIONS[id];
+    if (!comp) return '';
+    return '<button class="tab-btn' + (i===0?' comp-tab-active':'') + '" id="ctab-' + id + '" onclick="switchCompTab(\'' + id + '\')">' + comp.nome + '</button>';
+  }).join('');
+
+  // Render primeira aba
+  _activeCompTab = (c.competicoes || [])[0] || null;
+  renderCompContent(c, _activeCompTab);
+
+  // Elenco
+  renderElencoTime(c.nome);
+}
+
+function switchCompTab(id) {
+  _activeCompTab = id;
+  document.querySelectorAll('#time-comp-tabs .tab-btn').forEach(b => b.classList.remove('comp-tab-active'));
+  const btn = document.getElementById('ctab-' + id);
+  if (btn) btn.classList.add('comp-tab-active');
+  const user = getCurrentUser();
+  const clubeNome = user ? user.clube : Object.keys(CLUBS)[0];
+  const c = CLUBS[clubeNome] || Object.values(CLUBS)[0];
+  renderCompContent(c, id);
+}
+
+function renderCompContent(clube, compId) {
+  const el = document.getElementById('time-comp-content');
+  if (!el || !compId) { if(el) el.innerHTML=''; return; }
+  const comp = COMPETITIONS[compId];
+  if (!comp) { el.innerHTML=''; return; }
+
+  // Classificação (destaca linha do clube atual)
+  let classHtml = '';
+  if (comp.classificacao && comp.classificacao.length > 0) {
+    classHtml = '<table class="class-table"><thead><tr>' +
+      '<th>#</th><th style="text-align:left">Clube</th>' +
+      '<th>PTS</th><th>PJ</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GS</th><th>SG</th>' +
+      '</tr></thead><tbody>';
+    comp.classificacao.forEach(row => {
+      const isMy = row.time === clube.nome;
+      const topCls = row.pos <= 4 ? ' top' : '';
+      classHtml += '<tr class="' + (isMy ? 'my-row' : '') + '">' +
+        '<td class="class-pos' + topCls + '">' + row.pos + '</td>' +
+        '<td style="text-align:left;font-weight:' + (isMy?'700':'400') + '">' +
+          (isMy ? '▶ ' : '') + row.time +
+        '</td>' +
+        '<td style="font-weight:700;color:var(--text-1)">' + row.pts + '</td>' +
+        '<td>' + row.pj + '</td><td>' + row.v + '</td><td>' + row.e + '</td><td>' + row.d + '</td>' +
+        '<td>' + row.gp + '</td><td>' + row.gs + '</td>' +
+        '<td style="color:' + (row.sg.startsWith('+') ? 'var(--green)' : row.sg===0||row.sg==='0' ? 'var(--text-3)' : 'var(--red)') + '">' + row.sg + '</td>' +
+      '</tr>';
     });
-    const qtdAtletas = c.atletasBase + countReais;
-    totalAtletas += qtdAtletas;
-    
-    html += '<div class="club-card">' +
-      '<div class="club-badge">' +
-        '<img src="' + c.escudo + '" alt="' + c.sigla + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
-        '<span style="display:none;align-items:center;justify-content:center;width:100%;height:100%;font-size:11px;font-weight:700;color:var(--text-1);font-family:var(--font-display)">' + c.sigla + '</span>' +
+    classHtml += '</tbody></table>';
+  }
+
+  // Jogos recentes filtrados pelo clube
+  let jogosHtml = '';
+  const jogosDoClube = (comp.jogos || []).filter(j => j.home === clube.nome || j.away === clube.nome);
+  if (jogosDoClube.length > 0) {
+    jogosHtml = jogosDoClube.map(j => {
+      const isMandante = j.home === clube.nome;
+      const ganhou = isMandante ? j.gh > j.ga : j.ga > j.gh;
+      const empatou = j.gh === j.ga;
+      const resCls = empatou ? 'jogo-d' : ganhou ? 'jogo-w' : 'jogo-l';
+      return '<div class="jogo-row">' +
+        '<div class="jogo-data">' + j.data + '</div>' +
+        '<div class="jogo-teams">' +
+          '<span style="font-weight:' + (isMandante?'700':'400') + '">' + j.home + '</span>' +
+          '<span class="jogo-score ' + resCls + '">' + j.gh + ' – ' + j.ga + '</span>' +
+          '<span style="font-weight:' + (!isMandante?'700':'400') + '">' + j.away + '</span>' +
+        '</div>' +
+        '<div class="jogo-fase">' + j.fase + '</div>' +
+      '</div>';
+    }).join('');
+  } else {
+    jogosHtml = '<div class="text-muted" style="font-size:12px;padding:12px 0">Nenhuma partida registrada nesta competição.</div>';
+  }
+
+  el.innerHTML = '<div class="grid-2-eq">' +
+    '<div class="card">' +
+      '<div class="card-title">Classificação <span>' + comp.nome + ' ' + comp.edicao + '</span>' +
+        '<span class="badge ' + comp.corClasse + '" style="font-size:10px;margin-left:6px">' + comp.fase + '</span>' +
       '</div>' +
-      '<div class="club-name">' + c.nome + '</div>' +
-      '<div class="club-city">' + c.cidade + '</div>' +
-      '<div style="text-align:center;margin-top:6px"><span class="badge ' + c.divisaoClasse + '" style="font-size:10px">' + c.divisao + '</span></div>' +
-      '<div class="club-divider"></div>' +
-      '<div class="club-stats">' +
-        '<div><div class="club-stat-num">' + qtdAtletas + '</div><div class="club-stat-lbl">Atletas</div></div>' +
-        '<div><div class="club-stat-num">' + c.torcida + '</div><div class="club-stat-lbl">Torcida</div></div>' +
-        '<div><div class="club-stat-num">' + c.potencial + '</div><div class="club-stat-lbl">Potencial</div></div>' +
+      (classHtml || '<div class="text-muted" style="font-size:12px">Classificação não disponível.</div>') +
+    '</div>' +
+    '<div class="card">' +
+      '<div class="card-title">Partidas Recentes <span>' + clube.nome + '</span></div>' +
+      jogosHtml +
+    '</div>' +
+  '</div>';
+}
+
+function renderElencoTime(clubeNome) {
+  const grid = document.getElementById('time-elenco-grid');
+  if (!grid) return;
+  const jogadores = Object.values(PLAYERS).filter(p => p.clube === clubeNome);
+  document.getElementById('time-elenco-count').textContent = '(' + jogadores.length + ' atletas cadastrados)';
+  if (jogadores.length === 0) {
+    grid.innerHTML = '<div class="text-muted" style="font-size:12px;padding:12px">Nenhum atleta cadastrado para este clube ainda.</div>';
+    return;
+  }
+  const ordem = { 'Goleiro':0, 'Zagueiro':1, 'Lateral':2, 'Volante':3, 'Meia':4, 'Atacante':5 };
+  const sorted = [...jogadores].sort((a,b) => (ordem[a.pos]||9) - (ordem[b.pos]||9));
+  grid.innerHTML = sorted.map(p => {
+    const avatarStyle = p.color ? 'background:' + p.color + ',.15);color:' + p.pointColor : 'background:rgba(34,197,94,.12);color:var(--green)';
+    return '<div class="elenco-card" onclick="goTo(\'perfil\',document.querySelector(\'[data-screen=perfil]\'));showPlayer(\'' + p.id + '\')">' +
+      '<div class="elenco-avatar" style="' + avatarStyle + '">' + p.iniciais + '</div>' +
+      '<div><div class="elenco-nome">' + p.nome + '</div>' +
+        '<div class="elenco-pos"><span class="badge ' + p.badgeClass + '" style="font-size:9px">' + p.pos + '</span>' +
+        (p.gols > 0 ? ' <span style="font-size:10px;color:var(--green)">⚽ ' + p.gols + '</span>' : '') +
+        '</div>' +
       '</div>' +
     '</div>';
-  });
-  gridEl.innerHTML = html;
-  
-  document.getElementById('sponsor-total-clubes').textContent = Object.keys(CLUBS).length;
-  document.getElementById('sponsor-total-atletas').textContent = totalAtletas;
+  }).join('');
 }
 
 // ── Inicializar stats reais na carga da página ──
