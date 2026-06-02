@@ -1,0 +1,3934 @@
+{
+  "capixabao": {
+    "jogos": [
+      {
+        "data": "28/03",
+        "home": "Serra FC",
+        "away": "Porto Vitória",
+        "fase": "Final (Volta)",
+        "gh": 2,
+        "ga": 1,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 59,
+            "a": 41,
+            "hs": "59%",
+            "as": "41%"
+          },
+          "escanteios": {
+            "h": 9,
+            "a": 5
+          },
+          "amarelos": {
+            "h": 1,
+            "a": 4
+          },
+          "chutesAlvo": {
+            "h": 7,
+            "a": 5
+          },
+          "finalizacoes": {
+            "h": 13,
+            "a": 8
+          }
+        }
+      },
+      {
+        "data": "21/03",
+        "home": "Porto Vitória",
+        "away": "Serra FC",
+        "fase": "Final (Ida)",
+        "gh": 3,
+        "ga": 1,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 54,
+            "a": 46,
+            "hs": "54%",
+            "as": "46%"
+          },
+          "escanteios": {
+            "h": 7,
+            "a": 5
+          },
+          "amarelos": {
+            "h": 2,
+            "a": 1
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 5,
+            "a": 1
+          },
+          "finalizacoes": {
+            "h": 10,
+            "a": 6
+          }
+        }
+      },
+      {
+        "data": "15/03",
+        "home": "Serra FC",
+        "away": "Vilavelhense",
+        "fase": "Semifinal (Volta)",
+        "gh": 1,
+        "ga": 0,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 47,
+            "a": 53,
+            "hs": "47%",
+            "as": "53%"
+          },
+          "escanteios": {
+            "h": 6,
+            "a": 4
+          },
+          "amarelos": {
+            "h": 3,
+            "a": 2
+          },
+          "chutesAlvo": {
+            "h": 5,
+            "a": 1
+          },
+          "finalizacoes": {
+            "h": 10,
+            "a": 5
+          }
+        }
+      },
+      {
+        "data": "14/03",
+        "home": "Vitória ES",
+        "away": "Porto Vitória",
+        "fase": "Semifinal (Volta)",
+        "gh": 1,
+        "ga": 5,
+        "pen": true
+      },
+      {
+        "data": "08/03",
+        "home": "Porto Vitória",
+        "away": "Vitória ES",
+        "fase": "Semifinal (Ida)",
+        "gh": 0,
+        "ga": 4,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 53,
+            "a": 47,
+            "hs": "53%",
+            "as": "47%"
+          },
+          "escanteios": {
+            "h": 10,
+            "a": 2
+          },
+          "amarelos": {
+            "h": 3,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 8,
+            "a": 4
+          },
+          "finalizacoes": {
+            "h": 14,
+            "a": 6
+          }
+        }
+      },
+      {
+        "data": "07/03",
+        "home": "Vilavelhense",
+        "away": "Serra FC",
+        "fase": "Semifinal (Ida)",
+        "gh": 1,
+        "ga": 2,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 60,
+            "a": 40,
+            "hs": "60%",
+            "as": "40%"
+          },
+          "escanteios": {
+            "h": 7,
+            "a": 5
+          },
+          "amarelos": {
+            "h": 1,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 5,
+            "a": 4
+          },
+          "finalizacoes": {
+            "h": 12,
+            "a": 11
+          }
+        }
+      },
+      {
+        "data": "01/03",
+        "home": "Vitória ES",
+        "away": "Forte FC",
+        "fase": "Quartas (Volta)",
+        "gh": 4,
+        "ga": 1,
+        "stats": {
+          "posse": {
+            "h": 56,
+            "a": 44,
+            "hs": "56%",
+            "as": "44%"
+          },
+          "escanteios": {
+            "h": 4,
+            "a": 1
+          },
+          "amarelos": {
+            "h": 1,
+            "a": 3
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 7,
+            "a": 1
+          },
+          "finalizacoes": {
+            "h": 10,
+            "a": 3
+          }
+        }
+      },
+      {
+        "data": "28/02",
+        "home": "Rio Branco ES",
+        "away": "Porto Vitória",
+        "fase": "Quartas (Volta)",
+        "gh": 0,
+        "ga": 1,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 58,
+            "a": 42,
+            "hs": "58%",
+            "as": "42%"
+          },
+          "escanteios": {
+            "h": 8,
+            "a": 2
+          },
+          "amarelos": {
+            "h": 2,
+            "a": 3
+          },
+          "chutesAlvo": {
+            "h": 4,
+            "a": 2
+          },
+          "finalizacoes": {
+            "h": 11,
+            "a": 9
+          }
+        }
+      },
+      {
+        "data": "27/02",
+        "home": "Vilavelhense",
+        "away": "Desportiva Ferroviária",
+        "fase": "Quartas (Volta)",
+        "gh": 1,
+        "ga": 1,
+        "stats": {
+          "posse": {
+            "h": 33,
+            "a": 67,
+            "hs": "33%",
+            "as": "67%"
+          },
+          "escanteios": {
+            "h": 0,
+            "a": 5
+          },
+          "amarelos": {
+            "h": 4,
+            "a": 1
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 4,
+            "a": 3
+          },
+          "finalizacoes": {
+            "h": 9,
+            "a": 17
+          }
+        }
+      },
+      {
+        "data": "26/02",
+        "home": "Serra FC",
+        "away": "Real Noroeste",
+        "fase": "Quartas (Volta)",
+        "gh": 1,
+        "ga": 0,
+        "stats": {
+          "posse": {
+            "h": 59,
+            "a": 41,
+            "hs": "59%",
+            "as": "41%"
+          },
+          "escanteios": {
+            "h": 6,
+            "a": 1
+          },
+          "amarelos": {
+            "h": 8,
+            "a": 8
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 5,
+            "a": 5
+          },
+          "finalizacoes": {
+            "h": 12,
+            "a": 9
+          }
+        }
+      },
+      {
+        "data": "23/02",
+        "home": "Forte FC",
+        "away": "Vitória ES",
+        "fase": "Quartas (Ida)",
+        "gh": 1,
+        "ga": 1,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 36,
+            "a": 64,
+            "hs": "36%",
+            "as": "64%"
+          },
+          "escanteios": {
+            "h": 2,
+            "a": 4
+          },
+          "amarelos": {
+            "h": 3,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 2,
+            "a": 3
+          },
+          "finalizacoes": {
+            "h": 4,
+            "a": 10
+          }
+        }
+      },
+      {
+        "data": "22/02",
+        "home": "Desportiva Ferroviária",
+        "away": "Vilavelhense",
+        "fase": "Quartas (Ida)",
+        "gh": 1,
+        "ga": 1,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 57,
+            "a": 43,
+            "hs": "57%",
+            "as": "43%"
+          },
+          "escanteios": {
+            "h": 5,
+            "a": 2
+          },
+          "amarelos": {
+            "h": 2,
+            "a": 3
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 3,
+            "a": 5
+          },
+          "finalizacoes": {
+            "h": 11,
+            "a": 8
+          }
+        }
+      },
+      {
+        "data": "21/02",
+        "home": "Porto Vitória",
+        "away": "Rio Branco ES",
+        "fase": "Quartas (Ida)",
+        "gh": 1,
+        "ga": 1,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 48,
+            "a": 52,
+            "hs": "48%",
+            "as": "52%"
+          },
+          "escanteios": {
+            "h": 2,
+            "a": 4
+          },
+          "amarelos": {
+            "h": 2,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 4,
+            "a": 2
+          },
+          "finalizacoes": {
+            "h": 9,
+            "a": 7
+          }
+        }
+      },
+      {
+        "data": "20/02",
+        "home": "Real Noroeste",
+        "away": "Serra FC",
+        "fase": "Quartas (Ida)",
+        "gh": 2,
+        "ga": 1,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 50,
+            "a": 50,
+            "hs": "50%",
+            "as": "50%"
+          },
+          "escanteios": {
+            "h": 0,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 0,
+            "a": 0
+          },
+          "finalizacoes": {
+            "h": 0,
+            "a": 0
+          }
+        }
+      },
+      {
+        "data": "12/02",
+        "home": "Rio Branco-VN",
+        "away": "Rio Branco ES",
+        "fase": "Capixabão — Rodada 9",
+        "gh": 2,
+        "ga": 2,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 50,
+            "a": 50,
+            "hs": "50%",
+            "as": "50%"
+          },
+          "escanteios": {
+            "h": 0,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 0,
+            "a": 0
+          },
+          "finalizacoes": {
+            "h": 0,
+            "a": 0
+          }
+        }
+      },
+      {
+        "data": "12/02",
+        "home": "Serra FC",
+        "away": "Vitória ES",
+        "fase": "Capixabão — Rodada 9",
+        "gh": 1,
+        "ga": 2,
+        "stats": {
+          "posse": {
+            "h": 45,
+            "a": 55,
+            "hs": "45%",
+            "as": "55%"
+          },
+          "escanteios": {
+            "h": 2,
+            "a": 8
+          },
+          "faltas": {
+            "h": 17,
+            "a": 10
+          },
+          "amarelos": {
+            "h": 3,
+            "a": 4
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "impedimentos": {
+            "h": 1,
+            "a": 2
+          },
+          "chutesAlvo": {
+            "h": 2,
+            "a": 4
+          },
+          "finalizacoes": {
+            "h": 5,
+            "a": 7
+          }
+        }
+      },
+      {
+        "data": "12/02",
+        "home": "Porto Vitória",
+        "away": "Vilavelhense",
+        "fase": "Capixabão — Rodada 9",
+        "gh": 1,
+        "ga": 0,
+        "stats": {
+          "posse": {
+            "h": 47,
+            "a": 53,
+            "hs": "47%",
+            "as": "53%"
+          },
+          "escanteios": {
+            "h": 8,
+            "a": 6
+          },
+          "faltas": {
+            "h": 10,
+            "a": 4
+          },
+          "amarelos": {
+            "h": 2,
+            "a": 0
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "impedimentos": {
+            "h": 0,
+            "a": 3
+          },
+          "chutesAlvo": {
+            "h": 5,
+            "a": 3
+          },
+          "finalizacoes": {
+            "h": 13,
+            "a": 7
+          }
+        }
+      },
+      {
+        "data": "12/02",
+        "home": "Capixaba SC",
+        "away": "Real Noroeste",
+        "fase": "Capixabão — Rodada 9",
+        "gh": 0,
+        "ga": 2,
+        "stats": {
+          "posse": {
+            "h": 50,
+            "a": 50,
+            "hs": "50%",
+            "as": "50%"
+          },
+          "escanteios": {
+            "h": 6,
+            "a": 5
+          },
+          "faltas": {
+            "h": 8,
+            "a": 16
+          },
+          "amarelos": {
+            "h": 1,
+            "a": 2
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "impedimentos": {
+            "h": 0,
+            "a": 3
+          },
+          "chutesAlvo": {
+            "h": 0,
+            "a": 8
+          },
+          "finalizacoes": {
+            "h": 3,
+            "a": 17
+          }
+        }
+      },
+      {
+        "data": "12/02",
+        "home": "Forte FC",
+        "away": "Desportiva Ferroviária",
+        "fase": "Capixabão — Rodada 9",
+        "gh": 0,
+        "ga": 1,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 50,
+            "a": 50,
+            "hs": "50%",
+            "as": "50%"
+          },
+          "escanteios": {
+            "h": 0,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 0,
+            "a": 0
+          },
+          "finalizacoes": {
+            "h": 0,
+            "a": 0
+          }
+        }
+      },
+      {
+        "data": "09/02",
+        "home": "Vilavelhense",
+        "away": "Serra FC",
+        "fase": "Capixabão — Rodada 8",
+        "gh": 1,
+        "ga": 0,
+        "stats": {
+          "posse": {
+            "h": 37,
+            "a": 63,
+            "hs": "37%",
+            "as": "63%"
+          },
+          "escanteios": {
+            "h": 1,
+            "a": 10
+          },
+          "faltas": {
+            "h": 15,
+            "a": 12
+          },
+          "amarelos": {
+            "h": 3,
+            "a": 2
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "impedimentos": {
+            "h": 1,
+            "a": 5
+          },
+          "chutesAlvo": {
+            "h": 2,
+            "a": 2
+          },
+          "finalizacoes": {
+            "h": 7,
+            "a": 10
+          }
+        }
+      },
+      {
+        "data": "08/02",
+        "home": "Real Noroeste",
+        "away": "Porto Vitória",
+        "fase": "Capixabão — Rodada 8",
+        "gh": 0,
+        "ga": 1,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 50,
+            "a": 50,
+            "hs": "50%",
+            "as": "50%"
+          },
+          "escanteios": {
+            "h": 0,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 0,
+            "a": 0
+          },
+          "finalizacoes": {
+            "h": 0,
+            "a": 0
+          }
+        }
+      },
+      {
+        "data": "08/02",
+        "home": "Desportiva Ferroviária",
+        "away": "Capixaba SC",
+        "fase": "Capixabão — Rodada 8",
+        "gh": 0,
+        "ga": 1,
+        "stats": {
+          "posse": {
+            "h": 55,
+            "a": 45,
+            "hs": "55%",
+            "as": "45%"
+          },
+          "escanteios": {
+            "h": 10,
+            "a": 3
+          },
+          "faltas": {
+            "h": 14,
+            "a": 12
+          },
+          "amarelos": {
+            "h": 1,
+            "a": 3
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "impedimentos": {
+            "h": 2,
+            "a": 2
+          },
+          "chutesAlvo": {
+            "h": 3,
+            "a": 2
+          },
+          "finalizacoes": {
+            "h": 12,
+            "a": 6
+          }
+        }
+      },
+      {
+        "data": "07/02",
+        "home": "Vitória ES",
+        "away": "Rio Branco-VN",
+        "fase": "Capixabão — Rodada 8",
+        "gh": 3,
+        "ga": 0,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 55,
+            "a": 45,
+            "hs": "55%",
+            "as": "45%"
+          },
+          "escanteios": {
+            "h": 4,
+            "a": 4
+          },
+          "amarelos": {
+            "h": 1,
+            "a": 2
+          },
+          "chutesAlvo": {
+            "h": 6,
+            "a": 3
+          },
+          "finalizacoes": {
+            "h": 14,
+            "a": 7
+          }
+        }
+      },
+      {
+        "data": "07/02",
+        "home": "Rio Branco ES",
+        "away": "Forte FC",
+        "fase": "Capixabão — Rodada 8",
+        "gh": 0,
+        "ga": 0,
+        "stats": {
+          "posse": {
+            "h": 66,
+            "a": 34,
+            "hs": "66%",
+            "as": "34%"
+          },
+          "escanteios": {
+            "h": 9,
+            "a": 2
+          },
+          "faltas": {
+            "h": 15,
+            "a": 13
+          },
+          "amarelos": {
+            "h": 6,
+            "a": 6
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "impedimentos": {
+            "h": 0,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 6,
+            "a": 1
+          },
+          "finalizacoes": {
+            "h": 16,
+            "a": 2
+          }
+        }
+      },
+      {
+        "data": "05/02",
+        "home": "Real Noroeste",
+        "away": "Desportiva Ferroviária",
+        "fase": "Capixabão — Rodada 7",
+        "gh": 3,
+        "ga": 2,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 43,
+            "a": 57,
+            "hs": "43%",
+            "as": "57%"
+          },
+          "escanteios": {
+            "h": 5,
+            "a": 8
+          },
+          "amarelos": {
+            "h": 6,
+            "a": 5
+          },
+          "vermelhos": {
+            "h": 1,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 9,
+            "a": 4
+          },
+          "finalizacoes": {
+            "h": 17,
+            "a": 11
+          }
+        }
+      },
+      {
+        "data": "04/02",
+        "home": "Forte FC",
+        "away": "Vitória ES",
+        "fase": "Capixabão — Rodada 7",
+        "gh": 0,
+        "ga": 0,
+        "stats": {
+          "posse": {
+            "h": 26,
+            "a": 74,
+            "hs": "26%",
+            "as": "74%"
+          },
+          "escanteios": {
+            "h": 0,
+            "a": 7
+          },
+          "faltas": {
+            "h": 21,
+            "a": 9
+          },
+          "amarelos": {
+            "h": 5,
+            "a": 2
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "impedimentos": {
+            "h": 0,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 2,
+            "a": 7
+          },
+          "finalizacoes": {
+            "h": 5,
+            "a": 14
+          }
+        }
+      },
+      {
+        "data": "04/02",
+        "home": "Capixaba SC",
+        "away": "Rio Branco ES",
+        "fase": "Capixabão — Rodada 7",
+        "gh": 0,
+        "ga": 2,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 50,
+            "a": 50,
+            "hs": "50%",
+            "as": "50%"
+          },
+          "escanteios": {
+            "h": 0,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 0,
+            "a": 0
+          },
+          "finalizacoes": {
+            "h": 0,
+            "a": 0
+          }
+        }
+      },
+      {
+        "data": "03/02",
+        "home": "Porto Vitória",
+        "away": "Serra FC",
+        "fase": "Capixabão — Rodada 7",
+        "gh": 0,
+        "ga": 1,
+        "stats": {
+          "posse": {
+            "h": 59,
+            "a": 41,
+            "hs": "59%",
+            "as": "41%"
+          },
+          "escanteios": {
+            "h": 7,
+            "a": 2
+          },
+          "faltas": {
+            "h": 12,
+            "a": 6
+          },
+          "amarelos": {
+            "h": 3,
+            "a": 2
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "impedimentos": {
+            "h": 0,
+            "a": 2
+          },
+          "chutesAlvo": {
+            "h": 3,
+            "a": 4
+          },
+          "finalizacoes": {
+            "h": 9,
+            "a": 8
+          }
+        }
+      },
+      {
+        "data": "03/02",
+        "home": "Rio Branco-VN",
+        "away": "Vilavelhense",
+        "fase": "Capixabão — Rodada 7",
+        "gh": 0,
+        "ga": 1,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 56,
+            "a": 44,
+            "hs": "56%",
+            "as": "44%"
+          },
+          "escanteios": {
+            "h": 9,
+            "a": 2
+          },
+          "amarelos": {
+            "h": 2,
+            "a": 5
+          },
+          "vermelhos": {
+            "h": 1,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 0,
+            "a": 1
+          },
+          "finalizacoes": {
+            "h": 6,
+            "a": 8
+          }
+        }
+      },
+      {
+        "data": "01/02",
+        "home": "Rio Branco ES",
+        "away": "Real Noroeste",
+        "fase": "Capixabão — Rodada 6",
+        "gh": 0,
+        "ga": 1,
+        "stats": {
+          "posse": {
+            "h": 57,
+            "a": 43,
+            "hs": "57%",
+            "as": "43%"
+          },
+          "escanteios": {
+            "h": 6,
+            "a": 3
+          },
+          "faltas": {
+            "h": 17,
+            "a": 20
+          },
+          "amarelos": {
+            "h": 0,
+            "a": 4
+          },
+          "vermelhos": {
+            "h": 1,
+            "a": 0
+          },
+          "impedimentos": {
+            "h": 1,
+            "a": 2
+          },
+          "chutesAlvo": {
+            "h": 3,
+            "a": 3
+          },
+          "finalizacoes": {
+            "h": 8,
+            "a": 7
+          }
+        }
+      },
+      {
+        "data": "01/02",
+        "home": "Vitória ES",
+        "away": "Capixaba SC",
+        "fase": "Capixabão — Rodada 6",
+        "gh": 2,
+        "ga": 0,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 49,
+            "a": 51,
+            "hs": "49%",
+            "as": "51%"
+          },
+          "escanteios": {
+            "h": 3,
+            "a": 2
+          },
+          "amarelos": {
+            "h": 2,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 8,
+            "a": 1
+          },
+          "finalizacoes": {
+            "h": 11,
+            "a": 6
+          }
+        }
+      },
+      {
+        "data": "01/02",
+        "home": "Vilavelhense",
+        "away": "Forte FC",
+        "fase": "Capixabão — Rodada 6",
+        "gh": 1,
+        "ga": 1,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 49,
+            "a": 51,
+            "hs": "49%",
+            "as": "51%"
+          },
+          "escanteios": {
+            "h": 9,
+            "a": 5
+          },
+          "amarelos": {
+            "h": 3,
+            "a": 7
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 6,
+            "a": 3
+          },
+          "finalizacoes": {
+            "h": 17,
+            "a": 5
+          }
+        }
+      },
+      {
+        "data": "31/01",
+        "home": "Serra FC",
+        "away": "Rio Branco-VN",
+        "fase": "Capixabão — Rodada 6",
+        "gh": 1,
+        "ga": 0,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 57,
+            "a": 43,
+            "hs": "57%",
+            "as": "43%"
+          },
+          "escanteios": {
+            "h": 3,
+            "a": 3
+          },
+          "amarelos": {
+            "h": 1,
+            "a": 1
+          },
+          "vermelhos": {
+            "h": 1,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 2,
+            "a": 2
+          },
+          "finalizacoes": {
+            "h": 6,
+            "a": 5
+          }
+        }
+      },
+      {
+        "data": "31/01",
+        "home": "Desportiva Ferroviária",
+        "away": "Porto Vitória",
+        "fase": "Capixabão — Rodada 6",
+        "gh": 0,
+        "ga": 0,
+        "stats": {
+          "posse": {
+            "h": 61,
+            "a": 39,
+            "hs": "61%",
+            "as": "39%"
+          },
+          "escanteios": {
+            "h": 2,
+            "a": 4
+          },
+          "faltas": {
+            "h": 11,
+            "a": 14
+          },
+          "amarelos": {
+            "h": 2,
+            "a": 4
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 1
+          },
+          "impedimentos": {
+            "h": 1,
+            "a": 0
+          }
+        }
+      },
+      {
+        "data": "29/01",
+        "home": "Real Noroeste",
+        "away": "Vitória ES",
+        "fase": "Capixabão — Rodada 5",
+        "gh": 0,
+        "ga": 4,
+        "stats": {
+          "posse": {
+            "h": 47,
+            "a": 53,
+            "hs": "47%",
+            "as": "53%"
+          },
+          "escanteios": {
+            "h": 2,
+            "a": 5
+          },
+          "faltas": {
+            "h": 10,
+            "a": 9
+          },
+          "amarelos": {
+            "h": 6,
+            "a": 1
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "impedimentos": {
+            "h": 0,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 2,
+            "a": 8
+          },
+          "finalizacoes": {
+            "h": 5,
+            "a": 13
+          }
+        }
+      },
+      {
+        "data": "29/01",
+        "home": "Capixaba SC",
+        "away": "Vilavelhense",
+        "fase": "Capixabão — Rodada 5",
+        "gh": 2,
+        "ga": 1,
+        "stats": {
+          "posse": {
+            "h": 41,
+            "a": 59,
+            "hs": "41%",
+            "as": "59%"
+          },
+          "escanteios": {
+            "h": 5,
+            "a": 6
+          },
+          "faltas": {
+            "h": 15,
+            "a": 11
+          },
+          "amarelos": {
+            "h": 3,
+            "a": 2
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "impedimentos": {
+            "h": 1,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 5,
+            "a": 3
+          },
+          "finalizacoes": {
+            "h": 7,
+            "a": 12
+          }
+        }
+      },
+      {
+        "data": "28/01",
+        "home": "Porto Vitória",
+        "away": "Rio Branco-VN",
+        "fase": "Capixabão — Rodada 5",
+        "gh": 2,
+        "ga": 2,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 53,
+            "a": 47,
+            "hs": "53%",
+            "as": "47%"
+          },
+          "escanteios": {
+            "h": 7,
+            "a": 4
+          },
+          "amarelos": {
+            "h": 4,
+            "a": 3
+          },
+          "vermelhos": {
+            "h": 1,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 5,
+            "a": 4
+          },
+          "finalizacoes": {
+            "h": 13,
+            "a": 8
+          }
+        }
+      },
+      {
+        "data": "28/01",
+        "home": "Forte FC",
+        "away": "Serra FC",
+        "fase": "Capixabão — Rodada 5",
+        "gh": 2,
+        "ga": 0,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 53,
+            "a": 47,
+            "hs": "53%",
+            "as": "47%"
+          },
+          "escanteios": {
+            "h": 3,
+            "a": 3
+          },
+          "amarelos": {
+            "h": 4,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 3,
+            "a": 2
+          },
+          "finalizacoes": {
+            "h": 6,
+            "a": 8
+          }
+        }
+      },
+      {
+        "data": "27/01",
+        "home": "Desportiva Ferroviária",
+        "away": "Rio Branco ES",
+        "fase": "Capixabão — Rodada 5",
+        "gh": 1,
+        "ga": 1,
+        "stats": {
+          "posse": {
+            "h": 61,
+            "a": 39,
+            "hs": "61%",
+            "as": "39%"
+          },
+          "escanteios": {
+            "h": 7,
+            "a": 2
+          },
+          "faltas": {
+            "h": 10,
+            "a": 14
+          },
+          "amarelos": {
+            "h": 2,
+            "a": 5
+          },
+          "impedimentos": {
+            "h": 1,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 5,
+            "a": 2
+          },
+          "finalizacoes": {
+            "h": 10,
+            "a": 9
+          }
+        }
+      },
+      {
+        "data": "26/01",
+        "home": "Vilavelhense",
+        "away": "Real Noroeste",
+        "fase": "Capixabão — Rodada 4",
+        "gh": 1,
+        "ga": 0,
+        "stats": {
+          "posse": {
+            "h": 48,
+            "a": 52,
+            "hs": "48%",
+            "as": "52%"
+          },
+          "escanteios": {
+            "h": 4,
+            "a": 3
+          },
+          "faltas": {
+            "h": 15,
+            "a": 17
+          },
+          "amarelos": {
+            "h": 2,
+            "a": 4
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "impedimentos": {
+            "h": 1,
+            "a": 2
+          },
+          "chutesAlvo": {
+            "h": 2,
+            "a": 4
+          },
+          "finalizacoes": {
+            "h": 4,
+            "a": 8
+          }
+        }
+      },
+      {
+        "data": "25/01",
+        "home": "Serra FC",
+        "away": "Capixaba SC",
+        "fase": "Capixabão — Rodada 4",
+        "gh": 3,
+        "ga": 0,
+        "stats": {
+          "posse": {
+            "h": 57,
+            "a": 43,
+            "hs": "57%",
+            "as": "43%"
+          },
+          "escanteios": {
+            "h": 3,
+            "a": 6
+          },
+          "faltas": {
+            "h": 15,
+            "a": 9
+          },
+          "amarelos": {
+            "h": 3,
+            "a": 0
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "impedimentos": {
+            "h": 0,
+            "a": 2
+          },
+          "chutesAlvo": {
+            "h": 7,
+            "a": 2
+          },
+          "finalizacoes": {
+            "h": 9,
+            "a": 6
+          }
+        }
+      },
+      {
+        "data": "25/01",
+        "home": "Rio Branco-VN",
+        "away": "Forte FC",
+        "fase": "Capixabão — Rodada 4",
+        "gh": 0,
+        "ga": 0,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 60,
+            "a": 40,
+            "hs": "60%",
+            "as": "40%"
+          },
+          "escanteios": {
+            "h": 8,
+            "a": 2
+          },
+          "amarelos": {
+            "h": 3,
+            "a": 2
+          },
+          "chutesAlvo": {
+            "h": 7,
+            "a": 3
+          },
+          "finalizacoes": {
+            "h": 15,
+            "a": 5
+          }
+        }
+      },
+      {
+        "data": "24/01",
+        "home": "Vitória ES",
+        "away": "Desportiva Ferroviária",
+        "fase": "Capixabão — Rodada 4",
+        "gh": 0,
+        "ga": 2,
+        "stats": {
+          "posse": {
+            "h": 42,
+            "a": 58,
+            "hs": "42%",
+            "as": "58%"
+          },
+          "escanteios": {
+            "h": 2,
+            "a": 1
+          },
+          "faltas": {
+            "h": 12,
+            "a": 12
+          },
+          "amarelos": {
+            "h": 2,
+            "a": 5
+          },
+          "vermelhos": {
+            "h": 1,
+            "a": 0
+          },
+          "impedimentos": {
+            "h": 0,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 5,
+            "a": 2
+          },
+          "finalizacoes": {
+            "h": 9,
+            "a": 6
+          }
+        }
+      },
+      {
+        "data": "24/01",
+        "home": "Rio Branco ES",
+        "away": "Porto Vitória",
+        "fase": "Capixabão — Rodada 4",
+        "gh": 1,
+        "ga": 0,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 51,
+            "a": 49,
+            "hs": "51%",
+            "as": "49%"
+          },
+          "escanteios": {
+            "h": 4,
+            "a": 6
+          },
+          "amarelos": {
+            "h": 3,
+            "a": 4
+          },
+          "chutesAlvo": {
+            "h": 4,
+            "a": 3
+          },
+          "finalizacoes": {
+            "h": 12,
+            "a": 11
+          }
+        }
+      },
+      {
+        "data": "22/01",
+        "home": "Capixaba SC",
+        "away": "Rio Branco-VN",
+        "fase": "Capixabão — Rodada 3",
+        "gh": 1,
+        "ga": 1,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 53,
+            "a": 47,
+            "hs": "53%",
+            "as": "47%"
+          },
+          "escanteios": {
+            "h": 4,
+            "a": 5
+          },
+          "amarelos": {
+            "h": 2,
+            "a": 3
+          },
+          "chutesAlvo": {
+            "h": 6,
+            "a": 3
+          },
+          "finalizacoes": {
+            "h": 9,
+            "a": 8
+          }
+        }
+      },
+      {
+        "data": "22/01",
+        "home": "Real Noroeste",
+        "away": "Serra FC",
+        "fase": "Capixabão — Rodada 3",
+        "gh": 1,
+        "ga": 1,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 51,
+            "a": 49,
+            "hs": "51%",
+            "as": "49%"
+          },
+          "escanteios": {
+            "h": 6,
+            "a": 6
+          },
+          "amarelos": {
+            "h": 6,
+            "a": 2
+          },
+          "chutesAlvo": {
+            "h": 3,
+            "a": 4
+          },
+          "finalizacoes": {
+            "h": 5,
+            "a": 7
+          }
+        }
+      },
+      {
+        "data": "21/01",
+        "home": "Rio Branco ES",
+        "away": "Vitória ES",
+        "fase": "Capixabão — Rodada 3",
+        "gh": 0,
+        "ga": 1,
+        "stats": {
+          "posse": {
+            "h": 43,
+            "a": 57,
+            "hs": "43%",
+            "as": "57%"
+          },
+          "escanteios": {
+            "h": 2,
+            "a": 2
+          },
+          "faltas": {
+            "h": 16,
+            "a": 18
+          },
+          "amarelos": {
+            "h": 4,
+            "a": 4
+          },
+          "vermelhos": {
+            "h": 1,
+            "a": 0
+          },
+          "impedimentos": {
+            "h": 1,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 3,
+            "a": 3
+          },
+          "finalizacoes": {
+            "h": 5,
+            "a": 6
+          }
+        }
+      },
+      {
+        "data": "21/01",
+        "home": "Porto Vitória",
+        "away": "Forte FC",
+        "fase": "Capixabão — Rodada 3",
+        "gh": 0,
+        "ga": 0,
+        "stats": {
+          "posse": {
+            "h": 63,
+            "a": 37,
+            "hs": "63%",
+            "as": "37%"
+          },
+          "escanteios": {
+            "h": 4,
+            "a": 5
+          },
+          "faltas": {
+            "h": 19,
+            "a": 4
+          },
+          "amarelos": {
+            "h": 0,
+            "a": 3
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "impedimentos": {
+            "h": 0,
+            "a": 2
+          },
+          "chutesAlvo": {
+            "h": 3,
+            "a": 2
+          },
+          "finalizacoes": {
+            "h": 7,
+            "a": 5
+          }
+        }
+      },
+      {
+        "data": "20/01",
+        "home": "Desportiva Ferroviária",
+        "away": "Vilavelhense",
+        "fase": "Capixabão — Rodada 3",
+        "gh": 1,
+        "ga": 2,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 51,
+            "a": 49,
+            "hs": "51%",
+            "as": "49%"
+          },
+          "escanteios": {
+            "h": 4,
+            "a": 0
+          },
+          "amarelos": {
+            "h": 3,
+            "a": 4
+          },
+          "chutesAlvo": {
+            "h": 3,
+            "a": 6
+          },
+          "finalizacoes": {
+            "h": 9,
+            "a": 7
+          }
+        }
+      },
+      {
+        "data": "18/01",
+        "home": "Forte FC",
+        "away": "Capixaba SC",
+        "fase": "Capixabão — Rodada 2",
+        "gh": 0,
+        "ga": 2,
+        "stats": {
+          "posse": {
+            "h": 47,
+            "a": 53,
+            "hs": "47%",
+            "as": "53%"
+          },
+          "escanteios": {
+            "h": 1,
+            "a": 3
+          },
+          "faltas": {
+            "h": 16,
+            "a": 14
+          },
+          "amarelos": {
+            "h": 2,
+            "a": 1
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "impedimentos": {
+            "h": 0,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 1,
+            "a": 2
+          },
+          "finalizacoes": {
+            "h": 3,
+            "a": 5
+          }
+        }
+      },
+      {
+        "data": "18/01",
+        "home": "Rio Branco-VN",
+        "away": "Real Noroeste",
+        "fase": "Capixabão — Rodada 2",
+        "gh": 2,
+        "ga": 2,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 53,
+            "a": 47,
+            "hs": "53%",
+            "as": "47%"
+          },
+          "escanteios": {
+            "h": 8,
+            "a": 6
+          },
+          "amarelos": {
+            "h": 3,
+            "a": 2
+          },
+          "chutesAlvo": {
+            "h": 6,
+            "a": 7
+          },
+          "finalizacoes": {
+            "h": 10,
+            "a": 9
+          }
+        }
+      },
+      {
+        "data": "17/01",
+        "home": "Vilavelhense",
+        "away": "Rio Branco ES",
+        "fase": "Capixabão — Rodada 2",
+        "gh": 1,
+        "ga": 4,
+        "stats": {
+          "posse": {
+            "h": 55,
+            "a": 45,
+            "hs": "55%",
+            "as": "45%"
+          },
+          "escanteios": {
+            "h": 0,
+            "a": 1
+          },
+          "faltas": {
+            "h": 1,
+            "a": 4
+          },
+          "amarelos": {
+            "h": 1,
+            "a": 0
+          },
+          "impedimentos": {
+            "h": 0,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 0,
+            "a": 1
+          },
+          "finalizacoes": {
+            "h": 0,
+            "a": 1
+          }
+        }
+      },
+      {
+        "data": "17/01",
+        "home": "Vitória ES",
+        "away": "Porto Vitória",
+        "fase": "Capixabão — Rodada 2",
+        "gh": 1,
+        "ga": 1,
+        "stats": {
+          "posse": {
+            "h": 57,
+            "a": 43,
+            "hs": "57%",
+            "as": "43%"
+          },
+          "escanteios": {
+            "h": 6,
+            "a": 1
+          },
+          "faltas": {
+            "h": 7,
+            "a": 10
+          },
+          "amarelos": {
+            "h": 2,
+            "a": 2
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "impedimentos": {
+            "h": 2,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 6,
+            "a": 3
+          },
+          "finalizacoes": {
+            "h": 13,
+            "a": 8
+          }
+        }
+      },
+      {
+        "data": "16/01",
+        "home": "Serra FC",
+        "away": "Desportiva Ferroviária",
+        "fase": "Capixabão — Rodada 2",
+        "gh": 3,
+        "ga": 0,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 54,
+            "a": 46,
+            "hs": "54%",
+            "as": "46%"
+          },
+          "escanteios": {
+            "h": 2,
+            "a": 4
+          },
+          "amarelos": {
+            "h": 0,
+            "a": 3
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 2
+          },
+          "chutesAlvo": {
+            "h": 7,
+            "a": 2
+          },
+          "finalizacoes": {
+            "h": 9,
+            "a": 9
+          }
+        }
+      },
+      {
+        "data": "15/01",
+        "home": "Real Noroeste",
+        "away": "Forte FC",
+        "fase": "Capixabão — Rodada 1",
+        "gh": 0,
+        "ga": 2,
+        "stats": {
+          "posse": {
+            "h": 62,
+            "a": 38,
+            "hs": "62%",
+            "as": "38%"
+          },
+          "escanteios": {
+            "h": 13,
+            "a": 3
+          },
+          "faltas": {
+            "h": 21,
+            "a": 12
+          },
+          "amarelos": {
+            "h": 2,
+            "a": 4
+          },
+          "vermelhos": {
+            "h": 1,
+            "a": 0
+          },
+          "impedimentos": {
+            "h": 0,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 4,
+            "a": 5
+          },
+          "finalizacoes": {
+            "h": 9,
+            "a": 8
+          }
+        }
+      },
+      {
+        "data": "14/01",
+        "home": "Porto Vitória",
+        "away": "Capixaba SC",
+        "fase": "Capixabão — Rodada 1",
+        "gh": 2,
+        "ga": 0,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 47,
+            "a": 53,
+            "hs": "47%",
+            "as": "53%"
+          },
+          "escanteios": {
+            "h": 4,
+            "a": 3
+          },
+          "amarelos": {
+            "h": 1,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 4,
+            "a": 2
+          },
+          "finalizacoes": {
+            "h": 8,
+            "a": 10
+          }
+        }
+      },
+      {
+        "data": "14/01",
+        "home": "Vitória ES",
+        "away": "Vilavelhense",
+        "fase": "Capixabão — Rodada 1",
+        "gh": 1,
+        "ga": 0,
+        "stats": {
+          "posse": {
+            "h": 59,
+            "a": 41,
+            "hs": "59%",
+            "as": "41%"
+          },
+          "escanteios": {
+            "h": 5,
+            "a": 1
+          },
+          "faltas": {
+            "h": 26,
+            "a": 11
+          },
+          "amarelos": {
+            "h": 4,
+            "a": 1
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "impedimentos": {
+            "h": 2,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 2,
+            "a": 4
+          },
+          "finalizacoes": {
+            "h": 7,
+            "a": 11
+          }
+        }
+      },
+      {
+        "data": "13/01",
+        "home": "Desportiva Ferroviária",
+        "away": "Rio Branco-VN",
+        "fase": "Capixabão — Rodada 1",
+        "gh": 3,
+        "ga": 1,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 51,
+            "a": 49,
+            "hs": "51%",
+            "as": "49%"
+          },
+          "escanteios": {
+            "h": 0,
+            "a": 5
+          },
+          "amarelos": {
+            "h": 2,
+            "a": 2
+          },
+          "chutesAlvo": {
+            "h": 3,
+            "a": 2
+          },
+          "finalizacoes": {
+            "h": 8,
+            "a": 8
+          }
+        }
+      },
+      {
+        "data": "13/01",
+        "home": "Rio Branco ES",
+        "away": "Serra FC",
+        "fase": "Capixabão — Rodada 1",
+        "gh": 0,
+        "ga": 0,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 49,
+            "a": 51,
+            "hs": "49%",
+            "as": "51%"
+          },
+          "escanteios": {
+            "h": 3,
+            "a": 8
+          },
+          "amarelos": {
+            "h": 1,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 0,
+            "a": 5
+          },
+          "finalizacoes": {
+            "h": 6,
+            "a": 7
+          }
+        }
+      }
+    ],
+    "classificacao": [
+      {
+        "pos": 1,
+        "time": "Vitória ES",
+        "pts": 20,
+        "pj": 9,
+        "v": 6,
+        "e": 2,
+        "d": 1,
+        "gp": 14,
+        "gs": 4,
+        "sg": "+10"
+      },
+      {
+        "pos": 2,
+        "time": "Serra FC",
+        "pts": 14,
+        "pj": 9,
+        "v": 4,
+        "e": 2,
+        "d": 3,
+        "gp": 10,
+        "gs": 6,
+        "sg": "+4"
+      },
+      {
+        "pos": 3,
+        "time": "Vilavelhense",
+        "pts": 13,
+        "pj": 9,
+        "v": 4,
+        "e": 1,
+        "d": 4,
+        "gp": 8,
+        "gs": 10,
+        "sg": "-2"
+      },
+      {
+        "pos": 4,
+        "time": "Rio Branco ES",
+        "pts": 13,
+        "pj": 9,
+        "v": 3,
+        "e": 4,
+        "d": 2,
+        "gp": 10,
+        "gs": 6,
+        "sg": "+4"
+      },
+      {
+        "pos": 5,
+        "time": "Porto Vitória",
+        "pts": 13,
+        "pj": 9,
+        "v": 3,
+        "e": 4,
+        "d": 2,
+        "gp": 7,
+        "gs": 5,
+        "sg": "+2"
+      },
+      {
+        "pos": 6,
+        "time": "Desportiva Ferroviária",
+        "pts": 11,
+        "pj": 9,
+        "v": 3,
+        "e": 2,
+        "d": 4,
+        "gp": 10,
+        "gs": 11,
+        "sg": "-1"
+      },
+      {
+        "pos": 7,
+        "time": "Real Noroeste",
+        "pts": 11,
+        "pj": 9,
+        "v": 3,
+        "e": 2,
+        "d": 4,
+        "gp": 9,
+        "gs": 13,
+        "sg": "-4"
+      },
+      {
+        "pos": 8,
+        "time": "Forte FC",
+        "pts": 11,
+        "pj": 9,
+        "v": 2,
+        "e": 5,
+        "d": 2,
+        "gp": 5,
+        "gs": 4,
+        "sg": "+1"
+      },
+      {
+        "pos": 9,
+        "time": "Capixaba SC",
+        "pts": 10,
+        "pj": 9,
+        "v": 3,
+        "e": 1,
+        "d": 5,
+        "gp": 6,
+        "gs": 13,
+        "sg": "-7"
+      },
+      {
+        "pos": 10,
+        "time": "Rio Branco-VN",
+        "pts": 5,
+        "pj": 9,
+        "v": 0,
+        "e": 5,
+        "d": 4,
+        "gp": 8,
+        "gs": 15,
+        "sg": "-7"
+      }
+    ]
+  },
+  "copa-es": {
+    "jogos": [
+      {
+        "data": "06/06",
+        "home": "Vilavelhense",
+        "away": "Audax SM",
+        "fase": "Copa ES — Rodada 7",
+        "hora": "15:00"
+      },
+      {
+        "data": "06/06",
+        "home": "Vilavelhense",
+        "away": "Audax SM",
+        "fase": "Copa ES — Rodada 7",
+        "hora": "15:00"
+      },
+      {
+        "data": "06/06",
+        "home": "Porto Vitória",
+        "away": "Capixaba SC",
+        "fase": "Copa ES — Rodada 7",
+        "hora": "15:00"
+      },
+      {
+        "data": "06/06",
+        "home": "Vitória ES",
+        "away": "Rio Branco-VN",
+        "fase": "Copa ES — Rodada 7",
+        "hora": "15:00"
+      },
+      {
+        "data": "06/06",
+        "home": "Rio Branco ES",
+        "away": "Serra FC",
+        "fase": "Copa ES — Rodada 7",
+        "hora": "15:00"
+      },
+      {
+        "data": "03/06",
+        "home": "Vilavelhense",
+        "away": "Vitória ES",
+        "fase": "Copa ES — Rodada 6",
+        "hora": "15:00"
+      },
+      {
+        "data": "03/06",
+        "home": "Audax SM",
+        "away": "Rio Branco ES",
+        "fase": "Copa ES — Rodada 6",
+        "hora": "15:00"
+      },
+      {
+        "data": "31/05",
+        "home": "Capixaba SC",
+        "away": "Rio Branco-VN",
+        "fase": "Copa ES — Rodada 6",
+        "gh": 0,
+        "ga": 2
+      },
+      {
+        "data": "30/05",
+        "home": "Serra FC",
+        "away": "Porto Vitória",
+        "fase": "Copa ES — Rodada 6",
+        "gh": 1,
+        "ga": 1
+      },
+      {
+        "data": "27/05",
+        "home": "Rio Branco ES",
+        "away": "Vilavelhense",
+        "fase": "Copa ES — Rodada 5",
+        "gh": 1,
+        "ga": 1
+      },
+      {
+        "data": "27/05",
+        "home": "Vitória ES",
+        "away": "Capixaba SC",
+        "fase": "Copa ES — Rodada 5",
+        "gh": 5,
+        "ga": 0
+      },
+      {
+        "data": "24/05",
+        "home": "Rio Branco-VN",
+        "away": "Serra FC",
+        "fase": "Copa ES — Rodada 5",
+        "gh": 1,
+        "ga": 0
+      },
+      {
+        "data": "22/05",
+        "home": "Porto Vitória",
+        "away": "Audax SM",
+        "fase": "Copa ES — Rodada 5",
+        "gh": 3,
+        "ga": 0
+      },
+      {
+        "data": "20/05",
+        "home": "Capixaba SC",
+        "away": "Rio Branco ES",
+        "fase": "Copa ES — Rodada 4",
+        "gh": 1,
+        "ga": 0
+      },
+      {
+        "data": "20/05",
+        "home": "Vitória ES",
+        "away": "Serra FC",
+        "fase": "Copa ES — Rodada 4",
+        "gh": 3,
+        "ga": 2
+      },
+      {
+        "data": "17/05",
+        "home": "Vilavelhense",
+        "away": "Porto Vitória",
+        "fase": "Copa ES — Rodada 4",
+        "gh": 1,
+        "ga": 2
+      },
+      {
+        "data": "17/05",
+        "home": "Audax SM",
+        "away": "Rio Branco-VN",
+        "fase": "Copa ES — Rodada 4",
+        "gh": 0,
+        "ga": 0
+      },
+      {
+        "data": "13/05",
+        "home": "Rio Branco ES",
+        "away": "Vitória ES",
+        "fase": "Copa ES — Rodada 3",
+        "gh": 2,
+        "ga": 2
+      },
+      {
+        "data": "10/05",
+        "home": "Rio Branco-VN",
+        "away": "Porto Vitória",
+        "fase": "Copa ES — Rodada 3",
+        "gh": 0,
+        "ga": 1
+      },
+      {
+        "data": "10/05",
+        "home": "Capixaba SC",
+        "away": "Audax SM",
+        "fase": "Copa ES — Rodada 3",
+        "gh": 1,
+        "ga": 0
+      },
+      {
+        "data": "09/05",
+        "home": "Serra FC",
+        "away": "Vilavelhense",
+        "fase": "Copa ES — Rodada 3",
+        "gh": 2,
+        "ga": 3
+      },
+      {
+        "data": "07/05",
+        "home": "Vitória ES",
+        "away": "Audax SM",
+        "fase": "Copa ES — Rodada 2",
+        "gh": 3,
+        "ga": 1
+      },
+      {
+        "data": "06/05",
+        "home": "Porto Vitória",
+        "away": "Rio Branco ES",
+        "fase": "Copa ES — Rodada 2",
+        "gh": 3,
+        "ga": 0
+      },
+      {
+        "data": "03/05",
+        "home": "Rio Branco-VN",
+        "away": "Vilavelhense",
+        "fase": "Copa ES — Rodada 2",
+        "gh": 2,
+        "ga": 0
+      },
+      {
+        "data": "02/05",
+        "home": "Serra FC",
+        "away": "Capixaba SC",
+        "fase": "Copa ES — Rodada 2",
+        "gh": 1,
+        "ga": 0
+      },
+      {
+        "data": "28/04",
+        "home": "Audax SM",
+        "away": "Serra FC",
+        "fase": "Copa ES — Rodada 1",
+        "gh": 1,
+        "ga": 0
+      },
+      {
+        "data": "26/04",
+        "home": "Vilavelhense",
+        "away": "Capixaba SC",
+        "fase": "Copa ES — Rodada 1",
+        "gh": 2,
+        "ga": 1
+      },
+      {
+        "data": "23/04",
+        "home": "Rio Branco ES",
+        "away": "Rio Branco-VN",
+        "fase": "Copa ES — Rodada 1",
+        "gh": 3,
+        "ga": 0
+      },
+      {
+        "data": "22/04",
+        "home": "Porto Vitória",
+        "away": "Vitória ES",
+        "fase": "Copa ES — Rodada 1",
+        "gh": 1,
+        "ga": 3
+      }
+    ],
+    "classificacao": [
+      {
+        "pos": 1,
+        "time": "Vitória ES",
+        "pts": 13,
+        "pj": 5,
+        "v": 4,
+        "e": 1,
+        "d": 0,
+        "gp": 16,
+        "gs": 6,
+        "sg": "+10"
+      },
+      {
+        "pos": 2,
+        "time": "Porto Vitória",
+        "pts": 13,
+        "pj": 6,
+        "v": 4,
+        "e": 1,
+        "d": 1,
+        "gp": 11,
+        "gs": 5,
+        "sg": "+6"
+      },
+      {
+        "pos": 3,
+        "time": "Rio Branco-VN",
+        "pts": 10,
+        "pj": 6,
+        "v": 3,
+        "e": 1,
+        "d": 2,
+        "gp": 5,
+        "gs": 4,
+        "sg": "+1"
+      },
+      {
+        "pos": 4,
+        "time": "Vilavelhense",
+        "pts": 7,
+        "pj": 5,
+        "v": 2,
+        "e": 1,
+        "d": 2,
+        "gp": 7,
+        "gs": 8,
+        "sg": "-1"
+      },
+      {
+        "pos": 5,
+        "time": "Capixaba SC",
+        "pts": 6,
+        "pj": 6,
+        "v": 2,
+        "e": 0,
+        "d": 4,
+        "gp": 3,
+        "gs": 10,
+        "sg": "-7"
+      },
+      {
+        "pos": 6,
+        "time": "Rio Branco ES",
+        "pts": 5,
+        "pj": 5,
+        "v": 1,
+        "e": 2,
+        "d": 2,
+        "gp": 6,
+        "gs": 7,
+        "sg": "-1"
+      },
+      {
+        "pos": 7,
+        "time": "Serra FC",
+        "pts": 4,
+        "pj": 6,
+        "v": 1,
+        "e": 1,
+        "d": 4,
+        "gp": 6,
+        "gs": 9,
+        "sg": "-3"
+      },
+      {
+        "pos": 8,
+        "time": "Audax SM",
+        "pts": 4,
+        "pj": 5,
+        "v": 1,
+        "e": 1,
+        "d": 3,
+        "gp": 2,
+        "gs": 7,
+        "sg": "-5"
+      },
+      {
+        "pos": 9,
+        "time": "AA São Mateus",
+        "pts": 0,
+        "pj": 0,
+        "v": 0,
+        "e": 0,
+        "d": 0,
+        "gp": 0,
+        "gs": 0,
+        "sg": "0"
+      }
+    ]
+  },
+  "serie-d": {
+    "jogos": [
+      {
+        "data": "14/06",
+        "home": "Real Noroeste",
+        "away": "EC Democrata",
+        "fase": "Série D — Rodada 10",
+        "hora": "17:00"
+      },
+      {
+        "data": "14/06",
+        "home": "Rio Branco ES",
+        "away": "Porto SC",
+        "fase": "Série D — Rodada 10",
+        "hora": "17:00"
+      },
+      {
+        "data": "14/06",
+        "home": "Tombense",
+        "away": "Vitória ES",
+        "fase": "Série D — Rodada 10",
+        "hora": "17:00"
+      },
+      {
+        "data": "31/05",
+        "home": "EC Democrata",
+        "away": "Rio Branco ES",
+        "fase": "Série D — Rodada 9",
+        "gh": 3,
+        "ga": 1,
+        "stats": {
+          "posse": {
+            "h": 45,
+            "a": 55,
+            "hs": "45%",
+            "as": "55%"
+          },
+          "escanteios": {
+            "h": 3,
+            "a": 3
+          },
+          "amarelos": {
+            "h": 5,
+            "a": 3
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 4,
+            "a": 2
+          },
+          "finalizacoes": {
+            "h": 10,
+            "a": 11
+          }
+        }
+      },
+      {
+        "data": "30/05",
+        "home": "Vitória ES",
+        "away": "Real Noroeste",
+        "fase": "Série D — Rodada 9",
+        "gh": 1,
+        "ga": 1,
+        "stats": {
+          "posse": {
+            "h": 65,
+            "a": 35,
+            "hs": "65%",
+            "as": "35%"
+          },
+          "escanteios": {
+            "h": 6,
+            "a": 2
+          },
+          "amarelos": {
+            "h": 0,
+            "a": 3
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 3,
+            "a": 5
+          },
+          "finalizacoes": {
+            "h": 8,
+            "a": 8
+          }
+        }
+      },
+      {
+        "data": "24/05",
+        "home": "Rio Branco ES",
+        "away": "Vitória ES",
+        "fase": "Série D — Rodada 8",
+        "gh": 0,
+        "ga": 2,
+        "stats": {
+          "posse": {
+            "h": 61,
+            "a": 39,
+            "hs": "61%",
+            "as": "39%"
+          },
+          "escanteios": {
+            "h": 3,
+            "a": 2
+          },
+          "amarelos": {
+            "h": 5,
+            "a": 4
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 2
+          },
+          "chutesAlvo": {
+            "h": 1,
+            "a": 4
+          },
+          "finalizacoes": {
+            "h": 15,
+            "a": 7
+          }
+        }
+      },
+      {
+        "data": "23/05",
+        "home": "Tombense",
+        "away": "Real Noroeste",
+        "fase": "Série D — Rodada 8",
+        "gh": 1,
+        "ga": 1,
+        "stats": {
+          "posse": {
+            "h": 59,
+            "a": 41,
+            "hs": "59%",
+            "as": "41%"
+          },
+          "escanteios": {
+            "h": 8,
+            "a": 2
+          },
+          "amarelos": {
+            "h": 5,
+            "a": 5
+          },
+          "vermelhos": {
+            "h": 1,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 2,
+            "a": 2
+          },
+          "finalizacoes": {
+            "h": 11,
+            "a": 5
+          }
+        }
+      },
+      {
+        "data": "16/05",
+        "home": "Real Noroeste",
+        "away": "Rio Branco ES",
+        "fase": "Série D — Rodada 7",
+        "gh": 0,
+        "ga": 0,
+        "stats": {
+          "posse": {
+            "h": 47,
+            "a": 53,
+            "hs": "47%",
+            "as": "53%"
+          },
+          "escanteios": {
+            "h": 3,
+            "a": 6
+          },
+          "amarelos": {
+            "h": 3,
+            "a": 3
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 1,
+            "a": 3
+          },
+          "finalizacoes": {
+            "h": 4,
+            "a": 6
+          }
+        }
+      },
+      {
+        "data": "16/05",
+        "home": "Porto SC",
+        "away": "Vitória ES",
+        "fase": "Série D — Rodada 7",
+        "gh": 0,
+        "ga": 0
+      },
+      {
+        "data": "10/05",
+        "home": "Rio Branco ES",
+        "away": "Tombense",
+        "fase": "Série D — Rodada 6",
+        "gh": 2,
+        "ga": 2,
+        "stats": {
+          "posse": {
+            "h": 50,
+            "a": 50,
+            "hs": "50%",
+            "as": "50%"
+          },
+          "escanteios": {
+            "h": 8,
+            "a": 9
+          },
+          "amarelos": {
+            "h": 6,
+            "a": 4
+          },
+          "vermelhos": {
+            "h": 1,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 4,
+            "a": 6
+          },
+          "finalizacoes": {
+            "h": 16,
+            "a": 15
+          }
+        }
+      },
+      {
+        "data": "10/05",
+        "home": "Vitória ES",
+        "away": "EC Democrata",
+        "fase": "Série D — Rodada 6",
+        "gh": 2,
+        "ga": 1,
+        "stats": {
+          "posse": {
+            "h": 50,
+            "a": 50,
+            "hs": "50%",
+            "as": "50%"
+          },
+          "escanteios": {
+            "h": 11,
+            "a": 2
+          },
+          "amarelos": {
+            "h": 1,
+            "a": 0
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 3,
+            "a": 1
+          },
+          "finalizacoes": {
+            "h": 12,
+            "a": 3
+          }
+        }
+      },
+      {
+        "data": "09/05",
+        "home": "Porto SC",
+        "away": "Real Noroeste",
+        "fase": "Série D — Rodada 6",
+        "gh": 1,
+        "ga": 2
+      },
+      {
+        "data": "04/05",
+        "home": "EC Democrata",
+        "away": "Vitória ES",
+        "fase": "Série D — Rodada 5",
+        "gh": 2,
+        "ga": 0,
+        "stats": {
+          "posse": {
+            "h": 34,
+            "a": 66,
+            "hs": "34%",
+            "as": "66%"
+          },
+          "escanteios": {
+            "h": 6,
+            "a": 10
+          },
+          "amarelos": {
+            "h": 2,
+            "a": 1
+          },
+          "vermelhos": {
+            "h": 1,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 6,
+            "a": 6
+          },
+          "finalizacoes": {
+            "h": 9,
+            "a": 10
+          }
+        }
+      },
+      {
+        "data": "03/05",
+        "home": "Tombense",
+        "away": "Rio Branco ES",
+        "fase": "Série D — Rodada 5",
+        "gh": 0,
+        "ga": 0,
+        "stats": {
+          "posse": {
+            "h": 54,
+            "a": 46,
+            "hs": "54%",
+            "as": "46%"
+          },
+          "escanteios": {
+            "h": 4,
+            "a": 3
+          },
+          "amarelos": {
+            "h": 4,
+            "a": 2
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 4,
+            "a": 2
+          },
+          "finalizacoes": {
+            "h": 13,
+            "a": 13
+          }
+        }
+      },
+      {
+        "data": "02/05",
+        "home": "Real Noroeste",
+        "away": "Porto SC",
+        "fase": "Série D — Rodada 5",
+        "gh": 1,
+        "ga": 2
+      },
+      {
+        "data": "26/04",
+        "home": "Rio Branco ES",
+        "away": "Real Noroeste",
+        "fase": "Série D — Rodada 4",
+        "gh": 2,
+        "ga": 0,
+        "stats": {
+          "posse": {
+            "h": 53,
+            "a": 47,
+            "hs": "53%",
+            "as": "47%"
+          },
+          "escanteios": {
+            "h": 6,
+            "a": 5
+          },
+          "amarelos": {
+            "h": 4,
+            "a": 4
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 4,
+            "a": 3
+          },
+          "finalizacoes": {
+            "h": 13,
+            "a": 10
+          }
+        }
+      },
+      {
+        "data": "25/04",
+        "home": "Vitória ES",
+        "away": "Porto SC",
+        "fase": "Série D — Rodada 4",
+        "gh": 3,
+        "ga": 0,
+        "stats": {
+          "posse": {
+            "h": 61,
+            "a": 39,
+            "hs": "61%",
+            "as": "39%"
+          },
+          "escanteios": {
+            "h": 6,
+            "a": 2
+          },
+          "amarelos": {
+            "h": 3,
+            "a": 5
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 7,
+            "a": 1
+          },
+          "finalizacoes": {
+            "h": 12,
+            "a": 8
+          }
+        }
+      },
+      {
+        "data": "19/04",
+        "home": "Real Noroeste",
+        "away": "Tombense",
+        "fase": "Série D — Rodada 3",
+        "gh": 0,
+        "ga": 0,
+        "stats": {
+          "posse": {
+            "h": 60,
+            "a": 40,
+            "hs": "60%",
+            "as": "40%"
+          },
+          "escanteios": {
+            "h": 5,
+            "a": 4
+          },
+          "amarelos": {
+            "h": 4,
+            "a": 0
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 3,
+            "a": 2
+          },
+          "finalizacoes": {
+            "h": 9,
+            "a": 8
+          }
+        }
+      },
+      {
+        "data": "18/04",
+        "home": "Vitória ES",
+        "away": "Rio Branco ES",
+        "fase": "Série D — Rodada 3",
+        "gh": 1,
+        "ga": 2,
+        "stats": {
+          "posse": {
+            "h": 53,
+            "a": 47,
+            "hs": "53%",
+            "as": "47%"
+          },
+          "escanteios": {
+            "h": 6,
+            "a": 3
+          },
+          "amarelos": {
+            "h": 3,
+            "a": 7
+          },
+          "vermelhos": {
+            "h": 1,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 2,
+            "a": 3
+          },
+          "finalizacoes": {
+            "h": 7,
+            "a": 6
+          }
+        }
+      },
+      {
+        "data": "12/04",
+        "home": "Rio Branco ES",
+        "away": "EC Democrata",
+        "fase": "Série D — Rodada 2",
+        "gh": 1,
+        "ga": 1,
+        "stats": {
+          "posse": {
+            "h": 63,
+            "a": 37,
+            "hs": "63%",
+            "as": "37%"
+          },
+          "escanteios": {
+            "h": 5,
+            "a": 0
+          },
+          "amarelos": {
+            "h": 2,
+            "a": 3
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 2,
+            "a": 2
+          },
+          "finalizacoes": {
+            "h": 8,
+            "a": 5
+          }
+        }
+      },
+      {
+        "data": "11/04",
+        "home": "Real Noroeste",
+        "away": "Vitória ES",
+        "fase": "Série D — Rodada 2",
+        "gh": 1,
+        "ga": 3
+      },
+      {
+        "data": "06/04",
+        "home": "EC Democrata",
+        "away": "Real Noroeste",
+        "fase": "Série D — Rodada 1",
+        "gh": 1,
+        "ga": 0,
+        "stats": {
+          "posse": {
+            "h": 58,
+            "a": 42,
+            "hs": "58%",
+            "as": "42%"
+          },
+          "escanteios": {
+            "h": 2,
+            "a": 5
+          },
+          "amarelos": {
+            "h": 4,
+            "a": 3
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 7,
+            "a": 2
+          },
+          "finalizacoes": {
+            "h": 9,
+            "a": 6
+          }
+        }
+      },
+      {
+        "data": "04/04",
+        "home": "Vitória ES",
+        "away": "Tombense",
+        "fase": "Série D — Rodada 1",
+        "gh": 0,
+        "ga": 1,
+        "stats": {
+          "posse": {
+            "h": 50,
+            "a": 50,
+            "hs": "50%",
+            "as": "50%"
+          },
+          "escanteios": {
+            "h": 9,
+            "a": 7
+          },
+          "amarelos": {
+            "h": 2,
+            "a": 2
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 3,
+            "a": 1
+          },
+          "finalizacoes": {
+            "h": 11,
+            "a": 8
+          }
+        }
+      },
+      {
+        "data": "04/04",
+        "home": "Porto SC",
+        "away": "Rio Branco ES",
+        "fase": "Série D — Rodada 1",
+        "gh": 3,
+        "ga": 2,
+        "stats": {
+          "posse": {
+            "h": 43,
+            "a": 57,
+            "hs": "43%",
+            "as": "57%"
+          },
+          "escanteios": {
+            "h": 3,
+            "a": 4
+          },
+          "amarelos": {
+            "h": 5,
+            "a": 3
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 7,
+            "a": 6
+          },
+          "finalizacoes": {
+            "h": 8,
+            "a": 16
+          }
+        }
+      }
+    ],
+    "classificacao": [
+      {
+        "pos": 1,
+        "time": "EC Democrata",
+        "pts": 16,
+        "pj": 9,
+        "v": 5,
+        "e": 1,
+        "d": 3,
+        "gp": 13,
+        "gs": 9,
+        "sg": "+4"
+      },
+      {
+        "pos": 2,
+        "time": "Tombense",
+        "pts": 16,
+        "pj": 9,
+        "v": 4,
+        "e": 4,
+        "d": 1,
+        "gp": 13,
+        "gs": 6,
+        "sg": "+7"
+      },
+      {
+        "pos": 3,
+        "time": "Vitória ES",
+        "pts": 14,
+        "pj": 9,
+        "v": 4,
+        "e": 2,
+        "d": 3,
+        "gp": 12,
+        "gs": 8,
+        "sg": "+4"
+      },
+      {
+        "pos": 4,
+        "time": "Rio Branco ES",
+        "pts": 10,
+        "pj": 9,
+        "v": 2,
+        "e": 4,
+        "d": 3,
+        "gp": 10,
+        "gs": 12,
+        "sg": "-2"
+      },
+      {
+        "pos": 5,
+        "time": "Porto SC",
+        "pts": 10,
+        "pj": 9,
+        "v": 3,
+        "e": 1,
+        "d": 5,
+        "gp": 9,
+        "gs": 17,
+        "sg": "-8"
+      },
+      {
+        "pos": 6,
+        "time": "Real Noroeste",
+        "pts": 7,
+        "pj": 9,
+        "v": 1,
+        "e": 4,
+        "d": 4,
+        "gp": 6,
+        "gs": 11,
+        "sg": "-5"
+      }
+    ]
+  },
+  "copa-verde": {
+    "jogos": [
+      {
+        "data": "27/05",
+        "home": "Rio Branco ES",
+        "away": "Anápolis",
+        "fase": "Semifinal (Volta)",
+        "gh": 2,
+        "ga": 1,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 63,
+            "a": 37,
+            "hs": "63%",
+            "as": "37%"
+          },
+          "escanteios": {
+            "h": 7,
+            "a": 4
+          },
+          "vermelhos": {
+            "h": 5,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 2,
+            "a": 4
+          },
+          "finalizacoes": {
+            "h": 8,
+            "a": 7
+          }
+        }
+      },
+      {
+        "data": "21/05",
+        "home": "Anápolis",
+        "away": "Rio Branco ES",
+        "fase": "Semifinal (Ida)",
+        "gh": 3,
+        "ga": 0,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 54,
+            "a": 46,
+            "hs": "54%",
+            "as": "46%"
+          },
+          "escanteios": {
+            "h": 5,
+            "a": 3
+          },
+          "chutesAlvo": {
+            "h": 5,
+            "a": 1
+          },
+          "finalizacoes": {
+            "h": 13,
+            "a": 4
+          }
+        }
+      },
+      {
+        "data": "06/05",
+        "home": "Gama",
+        "away": "Rio Branco ES",
+        "fase": "Quartas",
+        "gh": 0,
+        "ga": 1,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 70,
+            "a": 30,
+            "hs": "70%",
+            "as": "30%"
+          },
+          "escanteios": {
+            "h": 8,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 5,
+            "a": 2
+          },
+          "finalizacoes": {
+            "h": 18,
+            "a": 6
+          }
+        }
+      },
+      {
+        "data": "29/04",
+        "home": "Primavera AC",
+        "away": "Rio Branco ES",
+        "fase": "Copa Verde — Grupo — Rodada 5",
+        "gh": 0,
+        "ga": 0,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 50,
+            "a": 50,
+            "hs": "50%",
+            "as": "50%"
+          },
+          "escanteios": {
+            "h": 5,
+            "a": 8
+          },
+          "chutesAlvo": {
+            "h": 5,
+            "a": 1
+          },
+          "finalizacoes": {
+            "h": 14,
+            "a": 12
+          }
+        }
+      },
+      {
+        "data": "29/04",
+        "home": "Porto Vitória",
+        "away": "Tocantinopólis",
+        "fase": "Copa Verde — Grupo — Rodada 5",
+        "gh": 1,
+        "ga": 1,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 57,
+            "a": 43,
+            "hs": "57%",
+            "as": "43%"
+          },
+          "escanteios": {
+            "h": 7,
+            "a": 2
+          },
+          "chutesAlvo": {
+            "h": 2,
+            "a": 3
+          },
+          "finalizacoes": {
+            "h": 9,
+            "a": 6
+          }
+        }
+      },
+      {
+        "data": "15/04",
+        "home": "Cuiabá",
+        "away": "Porto Vitória",
+        "fase": "Copa Verde — Grupo — Rodada 4",
+        "gh": 2,
+        "ga": 3,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 58,
+            "a": 42,
+            "hs": "58%",
+            "as": "42%"
+          },
+          "escanteios": {
+            "h": 3,
+            "a": 5
+          },
+          "chutesAlvo": {
+            "h": 6,
+            "a": 7
+          },
+          "finalizacoes": {
+            "h": 19,
+            "a": 16
+          }
+        }
+      },
+      {
+        "data": "15/04",
+        "home": "Rio Branco ES",
+        "away": "Araguáina",
+        "fase": "Copa Verde — Grupo — Rodada 4",
+        "gh": 1,
+        "ga": 3,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 63,
+            "a": 37,
+            "hs": "63%",
+            "as": "37%"
+          },
+          "escanteios": {
+            "h": 5,
+            "a": 2
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 12,
+            "a": 4
+          },
+          "finalizacoes": {
+            "h": 32,
+            "a": 8
+          }
+        }
+      },
+      {
+        "data": "09/04",
+        "home": "Operário-MS",
+        "away": "Rio Branco ES",
+        "fase": "Copa Verde — Grupo — Rodada 3",
+        "gh": 1,
+        "ga": 1,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 57,
+            "a": 43,
+            "hs": "57%",
+            "as": "43%"
+          },
+          "escanteios": {
+            "h": 10,
+            "a": 3
+          },
+          "amarelos": {
+            "h": 0,
+            "a": 1
+          },
+          "vermelhos": {
+            "h": 0,
+            "a": 1
+          },
+          "chutesAlvo": {
+            "h": 6,
+            "a": 3
+          },
+          "finalizacoes": {
+            "h": 13,
+            "a": 7
+          }
+        }
+      },
+      {
+        "data": "08/04",
+        "home": "Anápolis",
+        "away": "Porto Vitória",
+        "fase": "Copa Verde — Grupo — Rodada 3",
+        "gh": 2,
+        "ga": 0,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 49,
+            "a": 51,
+            "hs": "49%",
+            "as": "51%"
+          },
+          "escanteios": {
+            "h": 4,
+            "a": 3
+          },
+          "chutesAlvo": {
+            "h": 5,
+            "a": 2
+          },
+          "finalizacoes": {
+            "h": 15,
+            "a": 8
+          }
+        }
+      },
+      {
+        "data": "29/03",
+        "home": "Porto Vitória",
+        "away": "Atlético Goianiense",
+        "fase": "Copa Verde — Grupo — Rodada 2",
+        "gh": 3,
+        "ga": 2,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 49,
+            "a": 51,
+            "hs": "49%",
+            "as": "51%"
+          },
+          "escanteios": {
+            "h": 9,
+            "a": 3
+          },
+          "chutesAlvo": {
+            "h": 6,
+            "a": 3
+          },
+          "finalizacoes": {
+            "h": 13,
+            "a": 5
+          }
+        }
+      },
+      {
+        "data": "29/03",
+        "home": "Capital CF",
+        "away": "Rio Branco ES",
+        "fase": "Copa Verde — Grupo — Rodada 2",
+        "gh": 0,
+        "ga": 2,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 48,
+            "a": 52,
+            "hs": "48%",
+            "as": "52%"
+          },
+          "escanteios": {
+            "h": 6,
+            "a": 2
+          },
+          "chutesAlvo": {
+            "h": 2,
+            "a": 6
+          },
+          "finalizacoes": {
+            "h": 11,
+            "a": 14
+          }
+        }
+      },
+      {
+        "data": "25/03",
+        "home": "Porto Vitória",
+        "away": "Gama",
+        "fase": "Copa Verde — Grupo — Rodada 1",
+        "gh": 0,
+        "ga": 1,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 48,
+            "a": 52,
+            "hs": "48%",
+            "as": "52%"
+          },
+          "escanteios": {
+            "h": 4,
+            "a": 7
+          },
+          "chutesAlvo": {
+            "h": 1,
+            "a": 4
+          },
+          "finalizacoes": {
+            "h": 1,
+            "a": 8
+          }
+        }
+      },
+      {
+        "data": "24/03",
+        "home": "Rio Branco ES",
+        "away": "Vila Nova FC",
+        "fase": "Copa Verde — Grupo — Rodada 1",
+        "gh": 1,
+        "ga": 0,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 66,
+            "a": 34,
+            "hs": "66%",
+            "as": "34%"
+          },
+          "escanteios": {
+            "h": 2,
+            "a": 4
+          },
+          "chutesAlvo": {
+            "h": 4,
+            "a": 0
+          },
+          "finalizacoes": {
+            "h": 11,
+            "a": 1
+          }
+        }
+      }
+    ],
+    "classificacao": [
+      {
+        "pos": 1,
+        "time": "Vila Nova FC",
+        "pts": 8,
+        "pj": 5,
+        "v": 2,
+        "e": 2,
+        "d": 1,
+        "gp": 10,
+        "gs": 4,
+        "sg": "+6"
+      },
+      {
+        "pos": 1,
+        "time": "Gama",
+        "pts": 15,
+        "pj": 5,
+        "v": 5,
+        "e": 0,
+        "d": 0,
+        "gp": 8,
+        "gs": 3,
+        "sg": "+5"
+      },
+      {
+        "pos": 2,
+        "time": "Rio Branco ES",
+        "pts": 8,
+        "pj": 5,
+        "v": 2,
+        "e": 2,
+        "d": 1,
+        "gp": 5,
+        "gs": 4,
+        "sg": "+1"
+      },
+      {
+        "pos": 2,
+        "time": "Anápolis",
+        "pts": 9,
+        "pj": 5,
+        "v": 3,
+        "e": 0,
+        "d": 2,
+        "gp": 9,
+        "gs": 3,
+        "sg": "+6"
+      },
+      {
+        "pos": 3,
+        "time": "Operário-MS",
+        "pts": 8,
+        "pj": 5,
+        "v": 2,
+        "e": 2,
+        "d": 1,
+        "gp": 8,
+        "gs": 10,
+        "sg": "-2"
+      },
+      {
+        "pos": 3,
+        "time": "Atlético Goianiense",
+        "pts": 7,
+        "pj": 5,
+        "v": 2,
+        "e": 1,
+        "d": 2,
+        "gp": 5,
+        "gs": 5,
+        "sg": "0"
+      },
+      {
+        "pos": 4,
+        "time": "Araguáina",
+        "pts": 7,
+        "pj": 5,
+        "v": 2,
+        "e": 1,
+        "d": 2,
+        "gp": 6,
+        "gs": 4,
+        "sg": "+2"
+      },
+      {
+        "pos": 4,
+        "time": "Porto Vitória",
+        "pts": 7,
+        "pj": 5,
+        "v": 2,
+        "e": 1,
+        "d": 2,
+        "gp": 7,
+        "gs": 8,
+        "sg": "-1"
+      },
+      {
+        "pos": 5,
+        "time": "Capital CF",
+        "pts": 6,
+        "pj": 5,
+        "v": 1,
+        "e": 3,
+        "d": 1,
+        "gp": 6,
+        "gs": 7,
+        "sg": "-1"
+      },
+      {
+        "pos": 5,
+        "time": "Tocantinopólis",
+        "pts": 3,
+        "pj": 5,
+        "v": 0,
+        "e": 3,
+        "d": 2,
+        "gp": 2,
+        "gs": 5,
+        "sg": "-3"
+      },
+      {
+        "pos": 6,
+        "time": "Primavera AC",
+        "pts": 2,
+        "pj": 5,
+        "v": 0,
+        "e": 2,
+        "d": 3,
+        "gp": 6,
+        "gs": 12,
+        "sg": "-6"
+      },
+      {
+        "pos": 6,
+        "time": "Cuiabá",
+        "pts": 1,
+        "pj": 5,
+        "v": 0,
+        "e": 1,
+        "d": 4,
+        "gp": 2,
+        "gs": 9,
+        "sg": "-7"
+      }
+    ]
+  }
+}
