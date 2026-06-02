@@ -111,7 +111,47 @@
         "fase": "Semifinal (Volta)",
         "gh": 1,
         "ga": 5,
-        "pen": true
+        "pen": true,
+        "stats": {
+          "_source": "flashscore",
+          "posse": {
+            "h": 48,
+            "a": 52,
+            "hs": "48%",
+            "as": "52%"
+          },
+          "escanteios": {
+            "h": 7,
+            "a": 6
+          },
+          "amarelos": {
+            "h": 3,
+            "a": 3
+          },
+          "vermelhos": {
+            "h": 1,
+            "a": 0
+          },
+          "chutesAlvo": {
+            "h": 6,
+            "a": 7
+          },
+          "finalizacoes": {
+            "h": 9,
+            "a": 12
+          }
+        },
+        "penaltis": {
+          "ghPen": 4,
+          "gaPen": 5,
+          "errosHome": [
+            4,
+            6
+          ],
+          "errosAway": [
+            1
+          ]
+        }
       },
       {
         "data": "08/03",

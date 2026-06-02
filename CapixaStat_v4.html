@@ -1680,7 +1680,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 
           <!-- LISTA DE PARTIDAS -->
           <div id="match-list">
-            <div style="font-size:11px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">Partidas registradas — Camp. Capixaba 2026</div>
+            <div id="match-list-title" style="font-size:11px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Partidas registradas — Camp. Capixaba 2026</div>
+            <div id="match-comp-tabs" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px"></div>
             <div id="match-cards" style="display:flex;flex-direction:column;gap:10px"></div>
           </div>
 
@@ -1945,6 +1946,31 @@ function setCurrentUser(user) {
 }
 function getCurrentUser() {
   return JSON.parse(localStorage.getItem('capixastat_current') || 'null');
+}
+
+// Resolve o nome do clube do usuário para a chave exata usada em CLUBS/MATCHES
+// Ex: "Rio Branco FC" → "Rio Branco ES", "Porto Vitória FC" → "Porto Vitória"
+function resolveClube(nomeRaw) {
+  if (!nomeRaw) return null;
+  if (typeof CLUBS !== 'undefined' && CLUBS[nomeRaw]) return nomeRaw; // exact match
+  const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim();
+  const nRaw = norm(nomeRaw);
+  if (typeof CLUBS === 'undefined') return nomeRaw;
+  // 1. Normalised exact match
+  for (const key of Object.keys(CLUBS)) {
+    if (norm(key) === nRaw) return key;
+  }
+  // 2. First-two-words prefix match (e.g. "rio branco" matches "Rio Branco ES")
+  const prefix = nRaw.split(/\s+/).slice(0, 2).join(' ');
+  for (const key of Object.keys(CLUBS)) {
+    if (norm(key).startsWith(prefix)) return key;
+  }
+  // 3. First word match as last resort
+  const firstWord = nRaw.split(/\s+/)[0];
+  for (const key of Object.keys(CLUBS)) {
+    if (norm(key).startsWith(firstWord)) return key;
+  }
+  return nomeRaw;
 }
 
 // Seed: criar conta demo se não existir nenhuma
@@ -2577,7 +2603,7 @@ const CLUBS = {
     escudo: 'https://r2.thesportsdb.com/images/media/team/badge/tkx23p1625423235.png',
     sigla: 'RBES', torcida: '15k', potencial: 'A', atletasBase: 28,
     estadio: 'Kleber Andrade', fundacao: 1913, sportsdb_id: 142286,
-    site: 'site.riobrancoes.com.br', instagram: 'riobrancoes', competicoes: ['capixabao','copa-es','serie-d','copa-verde'] },
+    site: 'site.riobrancoes.com.br', instagram: 'riobrancoes', competicoes: ['capixabao','copa-es','serie-d','copa-verde','copa-do-brasil'] },
   'Vilavelhense': { nome: 'Vilavelhense', cidade: 'Vila Velha · ES', divisao: 'Capixabão 2026', divisaoClasse: 'badge-mid',
     escudo: 'https://r2.thesportsdb.com/images/media/team/badge/atebuv1754116314.png',
     sigla: 'VVE', torcida: '6k', potencial: 'B+', atletasBase: 31,
@@ -2587,7 +2613,7 @@ const CLUBS = {
     escudo: 'https://r2.thesportsdb.com/images/media/team/badge/i4di121763680174.png',
     sigla: 'TIVA', torcida: '7k', potencial: 'B+', atletasBase: 23,
     estadio: 'Engenheiro Araripe', fundacao: 1920, sportsdb_id: 152615,
-    site: '', instagram: '', competicoes: ['capixabao'] },
+    site: '', instagram: '', competicoes: ['capixabao','copa-do-brasil'] },
   'Real Noroeste': { nome: 'Real Noroeste', cidade: 'Água Doce do Norte · ES', divisao: 'Capixabão 2026', divisaoClasse: 'badge-mid',
     escudo: 'https://r2.thesportsdb.com/images/media/team/badge/gbkic71754115924.png',
     sigla: 'RN', torcida: '3k', potencial: 'B', atletasBase: 25,
@@ -3210,7 +3236,47 @@ const COMPETITIONS = {
                 "fase": "Semifinal (Volta)",
                 "gh": 1,
                 "ga": 5,
-                "pen": true
+                "pen": true,
+                "stats": {
+                      "_source": "flashscore",
+                      "posse": {
+                            "h": 48,
+                            "a": 52,
+                            "hs": "48%",
+                            "as": "52%"
+                      },
+                      "escanteios": {
+                            "h": 7,
+                            "a": 6
+                      },
+                      "amarelos": {
+                            "h": 3,
+                            "a": 3
+                      },
+                      "vermelhos": {
+                            "h": 1,
+                            "a": 0
+                      },
+                      "chutesAlvo": {
+                            "h": 6,
+                            "a": 7
+                      },
+                      "finalizacoes": {
+                            "h": 9,
+                            "a": 12
+                      }
+                },
+                "penaltis": {
+                      "ghPen": 4,
+                      "gaPen": 5,
+                      "errosHome": [
+                            4,
+                            6
+                      ],
+                      "errosAway": [
+                            1
+                      ]
+                }
           },
           {
                 "data": "08/03",
@@ -6922,6 +6988,22 @@ const COMPETITIONS = {
                 }
           }
     ]
+  },
+  'copa-do-brasil': {
+    nome: 'Copa do Brasil', edicao: '2026', sigla: 'CDB',
+    cor: '#facc15', corClasse: 'badge-atk',
+    fase: 'Encerrado · 2ª Fase',
+    times: ['Rio Branco ES','Desportiva Ferroviária'],
+    classificacao: [],
+    jogos: [
+      { data:'17/02', home:'Sampaio Corrêa FE',      away:'Desportiva Ferroviária', gh:1, ga:1, fase:'1ª Fase',
+        penaltis:{ ghPen:1, gaPen:3, errosHome:[1,2,4], errosAway:[3] },
+        stats:{ _source:'flashscore', posse:{h:52,a:48,hs:'52%',as:'48%'}, escanteios:{h:1,a:1}, chutesAlvo:{h:2,a:3}, finalizacoes:{h:6,a:6} } },
+      { data:'04/03', home:'Rio Branco ES',           away:'Athletic Club',          gh:1, ga:2, fase:'2ª Fase',
+        stats:{ _source:'flashscore', posse:{h:50,a:50,hs:'50%',as:'50%'}, escanteios:{h:2,a:4}, chutesAlvo:{h:2,a:2}, finalizacoes:{h:7,a:9} } },
+      { data:'05/03', home:'Desportiva Ferroviária',  away:'Sport Recife',           gh:0, ga:1, fase:'2ª Fase',
+        stats:{ _source:'flashscore', posse:{h:36,a:64,hs:'36%',as:'64%'}, escanteios:{h:4,a:10}, chutesAlvo:{h:2,a:5}, finalizacoes:{h:6,a:17} } },
+    ]
   }
 }
 
@@ -6978,25 +7060,104 @@ async function loadLiveData() {
   }
 }
 
+// ── Filtro ativo na aba Partidas ──
+let _activePartidaComp = 'todas';
+
+function setPartidaCompFilter(compId) {
+  _activePartidaComp = compId;
+  document.querySelectorAll('#match-comp-tabs .tab-btn').forEach(b => b.classList.remove('comp-tab-active'));
+  const btn = document.getElementById('ptab-' + compId);
+  if (btn) btn.classList.add('comp-tab-active');
+  _renderMatchCards();
+}
+
 // ── Renderizar lista de partidas ──
 function renderMatchList() {
+  const user = getCurrentUser();
+  const meuClube = user ? resolveClube(user.clube) : null;
+
+  // Atualizar título
+  const titleEl = document.getElementById('match-list-title');
+  if (titleEl) titleEl.textContent = meuClube
+    ? 'Partidas de ' + meuClube + ' — 2026'
+    : 'Todas as partidas — 2026';
+
+  // Montar cache de jogos por competição
+  window._jogosCache = window._jogosCache || {};
+  window._partidasAllJogos = [];
+
+  for (const [compId, compData] of Object.entries(COMPETITIONS)) {
+    const jogosComp = (compData.jogos || []).filter(j => j.gh !== undefined);
+    const jogosDoClube = meuClube
+      ? jogosComp.filter(j => j.home === meuClube || j.away === meuClube)
+      : jogosComp;
+    if (!jogosDoClube.length) continue;
+    const cacheKey = (meuClube || '__all__') + '|' + compId;
+    window._jogosCache[cacheKey] = jogosDoClube;
+    jogosDoClube.forEach((j, idx) => {
+      window._partidasAllJogos.push({ j, compId, compNome: compData.nome, sigla: compData.sigla, cor: compData.cor, cacheKey, idx });
+    });
+  }
+
+  // Construir tabs de competição
+  const tabsEl = document.getElementById('match-comp-tabs');
+  if (tabsEl) {
+    const compsPresentes = [...new Set(window._partidasAllJogos.map(x => x.compId))];
+    let html = '<button class="tab-btn comp-tab-active" id="ptab-todas" onclick="setPartidaCompFilter(\'todas\')">Todas</button>';
+    compsPresentes.forEach(cid => {
+      const item = window._partidasAllJogos.find(x => x.compId === cid);
+      html += '<button class="tab-btn" id="ptab-' + cid + '" onclick="setPartidaCompFilter(\'' + cid + '\')">' + (item?.sigla || cid) + '</button>';
+    });
+    tabsEl.innerHTML = html;
+  }
+
+  _activePartidaComp = 'todas';
+  _renderMatchCards();
+}
+
+function _renderMatchCards() {
   const container = document.getElementById('match-cards');
   container.innerHTML = '';
-  MATCHES.forEach(m => {
-    const isHomeWin = m.gHome > m.gAway;
-    const isDraw = m.gHome === m.gAway;
-    const badgeCls = isDraw ? 'draw' : (isHomeWin ? 'win' : 'loss');
-    const badgeText = isDraw ? 'Empate' : (isHomeWin ? 'Vitória Casa' : 'Vitória Visitante');
-    container.innerHTML += '<div class="match-card" onclick="openMatch(' + m.id + ')">'
-      + '<div class="mc-team home">' + m.home + '</div>'
-      + '<div class="mc-score">' + m.gHome + '</div>'
+  const user = getCurrentUser();
+  const meuClube = user ? resolveClube(user.clube) : null;
+
+  const lista = _activePartidaComp === 'todas'
+    ? window._partidasAllJogos
+    : window._partidasAllJogos.filter(x => x.compId === _activePartidaComp);
+
+  if (!lista || lista.length === 0) {
+    container.innerHTML = '<div style="color:var(--text-3);text-align:center;padding:40px 0">Nenhuma partida encontrada</div>';
+    return;
+  }
+
+  // Ordenar por data mais recente
+  const parseDate = d => {
+    if (!d) return 0;
+    const p = d.split('/');
+    return p.length >= 2 ? parseInt(p[1]) * 100 + parseInt(p[0]) : 0;
+  };
+  const sorted = [...lista].sort((a, b) => parseDate(b.j.data) - parseDate(a.j.data));
+
+  sorted.forEach(({ j, compNome, cacheKey, idx }) => {
+    const isMandante = j.home === meuClube;
+    const meuGols = meuClube ? (isMandante ? j.gh : j.ga) : j.gh;
+    const adversarioGols = meuClube ? (isMandante ? j.ga : j.gh) : j.ga;
+    const venceu = meuGols > adversarioGols;
+    const empatou = meuGols === adversarioGols;
+    const badgeCls = empatou ? 'draw' : (venceu ? 'win' : 'loss');
+    const badgeText = empatou ? 'Empate' : (venceu ? 'Vitória' : 'Derrota');
+    const statsIcon = j.stats ? ' <span style="font-size:9px;color:var(--green);opacity:.7" title="Estatísticas oficiais">●</span>' : '';
+    container.innerHTML += '<div class="match-card" onclick="openJogoDetail(\'' + cacheKey + '\',' + idx + ')">'
+      + '<div class="mc-team home">' + j.home + '</div>'
+      + '<div class="mc-score">' + j.gh + '</div>'
       + '<div class="mc-vs">×</div>'
-      + '<div class="mc-score">' + m.gAway + '</div>'
-      + '<div class="mc-team">' + m.away + '</div>'
-      + '<div class="mc-meta"><div>Rodada ' + m.rodada + ' · ' + m.data + '</div>'
-      + '<div>' + m.estadio + '</div>'
-      + '<div style="margin-top:4px"><span class="mc-badge ' + badgeCls + '">' + badgeText + '</span></div></div>'
-      + '</div>';
+      + '<div class="mc-score">' + j.ga + '</div>'
+      + '<div class="mc-team">' + j.away + '</div>'
+      + '<div class="mc-meta">'
+      + '<div>' + (j.fase || '') + ' · ' + (j.data || '') + statsIcon + '</div>'
+      + '<div style="color:var(--text-3);font-size:10px;margin-top:2px">' + compNome + '</div>'
+      + '<div style="margin-top:4px"><span class="mc-badge ' + badgeCls + '">' + badgeText + '</span></div>'
+      + '</div></div>';
   });
 }
 
@@ -7247,18 +7408,22 @@ function openJogoDetail(cacheKey, idx) {
   const comp = COMPETITIONS[compName];
 
   // Header
+  const pen = j.penaltis || null;
+
   document.getElementById('md-header').innerHTML = `
     <div class="fm-h-team" style="text-align:right">${j.home}</div>
-    <div class="fm-h-score-box">
-      <div class="fm-h-score" style="color:${j.gh>j.ga?'#4ade80':(j.gh<j.ga?'#ef4444':'#fff')}">${j.gh}</div>
-      <div class="fm-h-divider">:</div>
-      <div class="fm-h-score" style="color:${j.ga>j.gh?'#4ade80':(j.ga<j.gh?'#ef4444':'#fff')}">${j.ga}</div>
+    <div class="fm-h-score-box" style="flex-direction:column;gap:2px">
+      <div style="display:flex;align-items:center;gap:16px">
+        <div class="fm-h-score" style="color:${j.gh>j.ga?'#4ade80':(j.gh<j.ga?'#ef4444':'#fff')}">${j.gh}</div>
+        <div class="fm-h-divider">:</div>
+        <div class="fm-h-score" style="color:${j.ga>j.gh?'#4ade80':(j.ga<j.gh?'#ef4444':'#fff')}">${j.ga}</div>
+      </div>
+      ${pen ? `<div style="font-size:11px;color:var(--text-3);font-weight:600;text-align:center;letter-spacing:.5px">PEN ${pen.ghPen} – ${pen.gaPen}</div>` : ''}
     </div>
     <div class="fm-h-team" style="text-align:left">${j.away}</div>
     <div style="position:absolute;bottom:12px;left:0;right:0" class="fm-h-meta">
       <div><i class="fas fa-calendar"></i> ${j.data}</div>
       <div><i class="fas fa-trophy"></i> ${j.fase}</div>
-      ${j.pen ? '<div style="color:var(--amber)"><i class="fas fa-futbol"></i> Decidido nos pênaltis</div>' : ''}
     </div>
   `;
   document.getElementById('md-header').style.position = 'relative';
@@ -8435,7 +8600,7 @@ let _activeCompTab = null;
 
 function renderTeamScreen() {
   const user = getCurrentUser();
-  const clubeNome = user ? user.clube : Object.keys(CLUBS)[0];
+  const clubeNome = user ? resolveClube(user.clube) : Object.keys(CLUBS)[0];
   const c = CLUBS[clubeNome] || Object.values(CLUBS)[0];
   if (!c) return;
 
@@ -8483,7 +8648,7 @@ function switchCompTab(id) {
   const btn = document.getElementById('ctab-' + id);
   if (btn) btn.classList.add('comp-tab-active');
   const user = getCurrentUser();
-  const clubeNome = user ? user.clube : Object.keys(CLUBS)[0];
+  const clubeNome = user ? resolveClube(user.clube) : Object.keys(CLUBS)[0];
   const c = CLUBS[clubeNome] || Object.values(CLUBS)[0];
   renderCompContent(c, id);
 }
