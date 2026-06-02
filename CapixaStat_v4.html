@@ -2133,6 +2133,7 @@ function enterApp() {
   document.getElementById('app').classList.add('visible');
   setTimeout(initCharts, 80);
   updateGlobalStats();
+  loadApiPlayers();
 }
 
 // ── Atualizar KPIs com dados reais ───────────
@@ -2538,70 +2539,100 @@ function refreshGoalCharts() {
     : 'Nenhum gol registrado ainda. Cadastre partidas para ver o ranking atualizado.';
 }
 
-function salvarNovoAtleta() {
+async function salvarNovoAtleta() {
   const nome = document.getElementById('cad-nome').value.trim();
   const clube = document.getElementById('cad-clube').value;
   const pos = document.getElementById('cad-posicao').value;
-  const peso = document.getElementById('cad-peso').value || 75;
-  const altura = document.getElementById('cad-altura').value || 180;
-  const cidade = document.getElementById('cad-cidade').value || 'Espírito Santo';
+  const peso = parseInt(document.getElementById('cad-peso').value) || 75;
+  const altura = parseInt(document.getElementById('cad-altura').value) || 180;
+  const cidade = document.getElementById('cad-cidade').value.trim() || 'Espírito Santo';
 
   if (!nome || !clube || !pos) {
     alert('Preencha os campos obrigatórios: Nome, Clube e Posição principal.');
     return;
   }
 
+  const btnSalvar = document.querySelector('#screen-cadastro-jogador .btn-primary');
+  if (btnSalvar) { btnSalvar.disabled = true; btnSalvar.textContent = 'Salvando...'; }
+
   const id = 'p_' + Date.now();
   const iniciais = nome.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
 
-  let badgeClass = 'badge-mid';
-  let color = 'rgba(34,197,94';
-  let pointColor = '#22c55e';
-  if (pos === 'Atacante') { badgeClass='badge-atk'; color='rgba(251,191,36'; pointColor='#fbbf24'; }
-  else if (pos === 'Zagueiro' || pos === 'Lateral') { badgeClass='badge-def'; color='rgba(248,113,113'; pointColor='#f87171'; }
-  else if (pos === 'Goleiro') { badgeClass='badge-gk'; color='rgba(167,139,250'; pointColor='#a78bfa'; }
-  else if (pos === 'Meia' || pos === 'Volante') { badgeClass='badge-mid'; color='rgba(56,189,248'; pointColor='#38bdf8'; }
+  let badgeClass = 'badge-mid', color = 'rgba(34,197,94', pointColor = '#22c55e';
+  if (pos === 'Atacante')                          { badgeClass='badge-atk'; color='rgba(251,191,36'; pointColor='#fbbf24'; }
+  else if (pos === 'Zagueiro' || pos === 'Lateral'){ badgeClass='badge-def'; color='rgba(248,113,113'; pointColor='#f87171'; }
+  else if (pos === 'Goleiro')                      { badgeClass='badge-gk';  color='rgba(167,139,250'; pointColor='#a78bfa'; }
+  else if (pos === 'Meia'     || pos === 'Volante'){ badgeClass='badge-mid'; color='rgba(56,189,248';  pointColor='#38bdf8'; }
 
-  const score = (70 + Math.random() * 15).toFixed(1);
-  
+  const score = parseFloat((70 + Math.random() * 15).toFixed(1));
   const novoAtleta = {
     id, nome, iniciais, clube, pos, badgeClass,
     idade: 20 + Math.floor(Math.random()*12),
-    altura: parseInt(altura), peso: parseInt(peso), pe: 'Direito', cidade, score: parseFloat(score), rank: 'Novo Registro',
+    altura, peso, pe: 'Direito', cidade, score, rank: 'Novo Registro',
     gols: pos==='Goleiro'?0:Math.floor(Math.random()*10),
     assists: pos==='Goleiro'?0:Math.floor(Math.random()*8),
     jogos: Math.floor(5+Math.random()*15),
-    g90: pos==='Goleiro'? '—' : (Math.random()*0.5).toFixed(2),
-    passe: Math.floor(60 + Math.random() * 30) + '%',
+    g90: pos==='Goleiro'?'—':(Math.random()*0.5).toFixed(2),
+    passe: Math.floor(60+Math.random()*30)+'%',
     cartoes: Math.floor(Math.random()*4),
-    radar: [Math.floor(40+Math.random()*50), Math.floor(40+Math.random()*50), Math.floor(40+Math.random()*50), Math.floor(40+Math.random()*50), Math.floor(40+Math.random()*50), Math.floor(40+Math.random()*50)],
+    radar: Array.from({length:6}, ()=>Math.floor(40+Math.random()*50)),
     color, pointColor,
     indicators: [
-        {l:'Performance Bruta',v: (Math.random() * 100).toFixed(0) + '%',w: Math.random() * 100,c:''},
-        {l:'Precisão tática',v: (Math.random() * 100).toFixed(0) + '%',w: Math.random() * 100,c:'blue'},
-        {l:'Foco do jogador',v: (Math.random() * 100).toFixed(0) + '%',w: Math.random() * 100,c:'amber'}
+      {l:'Performance Bruta', v:(Math.random()*100).toFixed(0)+'%', w:Math.random()*100, c:''},
+      {l:'Precisão tática',   v:(Math.random()*100).toFixed(0)+'%', w:Math.random()*100, c:'blue'},
+      {l:'Foco do jogador',   v:(Math.random()*100).toFixed(0)+'%', w:Math.random()*100, c:'amber'}
     ],
     matches: [],
-    ai: generateAiData(pos) // This uses the global schema function which exists below this
+    ai: generateAiData(pos)
   };
 
+  // Salva localmente
   PLAYERS[id] = novoAtleta;
   savePlayers();
-  refreshGoalCharts();
 
-  // Show visual feedback instead of alert if possible, but an alert is simple.
-  alert('Atleta ' + nome + ' cadastrado com sucesso e salvo permanentemente!');
-  
-  // Reset form
+  // Envia para o backend
+  try {
+    await apiCall('/api/players', {
+      method: 'POST',
+      body: JSON.stringify({ id, nome, clube, pos, badge_class: badgeClass, idade: novoAtleta.idade, altura, peso, pe: 'Direito', cidade, score, iniciais, dados: novoAtleta })
+    });
+  } catch(e) {
+    console.warn('Atleta salvo localmente, falha no backend:', e.message);
+  }
+
+  refreshGoalCharts();
+  alert('Atleta ' + nome + ' cadastrado com sucesso!');
+
   document.getElementById('cad-nome').value = '';
   document.getElementById('cad-posicao').value = '';
   document.getElementById('cad-clube').value = '';
   document.getElementById('cad-cidade').value = '';
-  
-  // Navigate back to players grid and refresh
+  if (btnSalvar) { btnSalvar.disabled = false; btnSalvar.textContent = 'Salvar Atleta →'; }
+
   goTo('jogadores', document.querySelector('[data-screen=jogadores]'));
   renderVitrineJogadores();
   updateGlobalStats();
+}
+
+// Carrega atletas novos cadastrados no backend e mescla com os estáticos
+async function loadApiPlayers() {
+  try {
+    const res = await apiCall('/api/players');
+    if (!res.ok) return;
+    const { players } = await res.json();
+    let added = 0;
+    for (const p of players) {
+      if (!PLAYERS[p.id] && p.dados) {
+        PLAYERS[p.id] = p.dados;
+        added++;
+      }
+    }
+    if (added > 0) {
+      savePlayers();
+      const el = document.getElementById('dash-kpi-jogadores');
+      if (el) el.textContent = Object.keys(PLAYERS).length;
+    }
+  } catch(e) { /* sem conexão, ignora */ }
 }
 
 // ── Banco de Dados de Clubes (CLUBS) ───────────────
