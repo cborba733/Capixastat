@@ -1278,6 +1278,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
             <div class="user-role">Técnico · Real Noroeste</div>
           </div>
         </div>
+        <div onclick="logout()" style="margin-top:8px;padding:6px 12px;font-size:11px;color:var(--text-3);cursor:pointer;text-align:center;border-radius:6px;border:1px solid rgba(255,255,255,0.07)" onmouseover="this.style.color='#f87171'" onmouseout="this.style.color='var(--text-3)'">Sair da conta</div>
       </div>
     </nav>
 
@@ -1935,17 +1936,33 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 
 <script>
 // ── BANCO DE DADOS (localStorage) ────────────
-function getUsers() {
-  return JSON.parse(localStorage.getItem('capixastat_users') || '[]');
+// ── Backend API ──────────────────────────────
+const API_URL = 'https://capixastat.onrender.com';
+
+function getToken() {
+  return localStorage.getItem('capixastat_token');
 }
-function saveUsers(users) {
-  localStorage.setItem('capixastat_users', JSON.stringify(users));
+async function apiCall(endpoint, options = {}) {
+  const token = getToken();
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  return fetch(API_URL + endpoint, { ...options, headers: { ...headers, ...(options.headers || {}) } });
 }
+
 function setCurrentUser(user) {
   localStorage.setItem('capixastat_current', JSON.stringify(user));
 }
 function getCurrentUser() {
   return JSON.parse(localStorage.getItem('capixastat_current') || 'null');
+}
+function logout() {
+  localStorage.removeItem('capixastat_token');
+  localStorage.removeItem('capixastat_current');
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-senha').value = '';
+  document.getElementById('login-error').style.display = 'none';
 }
 
 // Resolve o nome do clube do usuário para a chave exata usada em CLUBS/MATCHES
@@ -2002,10 +2019,11 @@ function showLogin() {
 }
 
 // ── Login Handler ────────────────────────────
-function handleLogin() {
+async function handleLogin() {
   const email = document.getElementById('login-email').value.trim();
   const senha = document.getElementById('login-senha').value;
   const errBox = document.getElementById('login-error');
+  const btn = document.querySelector('#form-login .btn-primary');
 
   if (!email || !senha) {
     errBox.textContent = 'Preencha e-mail e senha para continuar.';
@@ -2013,23 +2031,36 @@ function handleLogin() {
     return;
   }
 
-  const users = getUsers();
-  const user = users.find(u => u.email === email && u.senha === senha);
+  errBox.style.display = 'none';
+  if (btn) { btn.disabled = true; btn.textContent = 'Entrando...'; }
 
-  if (!user) {
-    errBox.textContent = 'E-mail ou senha incorretos. Verifique seus dados ou crie uma conta.';
+  try {
+    const res = await apiCall('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, senha })
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      errBox.textContent = data.error || 'E-mail ou senha incorretos.';
+      errBox.style.display = 'block';
+      return;
+    }
+
+    localStorage.setItem('capixastat_token', data.token);
+    setCurrentUser(data.user);
+    updateSidebarUser(data.user);
+    enterApp();
+  } catch (e) {
+    errBox.textContent = 'Erro de conexão com o servidor. Tente novamente.';
     errBox.style.display = 'block';
-    return;
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Entrar'; }
   }
-
-  // Login OK
-  setCurrentUser(user);
-  updateSidebarUser(user);
-  enterApp();
 }
 
 // ── Register Handler ─────────────────────────
-function handleRegister() {
+async function handleRegister() {
   const nome = document.getElementById('reg-nome').value.trim();
   const clube = document.getElementById('reg-clube').value;
   const funcao = document.getElementById('reg-funcao').value;
@@ -2037,61 +2068,52 @@ function handleRegister() {
   const senha = document.getElementById('reg-senha').value;
   const senha2 = document.getElementById('reg-senha2').value;
   const msgBox = document.getElementById('register-msg');
+  const btn = document.querySelector('#form-register .btn-primary');
 
-  // Validações
-  if (!nome || !clube || !funcao || !email || !senha) {
-    msgBox.textContent = 'Preencha todos os campos para continuar.';
+  const showErr = (msg) => {
+    msgBox.textContent = msg;
     msgBox.style.background = 'rgba(248,113,113,.1)';
     msgBox.style.border = '1px solid rgba(248,113,113,.2)';
     msgBox.style.color = '#fca5a5';
     msgBox.style.display = 'block';
-    return;
-  }
-  if (senha.length < 6) {
-    msgBox.textContent = 'A senha deve ter pelo menos 6 caracteres.';
-    msgBox.style.background = 'rgba(248,113,113,.1)';
-    msgBox.style.border = '1px solid rgba(248,113,113,.2)';
-    msgBox.style.color = '#fca5a5';
+  };
+
+  if (!nome || !clube || !funcao || !email || !senha) return showErr('Preencha todos os campos para continuar.');
+  if (senha.length < 6) return showErr('A senha deve ter pelo menos 6 caracteres.');
+  if (senha !== senha2) return showErr('As senhas não coincidem. Verifique e tente novamente.');
+
+  msgBox.style.display = 'none';
+  if (btn) { btn.disabled = true; btn.textContent = 'Cadastrando...'; }
+
+  try {
+    const res = await apiCall('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ nome, email, senha, clube, funcao })
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      showErr(data.error || 'Erro ao criar conta.');
+      return;
+    }
+
+    msgBox.textContent = '✅ Conta criada com sucesso! Redirecionando para o login...';
+    msgBox.style.background = 'rgba(34,197,94,.1)';
+    msgBox.style.border = '1px solid rgba(34,197,94,.2)';
+    msgBox.style.color = '#86efac';
     msgBox.style.display = 'block';
-    return;
+
+    setTimeout(() => {
+      showLogin();
+      document.getElementById('login-email').value = email;
+      document.getElementById('login-senha').value = '';
+      document.getElementById('login-senha').focus();
+    }, 1500);
+  } catch (e) {
+    showErr('Erro de conexão com o servidor. Tente novamente.');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Criar Conta'; }
   }
-  if (senha !== senha2) {
-    msgBox.textContent = 'As senhas não coincidem. Verifique e tente novamente.';
-    msgBox.style.background = 'rgba(248,113,113,.1)';
-    msgBox.style.border = '1px solid rgba(248,113,113,.2)';
-    msgBox.style.color = '#fca5a5';
-    msgBox.style.display = 'block';
-    return;
-  }
-
-  const users = getUsers();
-  if (users.find(u => u.email === email)) {
-    msgBox.textContent = 'Este e-mail já está cadastrado. Faça login ou use outro e-mail.';
-    msgBox.style.background = 'rgba(248,113,113,.1)';
-    msgBox.style.border = '1px solid rgba(248,113,113,.2)';
-    msgBox.style.color = '#fca5a5';
-    msgBox.style.display = 'block';
-    return;
-  }
-
-  // Salvar no "banco"
-  const newUser = { nome, email, senha, clube, funcao, criadoEm: new Date().toISOString() };
-  users.push(newUser);
-  saveUsers(users);
-
-  // Sucesso
-  msgBox.textContent = '✅ Conta criada com sucesso! Redirecionando para o login...';
-  msgBox.style.background = 'rgba(34,197,94,.1)';
-  msgBox.style.border = '1px solid rgba(34,197,94,.2)';
-  msgBox.style.color = '#86efac';
-  msgBox.style.display = 'block';
-
-  setTimeout(() => {
-    showLogin();
-    document.getElementById('login-email').value = email;
-    document.getElementById('login-senha').value = '';
-    document.getElementById('login-senha').focus();
-  }, 1500);
 }
 
 // ── Atualizar sidebar com usuário logado ─────
