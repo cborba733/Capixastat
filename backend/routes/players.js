@@ -48,7 +48,7 @@ router.post('/', authMid, async (req, res) => {
       `INSERT INTO players (id, nome, clube, pos, badge_class, idade, altura, peso, pe, cidade, score, iniciais, dados)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
        RETURNING *`,
-      [id, nome, clube, pos, badge_class, idade, altura, peso, pe, cidade, score, iniciais, dados ? JSON.stringify(dados) : null]
+      [id, nome, clube, pos, badge_class, idade || null, altura || null, peso || null, pe, cidade, score || null, iniciais, dados ?? null]
     );
     res.status(201).json({ player: result.rows[0] });
   } catch (e) {
@@ -66,8 +66,7 @@ router.put('/:id', authMid, async (req, res) => {
       `UPDATE players SET nome=$1, clube=$2, pos=$3, badge_class=$4, idade=$5, altura=$6,
        peso=$7, pe=$8, cidade=$9, score=$10, iniciais=$11, dados=$12
        WHERE id=$13 RETURNING *`,
-      [nome, clube, pos, badge_class, idade, altura, peso, pe, cidade, score, iniciais,
-       dados ? JSON.stringify(dados) : null, req.params.id]
+      [nome, clube, pos, badge_class, idade || null, altura || null, peso || null, pe, cidade, score || null, iniciais, dados ?? null, req.params.id]
     );
     if (!result.rows.length)
       return res.status(404).json({ error: 'Jogador não encontrado' });

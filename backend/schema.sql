@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS players (
   peso      INTEGER,
   pe        VARCHAR(20),
   cidade    VARCHAR(100),
-  score     INTEGER,
+  score     FLOAT,
   iniciais  VARCHAR(5),
   dados     JSONB,
   criado_em TIMESTAMP DEFAULT NOW()
