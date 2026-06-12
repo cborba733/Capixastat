@@ -47,14 +47,18 @@ O projeto está alinhado com as seguintes ODS da ONU:
 - Comparativo entre atletas
 
 🧠 Formação de Atletas
-- Controle de carga e intensidade de treino
-- Acompanhamento de evolução física
-- Avaliação antropométrica e flexibilidade
+- Acompanhamento físico: carga e intensidade de treino
+- Evolução física e avaliação antropométrica
 - Microciclo e registro de sessões
 
-💰 Captação de Patrocínio
-- Cadastro de empresas
-- Conexão entre clubes e patrocinadores
+🛡️ Meu Time
+- Painel do clube: escudo, estádio, fundação e elenco
+- Competições do clube (Capixabão, Copa ES, Série D, Copa Verde)
+- Classificação e partidas recentes por competição
+
+🤖 Auxiliar Tático com IA
+- Dossiê do adversário e análise tática
+- Conversa com IA (Google Gemini) usando os dados cadastrados no sistema
 
 🖥️ Sistema Web (CapixaStat v4)
 A versão atual é um sistema web funcional desenvolvido em HTML, CSS e JavaScript,
