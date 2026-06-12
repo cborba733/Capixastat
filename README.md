@@ -67,6 +67,22 @@ Para visualizar:
 
 > Recomendado visualizar em desktop para melhor experiência.
 
+🔄 Evolução em React (pasta `web-react/`)
+Em paralelo ao MVP, o frontend está sendo reescrito em **React + Vite + TypeScript**
+(pasta `web-react/`), preparando o sistema para uma arquitetura componentizada e
+integrada ao backend. Para rodar localmente:
+
+```
+cd web-react
+npm install
+npm run dev
+```
+
+🗄️ Backend (pasta `backend/`)
+API REST em **Node.js + Express** com autenticação via **JWT**, senhas protegidas com
+**bcrypt** e persistência em banco **PostgreSQL hospedado na nuvem (Supabase)**.
+Rotas para autenticação, jogadores e partidas.
+
 🔗 Protótipo Figma (Entrega 1):
 👉 https://www.figma.com/proto/P6cKkNpznRsC6hGaXzQQo3/Sem-título?node-id=1-2&p=f&t=bDsslCgpTqMGOiU9-1  (Não está atualizado, continua sendo o mesmo da C1, atualizarei em breve)
 
@@ -74,7 +90,7 @@ Para visualizar:
 Vídeo demonstrando o funcionamento e a explicação do projeto:
 
 🔗 Assista aqui:
-👉 https://youtu.be/hJB4khBIWR4
+👉 https://youtu.be/AtuLAsqaVMQ
 
 📄 Relatório
 O relatório completo do PI3 está disponível no repositório:
@@ -90,35 +106,62 @@ O sistema aplica conceitos de ciência de dados para:
 - Comparação entre jogadores
 - Geração de insights automáticos para tomada de decisão
 
-📌 Os dados utilizados atualmente são simulados para fins acadêmicos e validação do MVP,
-com foco na camada analítica do sistema.
+📌 Origem dos dados
+O sistema utiliza **dados reais** da temporada 2026 do futebol capixaba, coletados de
+fontes públicas e integrados à plataforma:
+
+- **Resultados e eventos das partidas:** FlashScore
+- **Estatísticas individuais dos atletas** (gols, assistências, jogos, cartões, minutos),
+  por competição (Capixabão, Série D, Copa Verde, Copa do ES e Copa do Brasil):
+  Transfermarkt e oGol
+- **Fotos dos jogadores:** API da SofaScore (com opção de upload manual de foto)
+- **Escudos e logos dos clubes:** TheSportsDB e Transfermarkt
+- **Auxiliar Tático com IA** ("Dossiê do Adversário"): API do Google Gemini
+  (usa a chave do próprio usuário, salva apenas no navegador)
+
+> Sobre as camadas de dados: indicadores como gols, assistências, jogos e o **Score Geral**
+> (calculado pelo próprio sistema) partem de dados reais. Já os **gráficos de radar e mapas
+> de calor são ilustrativos** nesta fase — a análise por **visão computacional (YOLOv8)** sobre
+> vídeos de jogo é o próximo passo planejado do projeto.
 
 ⚙️ Tecnologias Utilizadas
 
-✔️ Utilizadas no MVP
-- HTML, CSS e JavaScript
+✔️ Frontend
+- HTML, CSS e JavaScript (MVP `CapixaStat_v4.html`)
+- React + Vite + TypeScript (evolução em `web-react/`)
 - Chart.js (gráficos e visualizações)
 - Figma (protótipo)
 
+✔️ Backend e dados
+- Node.js + Express (API REST)
+- Autenticação JWT + bcrypt
+- PostgreSQL hospedado na nuvem (Supabase)
+
+✔️ Integrações e APIs
+- FlashScore (resultados de partidas)
+- Transfermarkt e oGol (estatísticas dos atletas)
+- SofaScore (fotos dos jogadores)
+- TheSportsDB (escudos dos clubes)
+- Google Gemini (auxiliar tático com IA)
+
 🔜 Planejadas para evolução
-- React + Vite
-- Banco de Dados (MySQL ou PostgreSQL)
-- Python (análise de dados)
-- Pandas, NumPy
+- Python (análise de dados) — Pandas, NumPy
 - YOLOv8 (visão computacional — prova de conceito)
+- Machine learning para análise preditiva
 
 🚀 Status do Projeto
-📍 Fase atual: Entrega C2 — PI3
+📍 Fase atual: Entrega C3 — PI3
 
-O projeto encontra-se na segunda entrega, com foco em:
+O projeto encontra-se na terceira entrega, com foco em:
 
 - Sistema web funcional com dashboards interativos
-- Módulos de análise, formação e comparativo implementados
-- Planejamento de arquitetura para evolução do sistema
+- Integração de dados reais do futebol capixaba (temporada 2026)
+- Backend com API REST, autenticação e banco de dados na nuvem
+- Auxiliar tático com inteligência artificial
+- Início da migração do frontend para React
 
 🔮 Evoluções Futuras
-- Integração com APIs esportivas reais
-- Análise automática de vídeos com visão computacional
+- Análise automática de vídeos com visão computacional (YOLOv8)
 - Machine learning para análise preditiva
 - Métricas avançadas: xG (gols esperados) e ELO
-- Backend com banco de dados real
+- Conclusão da migração do frontend para React
