@@ -23,17 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-# Claude Code local config
-.claude/
-
-# Temp/geração de documentos
-criar_relatorio.cjs
-fix.cjs
-force_dom.js
-refactor.cjs
-test.js
+# Arquivos de trabalho (scraping, dumps de dados, geração do relatório) — uso local, não vão pro GitHub
+_scratch/
 *.docx
-fig1_dashboard.png
-fig2_perfil.png
-fig3_antropometria.png
-fig4_carga.png
