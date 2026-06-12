@@ -87,9 +87,6 @@ API REST em **Node.js + Express** com autenticação via **JWT**, senhas protegi
 **bcrypt** e persistência em banco **PostgreSQL hospedado na nuvem (Supabase)**.
 Rotas para autenticação, jogadores e partidas.
 
-🔗 Protótipo Figma (Entrega 1):
-👉 https://www.figma.com/proto/P6cKkNpznRsC6hGaXzQQo3/Sem-título?node-id=1-2&p=f&t=bDsslCgpTqMGOiU9-1  (Não está atualizado, continua sendo o mesmo da C1, atualizarei em breve)
-
 🎥 Exibição em Vídeo
 Vídeo demonstrando o funcionamento e a explicação do projeto:
 
