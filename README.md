@@ -36,18 +36,21 @@ O projeto está alinhado com as seguintes ODS da ONU:
 🧩 Funcionalidades do Sistema
 
 ⚽ Vitrine de Jogadores
-- Cadastro de atletas
+- Cadastro de atletas com estatísticas reais (jogos, gols, assistências, cartões, taxa de passe)
 - Perfil com informações (idade, posição, clube)
-- Estatísticas individuais e score geral
+- Radar de competências e Índice Ofensivo calculados a partir das estatísticas reais
+- Estatísticas individuais, score geral, percentil por posição e jogadores de perfil parecido
 
 📊 Análise de Desempenho
 - Cadastro de partidas
 - Registro de estatísticas por rodada
+- Detalhe da partida com estatísticas oficiais (posse, finalizações, escanteios, cartões) e linha do tempo de gols
 - Ranking de jogadores com KPIs
 - Comparativo entre atletas
 
 🧠 Formação de Atletas
 - Acompanhamento físico: carga e intensidade de treino
+- Gestão de carga com **ACWR** (razão carga aguda:crônica) e alerta de risco de lesão
 - Evolução física e avaliação antropométrica
 - Microciclo e registro de sessões
 
@@ -55,10 +58,18 @@ O projeto está alinhado com as seguintes ODS da ONU:
 - Painel do clube: escudo, estádio, fundação e elenco
 - Competições do clube (Capixabão, Copa ES, Série D, Copa Verde)
 - Classificação e partidas recentes por competição
+- Índice ofensivo do clube (a partir dos placares reais das partidas)
 
 🤖 Auxiliar Tático com IA
 - Dossiê do adversário e análise tática
 - Conversa com IA (Google Gemini) usando os dados cadastrados no sistema
+
+🆕 Atualizações recentes
+- **Radar de competências** dos jogadores agora **calculado a partir de estatísticas reais** (antes era modelo por posição / aleatório) — Gols, Passes e Disciplina saem do dado real; Físico e Consistência são proxies de durabilidade; Dribles é baseline por posição.
+- Novo **Índice Ofensivo** para jogadores (gols/assistências por jogo) e para clubes (placares reais das partidas).
+- **Cadastro de atletas** passou a coletar estatísticas reais e a calcular radar, score e índice a partir delas.
+- **Monitor de carga com ACWR** (razão carga aguda:crônica) e alerta de risco de lesão, na área de Formação.
+- **Competições 2026 atualizadas** com os resultados reais: Copa ES (campeão Rio Branco-VN) e Série D (Rio Branco-ES e Vitória-ES eliminados na 2ª fase), incluindo os jogos de mata-mata com **estatísticas oficiais e gols reais** obtidos da API pública do **SofaScore**.
 
 🖥️ Sistema Web (CapixaStat v4)
 A versão atual é um sistema web funcional desenvolvido em HTML, CSS e JavaScript,
@@ -120,10 +131,13 @@ fontes públicas e integrados à plataforma:
 - **Auxiliar Tático com IA** ("Dossiê do Adversário"): API do Google Gemini
   (usa a chave do próprio usuário, salva apenas no navegador)
 
-> Sobre as camadas de dados: indicadores como gols, assistências, jogos e o **Score Geral**
-> (calculado pelo próprio sistema) partem de dados reais. Já os **gráficos de radar e mapas
-> de calor são ilustrativos** nesta fase — a análise por **visão computacional (YOLOv8)** sobre
-> vídeos de jogo é o próximo passo planejado do projeto.
+> Sobre as camadas de dados: indicadores como gols, assistências, jogos, o **Score Geral**,
+> o **Radar de competências** e o **Índice Ofensivo** (todos calculados pelo próprio sistema)
+> partem de dados reais da temporada. No radar, os eixos Gols, Passes e Disciplina saem
+> diretamente das estatísticas; Físico e Consistência são proxies de durabilidade (jogos
+> disputados); o eixo Dribles é um baseline por posição, pois não há dado público de dribles.
+> Já os **mapas de calor são ilustrativos** nesta fase — a análise por **visão computacional
+> (YOLOv8)** sobre vídeos de jogo é o próximo passo planejado do projeto.
 
 ⚙️ Tecnologias Utilizadas
 
