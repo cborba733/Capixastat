@@ -8,6 +8,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- Konva (quadro tático) — arquivo local: funciona com e sem internet -->
+<script src="konva.min.js"></script>
 <style>
 /* ═══════════════════════════════════════════
    TOKENS & RESET
@@ -1713,6 +1715,10 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M12 3v18M2 12h20M7 7.5h1M16 7.5h1M7 16.5h1M16 16.5h1M12 9v6"/></svg>
         Táticas
       </div>
+      <div class="nav-item" data-screen="telestrador" onclick="goTo('telestrador',this)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+        Quadro Tático
+      </div>
 
       <div class="sidebar-bottom">
         <div class="user-chip">
@@ -1735,7 +1741,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
       <!-- ══ DASHBOARD ══ -->
       <div id="screen-dashboard" class="screen active">
         <div class="topbar">
-          <div class="topbar-left"><h1>Dashboard</h1><p>Campeonato Capixaba 2026 · Rodada 8</p></div>
+          <div class="topbar-left"><h1>Dashboard</h1><p id="dash-subtitle">Visão geral da temporada 2026</p></div>
           <div class="topbar-right">
             <span class="badge badge-season">Série A · 2026</span>
             <button class="btn btn-ghost btn-sm">Exportar</button>
@@ -1842,17 +1848,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
               <p class="chart-insight" id="insight-posicao"></p>
             </div>
             <div class="card">
-              <div class="card-title">Últimas atividades</div>
-              <table class="data-table">
-                <thead><tr><th>Tipo</th><th>Descrição</th><th>Data</th></tr></thead>
-                <tbody>
-                  <tr><td><span class="badge badge-mid" style="font-size:9px">PARTIDA</span></td><td>Porto Vitória 3 × 0 Sport Clube Capixaba</td><td class="text-muted">06/06</td></tr>
-                  <tr><td><span class="badge badge-ds">DATA</span></td><td>Rankings atualizados (DS)</td><td class="text-muted">06/06</td></tr>
-                  <tr><td><span class="badge badge-new" style="font-size:9px">ATLETA</span></td><td>Breninho (Rio Branco ES) — 11 gols na temporada</td><td class="text-muted">31/05</td></tr>
-                  <tr><td><span class="badge badge-mid" style="font-size:9px">PARTIDA</span></td><td>Porto Vitória 1 × 1 Serra FC</td><td class="text-muted">30/05</td></tr>
-                  <tr><td><span class="badge badge-atk" style="font-size:9px">GOLEADA</span></td><td>Vitória ES 5 × 0 Sport Clube Capixaba</td><td class="text-muted">27/05</td></tr>
-                </tbody>
-              </table>
+              <div class="card-title">Últimas partidas</div>
+              <div id="dash-activities"></div>
             </div>
           </div>
         </div>
@@ -2005,40 +2002,111 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 
           <div class="tab-nav">
             <button class="tab-btn active" onclick="switchTab(event,'pane-visao')">Visão Geral</button>
+            <button class="tab-btn" onclick="switchTab(event,'pane-desempenho')">Desempenho</button>
             <button class="tab-btn" onclick="switchTab(event,'pane-stats')">Estatísticas</button>
             <button class="tab-btn" onclick="switchTab(event,'pane-evolucao')">Evolução</button>
             <button class="tab-btn" onclick="switchTab(event,'pane-historico')">Histórico</button>
           </div>
 
+          <style>
+            .ov-grid-4{display:grid;grid-template-columns:0.7fr 2.5fr 1.35fr 0.85fr;gap:14px;margin-bottom:14px;align-items:stretch}
+            .ov-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px;align-items:stretch}
+            .ov-card{padding:18px;display:flex;flex-direction:column}
+            .ov-h{font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px;flex-shrink:0}
+            /* cards de linhas: distribuem o conteúdo pra preencher a altura (sem sobra) */
+            #p-clube-card,#p-status,#p-estat-comp{flex:1;display:flex;flex-direction:column;justify-content:space-between}
+            #p-posicoes{flex:1;display:flex;flex-direction:column;justify-content:center}
+            #p-estat-mini{flex:1;display:flex;flex-direction:column;justify-content:center}
+            .atrib-wrap{display:flex;gap:18px;align-items:center;flex:1;justify-content:flex-start}
+            .atrib-bars{flex:0 0 164px;min-width:0;display:flex;flex-direction:column;gap:12px}
+            .mini-radar-box{flex:1;min-width:0;height:330px}
+            .ov-bar{display:flex;align-items:center;gap:9px;font-size:12.5px}
+            .ov-bar .lbl{width:82px;color:var(--text-2);flex-shrink:0}
+            .ov-bar .trk{flex:1;height:7px;background:var(--border);border-radius:4px;overflow:hidden}
+            .ov-bar .fil{height:100%;border-radius:4px}
+            .ov-bar .val{width:38px;text-align:right;font-weight:800;color:var(--text-1);font-size:13px}
+            .ov-stat-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
+            .ov-stat-row:last-child{border-bottom:none}
+            .ov-stat-row .k{color:var(--text-3)}
+            .ov-stat-row .v{color:var(--text-1);font-weight:700}
+            .ov-clube-head{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+            .ov-clube-head img{width:46px;height:46px;object-fit:contain;flex-shrink:0}
+            .ov-estat-tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+            .ov-tile{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:10px;padding:14px 10px;text-align:center}
+            .ov-tile .n{font-size:26px;font-weight:800;line-height:1}
+            .ov-tile .l{font-size:11px;color:var(--text-3);margin-top:5px}
+            .desemp-chart{position:relative;height:320px;width:100%;margin:6px 0}
+            @media(max-width:1100px){ .ov-grid-4,.ov-grid-3{grid-template-columns:1fr 1fr} }
+          </style>
           <div id="pane-visao" class="tab-pane active">
-            <div class="grid-2-eq">
-              <div class="card">
-                <div class="card-title">Perfil técnico — Radar de competências <span class="badge badge-ds">DS</span><span class="tac-tip" data-tip="As 6 competências técnicas do atleta numa escala de 0 a 100, derivadas das estatísticas da temporada. É a nota bruta do jogador — diferente do gráfico de percentil ao lado, que mostra a posição dele no ranking comparado aos outros da mesma posição.">?</span></div>
-                <canvas id="chartRadar" height="170"></canvas>
-                <p class="chart-insight" id="insight-radar"></p>
+            <div class="ov-grid-4">
+              <div class="card ov-card">
+                <div class="ov-h">Clube atual</div>
+                <div id="p-clube-card"></div>
               </div>
-              <div class="card" id="p-indicators">
-                <div class="card-title">Indicadores de desempenho</div>
-                <!-- populated by JS -->
+              <div class="card ov-card">
+                <div class="ov-h">Atributos <span class="badge badge-ds">DS</span><span class="tac-tip" data-tip="As 6 competências técnicas do atleta (0 a 100), derivadas das estatísticas reais da temporada. Análise detalhada na aba Desempenho.">?</span></div>
+                <div class="atrib-wrap">
+                  <div id="p-atributos" class="atrib-bars"></div>
+                  <div class="mini-radar-box"><canvas id="chartMiniRadar"></canvas></div>
+                </div>
+              </div>
+              <div class="card ov-card">
+                <div class="ov-h">Posições</div>
+                <div id="p-posicoes"></div>
+              </div>
+              <div class="card ov-card">
+                <div class="ov-h">Status</div>
+                <div id="p-status"></div>
               </div>
             </div>
-            <div class="grid-2-eq">
-              <div class="card">
-                <div class="card-title">Percentil por posição <span class="badge badge-ds">DS</span><span class="tac-tip" data-tip="Mostra o ranking deste atleta em cada métrica comparado aos jogadores da mesma posição que têm estatísticas reais. É percentil (posição no ranking), não a nota bruta: fatia grande = entre os melhores da posição; fatia pequena = abaixo na comparação.">?</span></div>
-                <canvas id="chartPizza" height="170"></canvas>
-                <p class="chart-insight" id="insight-pizza"></p>
+
+            <div class="ov-grid-3">
+              <div class="card ov-card">
+                <div class="ov-h">Estatísticas</div>
+                <div id="p-estat-mini"></div>
               </div>
-              <div class="card" id="p-similar">
-                <div class="card-title">Jogadores com perfil parecido</div>
-                <!-- populated by JS -->
+              <div class="card ov-card">
+                <div class="ov-h">Por competição</div>
+                <div id="p-estat-comp"></div>
+              </div>
+              <div class="card ov-card">
+                <div class="ov-h">Desenvolvimento <span class="badge badge-ds">DS</span></div>
+                <canvas id="chartDevMini" height="110"></canvas>
               </div>
             </div>
+
             <div class="card" id="p-matches-card">
               <div class="card-title">Últimas partidas</div>
               <table class="data-table">
                 <thead><tr><th>Data</th><th>Adversário</th><th>Placar</th><th>Min.</th><th>Gols</th><th>Assist.</th><th>Chutes</th><th>Passes</th></tr></thead>
                 <tbody id="p-matches"></tbody>
               </table>
+            </div>
+          </div>
+
+          <div id="pane-desempenho" class="tab-pane">
+            <div class="grid-2-eq">
+              <div class="card">
+                <div class="card-title">Perfil técnico — Radar de competências <span class="badge badge-ds">DS</span><span class="tac-tip" data-tip="As 6 competências técnicas do atleta numa escala de 0 a 100, derivadas das estatísticas da temporada. É a nota bruta do jogador — diferente do gráfico de percentil ao lado, que mostra a posição dele no ranking comparado aos outros da mesma posição.">?</span></div>
+                <div class="desemp-chart"><canvas id="chartRadar"></canvas></div>
+                <p class="chart-insight" id="insight-radar"></p>
+              </div>
+              <div class="card">
+                <div class="card-title">Percentil por posição <span class="badge badge-ds">DS</span><span class="tac-tip" data-tip="Mostra o ranking deste atleta em cada métrica comparado aos jogadores da mesma posição que têm estatísticas reais. É percentil (posição no ranking), não a nota bruta: fatia grande = entre os melhores da posição; fatia pequena = abaixo na comparação.">?</span></div>
+                <div class="desemp-chart"><canvas id="chartPizza"></canvas></div>
+                <p class="chart-insight" id="insight-pizza"></p>
+              </div>
+            </div>
+            <div class="grid-2-eq">
+              <div class="card" id="p-indicators">
+                <div class="card-title">Indicadores de desempenho</div>
+                <!-- populated by JS -->
+              </div>
+              <div class="card" id="p-similar">
+                <div class="card-title">Jogadores com perfil parecido</div>
+                <!-- populated by JS -->
+              </div>
             </div>
 
             <!-- ★ BLOCO POC VISÃO COMPUTACIONAL (IA) — DINÂMICO -->
@@ -2358,6 +2426,217 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
         </div>
       </div>
 
+      <!-- ══ QUADRO TÁTICO (TELESTRADOR) ══ -->
+      <style>
+        #screen-telestrador .content{max-width:none;width:100%}
+        .tel-workspace{display:flex;gap:12px;align-items:stretch;height:calc(100vh - 148px);min-height:500px}
+        .tel-rail{flex:0 0 54px;display:flex;flex-direction:column;align-items:center;gap:3px;background:#0d1626;border:1px solid var(--border);border-radius:14px;padding:8px 5px;box-shadow:0 3px 14px rgba(0,0,0,.28)}
+        .tel-main{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;gap:10px}
+        .tel-tool{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:1px solid transparent;background:transparent;color:#8696b0;cursor:pointer;transition:background .12s,color .12s,border-color .12s;position:relative;padding:0}
+        .tel-tool svg{width:20px;height:20px;stroke-width:2;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
+        .tel-tool:hover{background:rgba(255,255,255,.05);color:#f0f4ff}
+        .tel-tool.active{background:rgba(0,230,118,.14);color:#00e676;border-color:rgba(0,230,118,.35)}
+        .tel-tool[data-tip]:hover::after{content:attr(data-tip);position:absolute;left:calc(100% + 11px);top:50%;transform:translateY(-50%);background:#05080f;color:#dfe6f2;font-size:11px;font-weight:600;padding:5px 9px;border-radius:7px;white-space:nowrap;border:1px solid var(--border);z-index:40;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.4)}
+        .tel-rdiv{width:30px;height:1px;background:var(--border);margin:5px 0;flex-shrink:0}
+        .tel-swatches{display:flex;flex-direction:column;align-items:center;gap:7px}
+        .tel-color{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid rgba(255,255,255,.14);transition:transform .1s}
+        .tel-color:hover{transform:scale(1.14)}
+        .tel-color.active{border-color:#fff;box-shadow:0 0 0 3px rgba(0,230,118,.35)}
+        .tel-stage{position:relative;flex:1 1 auto;min-height:0;width:100%;background:#070b14;border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 50px rgba(0,0,0,.45)}
+        .tel-stage #tel-konva{line-height:0}
+        .tel-stage #tel-konva canvas{display:block}
+        .tel-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:24px;z-index:5;background:radial-gradient(120% 120% at 50% 35%,#0b1220 0%,#070b14 70%)}
+        .tel-empty-ic{width:64px;height:64px;display:flex;align-items:center;justify-content:center;border-radius:18px;background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.28)}
+        .tel-empty-ic svg{width:30px;height:30px;stroke:#00e676;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+        .tel-empty h3{margin:0;font-size:18px;font-weight:800;color:#eef3fb;letter-spacing:-.2px}
+        .tel-empty p{margin:0;font-size:13px;color:#8696b0;max-width:400px;line-height:1.55}
+        .tel-empty-actions{display:flex;gap:10px;margin-top:4px;flex-wrap:wrap;justify-content:center}
+        .tel-empty-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:#0d1626;color:#c7d2e8;transition:border-color .12s,color .12s,background .12s}
+        .tel-empty-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+        .tel-empty-btn.primary{background:#00e676;color:#04140a;border-color:#00e676}
+        .tel-empty-btn.primary svg{stroke:#04140a}
+        .tel-empty-btn.primary:hover{background:#00c766}
+        .tel-empty-btn:not(.primary):hover{border-color:rgba(255,255,255,.22);color:#fff}
+        .tel-empty-hint{font-size:11.5px;color:#55657f;margin-top:2px}
+        .tel-videobar{display:none;align-items:center;gap:13px;background:#0d1626;border:1px solid var(--border);border-radius:12px;padding:9px 14px}
+        .tel-play{width:42px;height:34px;display:flex;align-items:center;justify-content:center;background:rgba(0,230,118,.14);color:#00e676;border:1px solid rgba(0,230,118,.32);border-radius:9px;cursor:pointer}
+        .tel-play svg{width:15px;height:15px;fill:currentColor;stroke:none}
+        .tel-vbtn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:#0a0f1a;color:#aab6cc;border:1px solid var(--border);border-radius:8px;cursor:pointer;flex-shrink:0}
+        .tel-vbtn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+        .tel-vbtn:hover{border-color:rgba(255,255,255,.2);color:#fff}
+        .tel-speed{background:#0a0f1a;color:#c7d2e8;border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;padding:7px 8px;cursor:pointer;outline:none;flex-shrink:0}
+        .tel-timing-box{display:flex;flex-direction:column;gap:8px;background:#0a0f1a;border:1px solid var(--border);border-radius:9px;padding:10px}
+        .tel-timing-box .tt-range{font-size:11px;color:#8696b0;font-family:'JetBrains Mono',monospace;text-align:center}
+        .tel-timing-box .tt-range b{color:#00e676;font-weight:700}
+        .tel-timing-btns{display:flex;gap:6px}
+        .tel-seek{flex:1;-webkit-appearance:none;appearance:none;height:5px;border-radius:3px;background:#1a2540;cursor:pointer;outline:none}
+        .tel-seek::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:#00e676;cursor:pointer;box-shadow:0 0 0 3px rgba(0,230,118,.22)}
+        .tel-seek::-moz-range-thumb{width:15px;height:15px;border:none;border-radius:50%;background:#00e676;cursor:pointer}
+        .tel-time{font-size:11.5px;color:#8696b0;font-family:'JetBrains Mono',monospace;min-width:92px;text-align:right}
+        .tel-timeline{display:none;background:#0d1626;border:1px solid var(--border);border-radius:12px;padding:10px 14px 13px}
+        .tel-tl-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+        .tel-tl-title{font-size:10.5px;font-weight:700;letter-spacing:.7px;color:#8696b0;text-transform:uppercase}
+        .tel-tl-add{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:#00e676;background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.32);border-radius:7px;padding:5px 11px;cursor:pointer}
+        .tel-tl-add svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round}
+        .tel-tl-add:hover{background:rgba(0,230,118,.2)}
+        .tel-track{position:relative;height:38px;background:#070b14;border:1px solid var(--border);border-radius:8px;cursor:pointer;overflow:hidden}
+        .tel-track-fill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,rgba(0,230,118,.16),rgba(0,230,118,.04));pointer-events:none}
+        .tel-playhead{position:absolute;top:0;bottom:0;left:0;width:2px;background:#00e676;box-shadow:0 0 7px rgba(0,230,118,.8);pointer-events:none;z-index:3}
+        .tel-marker{position:absolute;top:0;bottom:0;width:3px;margin-left:-1.5px;background:#f59e0b;cursor:pointer;z-index:2}
+        .tel-marker::before{content:'';position:absolute;top:4px;left:50%;transform:translateX(-50%);width:9px;height:9px;border-radius:50%;background:#f59e0b;border:2px solid #0d1626}
+        .tel-marker:hover::after{content:attr(data-label);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#05080f;color:#ffce7a;font-size:10.5px;font-weight:600;padding:3px 7px;border-radius:5px;white-space:nowrap;border:1px solid var(--border);z-index:6;box-shadow:0 3px 9px rgba(0,0,0,.45)}
+        .tel-tl-empty{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:11px;color:#55657f;pointer-events:none}
+        .tel-tipbar{display:flex;align-items:center;gap:8px;font-size:12px;color:#6b7a99;padding:1px 4px;line-height:1.5}
+        .tel-tipbar svg{width:14px;height:14px;stroke:#6b7a99;fill:none;stroke-width:2;flex-shrink:0}
+        .tel-act{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:9px;border:1px solid var(--border);background:#0d1626;color:#c7d2e8;font-size:12.5px;font-weight:600;cursor:pointer;transition:border-color .12s,color .12s}
+        .tel-act svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+        .tel-act:hover{border-color:rgba(255,255,255,.22);color:#fff}
+        .tel-act.primary{background:#00e676;color:#04140a;border-color:#00e676}
+        .tel-act.primary svg{stroke:#04140a}
+        .tel-act.primary:hover{background:#00c766;color:#04140a}
+        .tel-act.danger:hover{border-color:rgba(248,113,113,.4);color:#f87171}
+        .tel-act[disabled]{opacity:.4;pointer-events:none}
+        .tel-props{flex:0 0 216px;display:flex;flex-direction:column;gap:13px;background:#0d1626;border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:0 3px 14px rgba(0,0,0,.28);overflow-y:auto}
+        .tel-props-title{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:#8696b0}
+        .tel-props-empty{font-size:12px;color:#55657f;line-height:1.55}
+        .tel-props-body{display:flex;flex-direction:column;gap:14px}
+        .tel-prow{display:flex;flex-direction:column;gap:7px}
+        .tel-prow>label{display:flex;align-items:center;justify-content:space-between;font-size:11.5px;font-weight:600;color:#aab6cc}
+        .tel-prow>label span{color:#00e676;font-family:'JetBrains Mono',monospace;font-size:11px}
+        .tel-prow input[type=range]{-webkit-appearance:none;appearance:none;height:4px;border-radius:3px;background:#1a2540;cursor:pointer;outline:none}
+        .tel-prow input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#00e676;cursor:pointer}
+        .tel-prow input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-radius:50%;background:#00e676;cursor:pointer}
+        .tel-prow-inline{flex-direction:row;align-items:center;justify-content:space-between}
+        .tel-seg{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+        .tel-seg button{background:transparent;border:none;color:#8696b0;font-size:11px;font-weight:600;padding:6px 10px;cursor:pointer}
+        .tel-seg button.active{background:rgba(0,230,118,.14);color:#00e676}
+        .tel-switch{position:relative;display:inline-block;width:38px;height:21px;flex-shrink:0}
+        .tel-switch input{display:none}
+        .tel-switch span{position:absolute;inset:0;background:#1a2540;border-radius:21px;transition:.15s;cursor:pointer}
+        .tel-switch span::before{content:'';position:absolute;left:3px;top:3px;width:15px;height:15px;border-radius:50%;background:#8696b0;transition:.15s}
+        .tel-switch input:checked + span{background:rgba(0,230,118,.4)}
+        .tel-switch input:checked + span::before{transform:translateX(17px);background:#00e676}
+        .tel-props-actions{display:flex;gap:8px;flex-wrap:wrap}
+        .tel-pbtn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:0;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:#0a0f1a;color:#c7d2e8;font-size:11.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+        .tel-pbtn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+        .tel-pbtn:hover{border-color:rgba(255,255,255,.2);color:#fff}
+        .tel-pbtn.danger:hover{border-color:rgba(248,113,113,.4);color:#f87171}
+        .tel-props-foot{margin-top:2px;border-top:1px solid var(--border);padding-top:12px}
+        @media (max-width: 980px){ .tel-props{display:none} }
+        .tel-fs-btn{position:absolute;top:10px;right:10px;z-index:8;width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:rgba(10,15,26,.72);border:1px solid var(--border);border-radius:9px;color:#dfe6f2;cursor:pointer}
+        .tel-fs-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+        .tel-fs-btn:hover{background:rgba(10,15,26,.92);color:#fff}
+        .tel-workspace:fullscreen{background:#070b14;padding:12px;height:100vh;box-sizing:border-box}
+        .tel-workspace:-webkit-full-screen{background:#070b14;padding:12px;height:100vh;box-sizing:border-box}
+        .tel-workspace.tel-max{position:fixed;inset:0;z-index:9999;width:100vw;height:100vh;background:#070b14;padding:12px;box-sizing:border-box}
+      </style>
+      <div id="screen-telestrador" class="screen">
+        <div class="topbar">
+          <div class="topbar-left"><h1>Quadro Tático</h1><p>Telestração e análise de lances</p></div>
+          <div class="topbar-right" style="gap:8px">
+            <label class="tel-act" style="cursor:pointer"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.5-3.5a2 2 0 0 0-2.8 0L5 21"/></svg>Carregar<input id="tel-upload" type="file" accept="image/*,video/*" style="display:none"></label>
+            <button class="tel-act" id="tel-undo-btn" onclick="telUndo()"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-4"/></svg>Desfazer</button>
+            <button class="tel-act" id="tel-redo-btn" onclick="telRedo()"><svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H9a5 5 0 0 0 0 10h4"/></svg>Refazer</button>
+            <button class="tel-act danger" onclick="telClear()"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Limpar</button>
+            <button class="tel-act" onclick="telSaveAnalysis()"><svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg>Salvar</button>
+            <button class="tel-act primary" onclick="telExport()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>Exportar PNG</button>
+          </div>
+        </div>
+        <div class="content">
+          <div class="tel-workspace" id="tel-workspace">
+            <div class="tel-rail">
+              <button class="tel-tool" data-tool="select" data-tip="Selecionar / mover"><svg viewBox="0 0 24 24"><path d="m4 4 7.07 17 2.51-7.39L21 11.07z"/></svg></button>
+              <button class="tel-tool" data-tool="player" data-tip="Jogador"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg></button>
+              <button class="tel-tool" data-tool="ball" data-tip="Bola"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M18.7 6.3C15.5 10 10.5 11.6 3.6 11.9"/><path d="M20.5 13.2c-5.8-1.2-10.6.9-14.4 5.4"/><path d="M8.3 3.3c3.7 5 5.2 8.4 6.7 15.5"/></svg></button>
+              <button class="tel-tool" data-tool="pass" data-tip="Passe (curvo)"><svg viewBox="0 0 24 24"><path d="M3 17c5-8 11-9 17-6"/><path d="m15 5 5 1.5L18.5 11"/></svg></button>
+              <button class="tel-tool" data-tool="move" data-tip="Movimento (tracejado)"><svg viewBox="0 0 24 24"><path d="M4 12h12" stroke-dasharray="3 3"/><path d="m13 6 6 6-6 6"/></svg></button>
+              <button class="tel-tool" data-tool="line" data-tip="Linha reta"><svg viewBox="0 0 24 24"><path d="M5 19 19 5"/></svg></button>
+              <button class="tel-tool" data-tool="rect" data-tip="Retângulo / espaço"><svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="1.5"/></svg></button>
+              <button class="tel-tool" data-tool="ellipse" data-tip="Círculo / destaque"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9" ry="6.5"/></svg></button>
+              <button class="tel-tool" data-tool="cone" data-tip="Campo de visão"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+              <button class="tel-tool" data-tool="zone" data-tip="Zona (perspectiva)"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></button>
+              <button class="tel-tool" data-tool="draw" data-tip="Desenho livre"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+              <button class="tel-tool" data-tool="text" data-tip="Texto"><svg viewBox="0 0 24 24"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg></button>
+              <div class="tel-rdiv"></div>
+              <div class="tel-swatches" id="tel-colors"></div>
+              <div class="tel-rdiv"></div>
+              <button class="tel-tool" onclick="telDeleteSel()" data-tip="Apagar seleção" style="color:#f87171"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button>
+            </div>
+
+            <div class="tel-main">
+              <div class="tel-stage" id="tel-stage">
+                <div id="tel-konva"></div>
+                <div class="tel-empty" id="tel-empty">
+                  <div class="tel-empty-ic"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v13"/></svg></div>
+                  <h3>Comece sua análise tática</h3>
+                  <p>Importe um print de transmissão ou um vídeo curto de um lance e desenhe por cima — setas, trajetórias, zonas, destaques e textos para explicar a jogada.</p>
+                  <div class="tel-empty-actions">
+                    <button class="tel-empty-btn primary" onclick="document.getElementById('tel-upload').click()"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.5-3.5a2 2 0 0 0-2.8 0L5 21"/></svg>Importar imagem ou vídeo</button>
+                    <button class="tel-empty-btn" onclick="telUseBlankPitch()"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M12 5v14"/><circle cx="12" cy="12" r="2.5"/></svg>Usar campo em branco</button>
+                    <button class="tel-empty-btn" id="tel-resume-btn" style="display:none" onclick="telLoadAnalysis()"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Retomar análise salva</button>
+                  </div>
+                  <div class="tel-empty-hint">Formatos comuns de imagem e vídeo (MP4/WebM). O vídeo é processado localmente, nada é enviado.</div>
+                </div>
+                <button class="tel-fs-btn" id="tel-fs-btn" onclick="telToggleFullscreen()" title="Tela cheia"><svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+              </div>
+
+              <div id="tel-video-ctrls" class="tel-videobar">
+                <button class="tel-vbtn" onclick="telFrameStep(-1)" title="Quadro anterior"><svg viewBox="0 0 24 24"><path d="m11 19-7-7 7-7"/><path d="M20 5v14"/></svg></button>
+                <button class="tel-play" id="tel-playpause" onclick="telTogglePlay()"><svg viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"/></svg></button>
+                <button class="tel-vbtn" onclick="telFrameStep(1)" title="Próximo quadro"><svg viewBox="0 0 24 24"><path d="m13 19 7-7-7-7"/><path d="M4 5v14"/></svg></button>
+                <input type="range" id="tel-seek" class="tel-seek" min="0" max="1000" value="0">
+                <span id="tel-time" class="tel-time">0:00 / 0:00</span>
+                <select id="tel-speed" class="tel-speed" onchange="telSetSpeed(this.value)" title="Velocidade de reprodução">
+                  <option value="0.25">0,25×</option><option value="0.5">0,5×</option><option value="1" selected>1×</option><option value="1.5">1,5×</option><option value="2">2×</option>
+                </select>
+              </div>
+
+              <div id="tel-timeline" class="tel-timeline">
+                <div class="tel-tl-head">
+                  <span class="tel-tl-title">Linha do tempo · Eventos</span>
+                  <button class="tel-tl-add" onclick="telAddEvent()"><svg viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></svg>Marcar evento</button>
+                </div>
+                <div class="tel-track" id="tel-track">
+                  <div class="tel-track-fill" id="tel-track-fill"></div>
+                  <div class="tel-playhead" id="tel-playhead"></div>
+                  <span class="tel-tl-empty" id="tel-tl-empty">Pause no lance e clique em “Marcar evento” para fixar pontos na linha do tempo.</span>
+                </div>
+              </div>
+
+              <div class="tel-tipbar">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                <span id="tel-tiphelp">Selecione uma ferramenta no painel à esquerda. Carregue uma imagem ou vídeo curto para analisar um lance.</span>
+              </div>
+            </div>
+
+            <aside class="tel-props" id="tel-props">
+              <div class="tel-props-title">Propriedades</div>
+              <div class="tel-props-empty" id="tel-props-empty">Selecione um elemento no quadro para editar cor, espessura, opacidade e mais.</div>
+              <div class="tel-props-body" id="tel-props-body" style="display:none">
+                <div class="tel-prow" data-for="stroke"><label>Espessura<span id="tel-p-stroke-v">4</span></label><input type="range" id="tel-p-stroke" min="1" max="16" value="4"></div>
+                <div class="tel-prow" data-for="opacity"><label>Opacidade<span id="tel-p-opacity-v">100%</span></label><input type="range" id="tel-p-opacity" min="10" max="100" value="100"></div>
+                <div class="tel-prow" data-for="arrow"><label>Ponta da seta<span id="tel-p-arrow-v">16</span></label><input type="range" id="tel-p-arrow" min="8" max="34" value="16"></div>
+                <div class="tel-prow" data-for="textsize"><label>Tamanho do texto<span id="tel-p-textsize-v">17</span></label><input type="range" id="tel-p-textsize" min="10" max="48" value="17"></div>
+                <div class="tel-prow tel-prow-inline" data-for="dash"><label>Estilo de linha</label><div class="tel-seg" id="tel-p-dash"><button data-v="solid" class="active">Sólida</button><button data-v="dashed">Tracejada</button></div></div>
+                <div class="tel-prow tel-prow-inline" data-for="fill"><label>Preenchimento</label><label class="tel-switch"><input type="checkbox" id="tel-p-fill"><span></span></label></div>
+                <div class="tel-prow" data-for="order"><label>Ordem</label><div class="tel-props-actions"><button class="tel-pbtn" onclick="telOrder('top')">Trazer p/ frente</button><button class="tel-pbtn" onclick="telOrder('bottom')">Enviar p/ trás</button></div></div>
+                <div class="tel-prow" data-for="timing"><label>Exibição no vídeo</label>
+                  <div class="tel-timing-box">
+                    <div class="tt-range" id="tel-tt-range">Sempre visível</div>
+                    <div class="tel-timing-btns"><button class="tel-pbtn" onclick="telTimingSet('in')">Início aqui</button><button class="tel-pbtn" onclick="telTimingSet('out')">Fim aqui</button></div>
+                    <button class="tel-pbtn" onclick="telTimingClear()">Sempre visível</button>
+                  </div>
+                </div>
+                <div class="tel-props-actions tel-props-foot">
+                  <button class="tel-pbtn" onclick="telDuplicateSel()"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Duplicar</button>
+                  <button class="tel-pbtn danger" onclick="telDeleteSel()"><svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Apagar</button>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+
     </main>
   </div>
 </div>
@@ -2386,6 +2665,8 @@ function getCurrentUser() {
 function logout() {
   localStorage.removeItem('capixastat_token');
   localStorage.removeItem('capixastat_current');
+  localStorage.removeItem('capixastat_screen');
+  localStorage.removeItem('capixastat_profileid');
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('app').classList.remove('visible');
   document.getElementById('login-email').value = '';
@@ -2606,8 +2887,48 @@ function updateGlobalStats() {
   if (elLoginCl) elLoginCl.textContent = totalClubes;
   if (elLoginPa) elLoginPa.textContent = totalPartidasGeral;
 
-  // Dashboard insight dinâmico
+  // Subtítulo do dashboard (clube do usuário)
+  var _subEl = document.getElementById('dash-subtitle');
+  if (_subEl) _subEl.textContent = meuClube ? meuClube + ' · Temporada 2026' : 'Visão geral da temporada 2026';
+
+  // Dashboard insight dinâmico + feed de partidas reais
   updateDashboardInsight();
+  renderDashActivities();
+}
+
+// Feed de últimas partidas (dados reais das competições)
+function renderDashActivities() {
+  var el = document.getElementById('dash-activities');
+  if (!el) return;
+  var user = getCurrentUser();
+  var meuClube = user ? resolveClube(user.clube) : null;
+  var all = [];
+  for (var cid in COMPETITIONS) {
+    var comp = COMPETITIONS[cid];
+    (comp.jogos || []).forEach(function(j){ if (j.gh != null && j.ga != null) all.push({ j: j, comp: comp }); });
+  }
+  var list = meuClube ? all.filter(function(x){ return x.j.home === meuClube || x.j.away === meuClube; }) : all;
+  if (!list.length) list = all;
+  function dnum(d){ if (!d) return 0; var p = String(d).split('/'); return p.length >= 2 ? parseInt(p[1]) * 100 + parseInt(p[0]) : 0; }
+  list.sort(function(a, b){ return dnum(b.j.data) - dnum(a.j.data); });
+  function img(u){ return u ? '<img src="' + u + '" style="width:18px;height:18px;object-fit:contain;flex-shrink:0" onerror="this.style.display=\'none\'">' : ''; }
+  var rows = list.slice(0, 6).map(function(x){
+    var j = x.j, comp = x.comp;
+    var hb = (CLUBS[j.home] && CLUBS[j.home].escudo) || (typeof EXTRA_BADGES !== 'undefined' && EXTRA_BADGES[j.home]) || '';
+    var ab = (CLUBS[j.away] && CLUBS[j.away].escudo) || (typeof EXTRA_BADGES !== 'undefined' && EXTRA_BADGES[j.away]) || '';
+    var goleada = Math.abs(j.gh - j.ga) >= 3;
+    var tag = goleada ? '<span class="badge badge-atk" style="font-size:8px">GOLEADA</span>' : '<span class="badge ' + (comp.corClasse || 'badge-mid') + '" style="font-size:8px">' + (comp.sigla || '') + '</span>';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid var(--border)">' +
+      '<div style="flex-shrink:0;width:58px">' + tag + '</div>' +
+      '<div style="flex:1;display:flex;align-items:center;gap:7px;min-width:0;font-size:12.5px;color:var(--text-2)">' +
+        img(hb) + '<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + j.home + '</span>' +
+        '<strong style="margin:0 2px;color:var(--text-1)">' + j.gh + ' × ' + j.ga + '</strong>' +
+        '<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + j.away + '</span>' + img(ab) +
+      '</div>' +
+      '<div style="flex-shrink:0;font-size:11px;color:var(--text-3)">' + (j.data || '') + '</div>' +
+    '</div>';
+  }).join('');
+  el.innerHTML = rows || '<div style="color:var(--text-3);font-size:12px;padding:12px 0;text-align:center">Nenhuma partida registrada.</div>';
 }
 
 function updateDashboardInsight() {
@@ -3546,8 +3867,31 @@ function computePlayerScore(p) {
 function recomputeAllScores() {
   Object.values(PLAYERS).forEach(p => { p.score = computePlayerScore(p); });
 }
+// ── Indicadores de desempenho calculados dos dados reais (jogadores de linha) ──
+// Substitui os valores antigos que estavam fixos no código (ex.: "Taxa de conversão 20%" igual para todos).
+// Goleiros mantêm seus indicadores (Defesas % / Gols sofridos por jogo), usados na vitrine.
+function computeOutfieldIndicators(p) {
+  const clamp = x => Math.max(0, Math.min(100, Math.round(x)));
+  const jogos = p.jogos || 0, gols = p.gols || 0, assists = p.assists || 0;
+  const passe = parseInt(String(p.passe || '0').replace('%', '')) || 0;
+  const r = p.radar || [];
+  const gpg = jogos ? gols / jogos : 0;             // gols por jogo (real)
+  const ppg = jogos ? (gols + assists) / jogos : 0; // participação em gols por jogo (real)
+  const fmt = n => n.toFixed(2).replace('.', ',');
+  return [
+    { l: 'Gols por jogo', v: fmt(gpg), w: clamp(gpg / 0.8 * 100), c: '' },
+    { l: 'Participação em gols/jogo', v: fmt(ppg), w: clamp(ppg / 1.0 * 100), c: 'green' },
+    { l: 'Precisão de passe', v: passe + '%', w: clamp(passe), c: 'blue' },
+    { l: 'Finalização', v: (r[0] || 0) + '%', w: clamp(r[0] || 0), c: 'amber' },
+    { l: 'Consistência', v: (r[5] || 0) + '%', w: clamp(r[5] || 0), c: 'purple' }
+  ];
+}
+function recomputeAllIndicators() {
+  Object.values(PLAYERS).forEach(p => { if (p.pos !== 'Goleiro') p.indicators = computeOutfieldIndicators(p); });
+}
 recomputeAllRadars();  // radar real antes do score (GK/DEF usam radar[3,4,5])
 recomputeAllScores();
+recomputeAllIndicators();
 
 function savePlayers() {
   localStorage.setItem('capixastat_players', JSON.stringify(PLAYERS));
@@ -4433,32 +4777,171 @@ function showPlayer(id) {
 
   // Navigate to profile (seleção explícita — não deixar o goTo sobrescrever pelo clube do usuário)
   window._profileExplicit = true;
+  window._perfilPlayer = p;
   goTo('perfil', document.querySelector('[data-screen=perfil]'));
 
-  // Radar chart with player-specific data
-  setTimeout(() => {
-    var _rc = _chartColors();
-    mkChart('chartRadar', {
-      type: 'radar',
-      data: { labels: ['Gols','Passes','Dribles','Físico','Disciplina','Consistência'],
-        datasets: [{ label: p.nome, data: p.radar,
-          backgroundColor: p.color + ',.1)', borderColor: p.color + ',.8)',
-          pointBackgroundColor: p.pointColor, pointRadius: 4 }] },
-      options: { scales: { r: {
-          grid:        {color: _rc.radarGrid},
-          angleLines:  {color: _rc.radarAngle},
-          ticks:       {display:false},
-          pointLabels: {color: _rc.radarLabels, font:{size:11}} } },
-        plugins:{ legend:{display:false} } }
-    });
-  }, 80);
+  // Sempre abre na aba Visão Geral
+  _resetPerfilTab();
 
-  // Scouting: percentil por posição + jogadores parecidos
+  // Visão Geral — cards (clube, atributos, posições, status, estatísticas, desenvolvimento)
+  renderOverview(p);
+
+  // Desempenho — radar grande + scouting (percentil/similares); redesenhados ao abrir a aba
+  _drawPerfilRadar(p);
   renderScouting(p);
 }
 
+function _resetPerfilTab() {
+  var nav = document.querySelector('#screen-perfil .tab-nav');
+  if (nav) nav.querySelectorAll('.tab-btn').forEach(function(b, ix){ b.classList.toggle('active', ix === 0); });
+  document.querySelectorAll('#screen-perfil .tab-pane').forEach(function(pn){ pn.classList.toggle('active', pn.id === 'pane-visao'); });
+}
+
+function _drawPerfilRadar(p) {
+  setTimeout(function() {
+    var _rc = _chartColors();
+    mkChart('chartRadar', {
+      type: 'radar',
+      data: { labels: ['Finalização','Passes','Dribles','Físico','Disciplina','Consistência'],
+        datasets: [{ label: p.nome, data: p.radar,
+          backgroundColor: p.color + ',.1)', borderColor: p.color + ',.8)',
+          pointBackgroundColor: p.pointColor, pointRadius: 4 }] },
+      options: { responsive:true, maintainAspectRatio:false, scales: { r: {
+          min: 0, max: 100,
+          grid: {color: _rc.radarGrid}, angleLines: {color: _rc.radarAngle},
+          ticks: {display:false}, pointLabels: {color: _rc.radarLabels, font:{size:11}} } },
+        plugins:{ legend:{display:false} } }
+    });
+  }, 80);
+}
+
+// ── VISÃO GERAL — cards (estilo painel) ──────────────────────────────
+function renderOverview(p) {
+  var axes = ['Finalização','Passes','Dribles','Físico','Disciplina','Consistência'];
+  var r = (Array.isArray(p.radar) && p.radar.length === 6) ? p.radar : [50,50,50,50,50,50];
+  var barColors = ['#22c55e','#38bdf8','#a78bfa','#fbbf24','#f87171','#22c55e'];
+
+  // Atributos — barras
+  var barsEl = document.getElementById('p-atributos');
+  if (barsEl) barsEl.innerHTML = axes.map(function(ax, i){
+    return '<div class="ov-bar"><span class="lbl">' + ax + '</span><span class="trk"><span class="fil" style="width:' + r[i] + '%;background:' + barColors[i] + '"></span></span><span class="val">' + r[i] + '%</span></div>';
+  }).join('');
+  // mini radar
+  setTimeout(function(){
+    var _rc = _chartColors();
+    var _rbox = document.querySelector('.mini-radar-box');
+    if (_rbox) { var _w = _rbox.clientWidth; if (_w > 0) _rbox.style.height = Math.min(_w, 360) + 'px'; } // mantém quadrado
+    mkChart('chartMiniRadar', { type:'radar',
+      data:{ labels:axes, datasets:[{ label:p.nome, data:r, backgroundColor:p.color + ',.1)', borderColor:p.color + ',.8)', pointBackgroundColor:p.pointColor, pointRadius:4 }] },
+      options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ r:{ min:0, max:100, grid:{color:_rc.radarGrid}, angleLines:{color:_rc.radarAngle}, ticks:{display:false}, pointLabels:{color:_rc.radarLabels, font:{size:11}} } } } });
+  }, 70);
+
+  // Clube atual
+  var clubeEl = document.getElementById('p-clube-card');
+  if (clubeEl) {
+    var ck = (typeof resolveClube === 'function') ? resolveClube(p.clube) : p.clube;
+    var c = (typeof CLUBS !== 'undefined' && CLUBS[ck]) ? CLUBS[ck] : null;
+    var esc = (c && c.escudo) || (typeof EXTRA_BADGES !== 'undefined' && EXTRA_BADGES[p.clube]) || '';
+    clubeEl.innerHTML =
+      '<div class="ov-clube-head">' + (esc ? '<img src="' + esc + '" onerror="this.style.display=\'none\'">' : '') +
+        '<div><div style="font-size:15px;font-weight:700;color:var(--text-1)">' + (c ? c.nome : p.clube) + '</div>' +
+        '<div style="font-size:11px;color:var(--text-3)">🇧🇷 Brasil</div></div></div>' +
+      '<div class="ov-stat-row"><span class="k">Fundação</span><span class="v">' + ((c && c.fundacao) || '—') + '</span></div>' +
+      '<div class="ov-stat-row"><span class="k">Estádio</span><span class="v">' + ((c && c.estadio) || '—') + '</span></div>' +
+      '<div class="ov-stat-row"><span class="k">Cidade</span><span class="v">' + ((c && c.cidade) || p.cidade || '—') + '</span></div>';
+  }
+
+  // Posições
+  renderPosicoes(p);
+
+  // Status
+  var stEl = document.getElementById('p-status');
+  if (stEl) {
+    var ac = (typeof computeACWR === 'function') ? computeACWR(p) : null;
+    var acTxt = ac ? ac.ratio.toFixed(2) + ' · ' + ac.zone : '—';
+    var acColor = ac ? ({'Ideal':'var(--green)','Subcarga':'#38bdf8','Alerta':'#fbbf24','Risco':'#f87171'}[ac.zone] || 'var(--text-1)') : 'var(--text-1)';
+    stEl.innerHTML =
+      '<div class="ov-stat-row"><span class="k">Situação</span><span class="v" style="color:var(--green)">Disponível</span></div>' +
+      '<div class="ov-stat-row"><span class="k">Lesionado</span><span class="v">Não</span></div>' +
+      '<div class="ov-stat-row"><span class="k">Carga (ACWR)</span><span class="v" style="color:' + acColor + '">' + acTxt + '</span></div>' +
+      '<div class="ov-stat-row"><span class="k">Pé dominante</span><span class="v">' + (p.pe || '—') + '</span></div>';
+  }
+
+  // Estatísticas — tiles
+  var esEl = document.getElementById('p-estat-mini');
+  if (esEl) {
+    var isGK = p.pos === 'Goleiro';
+    esEl.innerHTML = '<div class="ov-estat-tiles">' +
+      '<div class="ov-tile"><div class="n" style="color:var(--green)">' + (isGK ? p.jogos : p.gols) + '</div><div class="l">' + (isGK ? 'Jogos' : 'Gols') + '</div></div>' +
+      '<div class="ov-tile"><div class="n" style="color:#38bdf8">' + (isGK ? p.cartoes : p.assists) + '</div><div class="l">' + (isGK ? 'Cartões' : 'Assist.') + '</div></div>' +
+      '<div class="ov-tile"><div class="n">' + p.jogos + '</div><div class="l">Jogos</div></div>' +
+      '<div class="ov-tile"><div class="n" style="color:#fbbf24">' + (isGK ? p.passe : p.g90) + '</div><div class="l">' + (isGK ? 'Taxa Passe' : 'Gols/90') + '</div></div>' +
+      '</div>';
+  }
+
+  // Por competição
+  var compEl = document.getElementById('p-estat-comp');
+  if (compEl) {
+    var CN = {capixabao:'Capixabão',copaEs:'Copa ES','copa-es':'Copa ES',serieD:'Série D','serie-d':'Série D',copaVerde:'Copa Verde','copa-verde':'Copa Verde',copaBrasil:'Copa BR','copa-do-brasil':'Copa BR'};
+    var st = p.stats || {}; var keys = Object.keys(st); var rows = '';
+    if (keys.length) keys.slice(0,4).forEach(function(k){ var cc = st[k] || {}; rows += '<div class="ov-stat-row"><span class="k" style="font-size:11.5px">' + (CN[k] || k) + '</span><span class="v" style="font-size:11.5px">' + (cc.jogos||0) + 'J · ' + (cc.gols||0) + 'G · ' + (cc.assists||0) + 'A</span></div>'; });
+    else rows = '<div style="font-size:11.5px;color:var(--text-3)">Sem recorte por competição.</div>';
+    compEl.innerHTML = rows;
+  }
+
+  // Desenvolvimento — mini linha (mesma série ilustrativa da aba Evolução)
+  setTimeout(function(){
+    var base = p.score - 5;
+    var d = [base, base+1, base-1, base+2, base+4, Math.max(60, base+3), base+6, base+5, p.score].map(function(v){ return parseFloat(v.toFixed(1)); });
+    mkChart('chartDevMini', { type:'line',
+      data:{ labels:d.map(function(_, i){ return i+1; }), datasets:[{ data:d, borderColor:p.color + ',.9)', backgroundColor:p.color + ',.08)', tension:.4, fill:true, pointRadius:0, borderWidth:2 }] },
+      options:{ plugins:{legend:{display:false}}, scales:{ x:{display:false}, y:{display:false, min:55, max:100} } } });
+  }, 70);
+}
+
+// Posições: principal (verde) + secundárias (laranja), com campinho e legenda %.
+var POS_COORD = { GOL:[90,50],ZAG:[76,50],LD:[72,80],LE:[72,20],LAT:[72,20],VOL:[60,50],MC:[55,50],MD:[50,80],ME:[50,20],MEI:[40,50],PD:[26,80],PE:[26,20],SA:[28,50],ATA:[16,50] };
+var POS_NOME  = { GOL:'Goleiro',ZAG:'Zagueiro',LAT:'Lateral',LD:'Lateral direito',LE:'Lateral esquerdo',VOL:'Volante',MC:'Meia central',MD:'Meia direita',ME:'Meia esquerda',MEI:'Meia',PD:'Ponta direita',PE:'Ponta esquerda',SA:'Segundo atacante',ATA:'Atacante' };
+// Override de posições por atleta (quando temos as posições específicas); senão mapeia da posição base.
+var POS_OVERRIDE = { 'rb_breninho': [ {abbr:'MEI',pct:100,primary:true}, {abbr:'MC',pct:75}, {abbr:'PE',pct:75} ] };
+
+function renderPosicoes(p) {
+  var el = document.getElementById('p-posicoes'); if (!el) return;
+  var list = POS_OVERRIDE[p.id];
+  if (!list) {
+    var baseAbbr = { 'Goleiro':'GOL','Zagueiro':'ZAG','Lateral':'LAT','Volante':'VOL','Meia':'MEI','Atacante':'ATA' };
+    var SEC = { 'Goleiro':[],'Zagueiro':['LAT'],'Lateral':['ZAG'],'Volante':['MC'],'Meia':['VOL','ATA'],'Atacante':['MEI'] };
+    var pa = baseAbbr[p.pos] || 'MEI';
+    list = [{abbr:pa, pct:100, primary:true}].concat((SEC[p.pos] || []).map(function(s){ return {abbr:s, pct:75}; }));
+  }
+  var GREEN = '#22c55e', ORANGE = '#f59e0b';
+  var markers = list.map(function(it){
+    var c = POS_COORD[it.abbr]; if (!c) return '';
+    var col = it.primary ? GREEN : ORANGE;
+    return '<div style="position:absolute;top:' + c[0] + '%;left:' + c[1] + '%;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:' + col + ';color:#04140a;font-size:8.5px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 4px ' + col + '33">' + it.abbr + '</div>';
+  }).join('');
+  var legend = list.map(function(it){
+    var col = it.primary ? GREEN : ORANGE;
+    return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:11px">' +
+      '<span style="background:' + col + '22;border:1px solid ' + col + '66;color:' + col + ';font-size:10px;font-weight:800;padding:3px 7px;border-radius:5px;min-width:30px;text-align:center">' + it.abbr + '</span>' +
+      '<span style="flex:1;font-size:12px;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + (POS_NOME[it.abbr] || it.abbr) + '</span>' +
+      '<span style="font-size:13px;font-weight:800;color:' + col + '">' + it.pct + '%</span></div>';
+  }).join('');
+  el.innerHTML =
+    '<div style="display:flex;gap:14px;align-items:center">' +
+      '<div style="position:relative;width:120px;height:172px;flex-shrink:0;background:linear-gradient(#0c3a24,#0a2b1b);border:1px solid var(--border);border-radius:8px;overflow:hidden">' +
+        '<div style="position:absolute;top:50%;left:0;right:0;height:1px;background:rgba(255,255,255,.14)"></div>' +
+        '<div style="position:absolute;top:50%;left:50%;width:40px;height:40px;border:1px solid rgba(255,255,255,.14);border-radius:50%;transform:translate(-50%,-50%)"></div>' +
+        '<div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:46px;height:16px;border:1px solid rgba(255,255,255,.14);border-top:none"></div>' +
+        '<div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:46px;height:16px;border:1px solid rgba(255,255,255,.14);border-bottom:none"></div>' +
+        markers +
+      '</div>' +
+      '<div style="flex:1;min-width:0">' + legend + '</div>' +
+    '</div>';
+}
+
 // ── SCOUTING: percentil por posição + similaridade de perfil ──
-const RADAR_AXES = ['Gols','Passes','Dribles','Físico','Disciplina','Consistência'];
+const RADAR_AXES = ['Finalização','Passes','Dribles','Físico','Disciplina','Consistência'];
 const POS_GROUP_NAME = { 'badge-gk':'goleiros', 'badge-def':'defensores', 'badge-mid':'meio-campistas', 'badge-atk':'atacantes' };
 
 function _posGroup(p) { return p && p.badgeClass ? p.badgeClass : 'badge-mid'; }
@@ -4544,6 +5027,7 @@ function renderScouting(p) {
       type: 'polarArea',
       data: { labels: RADAR_AXES, datasets: [{ data: pcts, backgroundColor: bg, borderColor: bd, borderWidth: 1 }] },
       options: {
+        responsive: true, maintainAspectRatio: false,
         scales: { r: { min: 0, max: 100, grid: { color: _rc.radarGrid }, angleLines: { color: _rc.radarAngle }, ticks: { display: false }, pointLabels: { display: true, color: _rc.radarLabels, font: { size: 11 }, centerPointLabels: true } } },
         plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => c.label + ': ' + c.raw + 'º percentil' } } }
       }
@@ -9737,6 +10221,11 @@ function goTo(screenId, navEl) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   if (navEl) navEl.classList.add('active');
   document.querySelector('.main').scrollTo({top:0, behavior:'smooth'});
+  // Lembra a tela atual (restaurada ao recarregar a página)
+  try {
+    localStorage.setItem('capixastat_screen', screenId);
+    if (screenId === 'perfil' && window.currentProfileId) localStorage.setItem('capixastat_profileid', window.currentProfileId);
+  } catch (e) {}
   if (screenId === 'perfil') {
     // _profileExplicit: showPlayer já escolheu um atleta específico (clique direto) —
     // nesse caso NÃO sobrescrever pelo melhor do clube do usuário.
@@ -9759,6 +10248,7 @@ function goTo(screenId, navEl) {
   if (screenId === 'partidas')     { showMatchList(); renderMatchList(); }
   if (screenId === 'time')         renderTeamScreen();
   if (screenId === 'taticas')      renderTaticasScreen();
+  if (screenId === 'telestrador')  setTimeout(telInit, 30);
   if (screenId === 'jogadores')    renderVitrineJogadores();
 }
 function switchTab(e, paneId) {
@@ -9768,7 +10258,11 @@ function switchTab(e, paneId) {
   const parent = e.target.closest('.content, #screen-perfil');
   parent.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
   const pane = document.getElementById(paneId);
-  if (pane) { pane.classList.add('active'); if (paneId === 'pane-evolucao') setTimeout(initEvolucaoChart, 50); }
+  if (pane) {
+    pane.classList.add('active');
+    if (paneId === 'pane-evolucao') setTimeout(initEvolucaoChart, 50);
+    if (paneId === 'pane-desempenho') setTimeout(function(){ if (window._perfilPlayer) { _drawPerfilRadar(window._perfilPlayer); renderScouting(window._perfilPlayer); } }, 50);
+  }
 }
 
 // ── Chart defaults ───────────────────────────
@@ -12873,7 +13367,427 @@ function hideExtMatch() {
 }
 
 // ── Inicializar stats reais na carga da página ──
+// ══════════════ QUADRO TÁTICO (TELESTRADOR — Konva, nível pro) ══════════════
+var telStage, telBg, telLayer, telUI, telTr, telInited = false, telScale = 1;
+var telTool = 'select', telColor = '#ef4444';
+var telMedia = null, telVideoAnim = null, telBgImage = null, telEvents = [];
+var telPending = null, telZonePts = null, telPreviewNode = null, telPlayerNum = 1;
+var telUndoStack = [], telRedoStack = [], telDrawing = false, telFreePts = null;
+var TEL_W = 1280, TEL_H = 720;
+var TEL_COLORS = ['#ef4444','#22c55e','#3b82f6','#f59e0b','#a855f7','#ffffff','#111827'];
+
+function telRgba(hex, a){ hex = (hex || '#ffffff').replace('#',''); if (hex.length === 3) hex = hex.split('').map(function(c){ return c + c; }).join(''); var r = parseInt(hex.slice(0,2),16), g = parseInt(hex.slice(2,4),16), b = parseInt(hex.slice(4,6),16); return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')'; }
+
+function telInit(){
+  var cont = document.getElementById('tel-konva'); if (!cont) return;
+  if (typeof Konva === 'undefined'){ var h = document.getElementById('tel-tiphelp'); if (h) h.textContent = '⚠ Biblioteca Konva não carregou (verifique konva.min.js).'; return; }
+  if (telInited){ telFit(); return; }
+  telInited = true;
+
+  telStage = new Konva.Stage({ container:'tel-konva', width:TEL_W, height:TEL_H });
+  telBg = new Konva.Layer({ listening:false });
+  telLayer = new Konva.Layer();
+  telUI = new Konva.Layer();
+  telStage.add(telBg); telStage.add(telLayer); telStage.add(telUI);
+  telTr = new Konva.Transformer({ rotateEnabled:true, borderStroke:'#00e676', borderStrokeWidth:1.5, anchorStroke:'#00e676', anchorFill:'#0A0F1A', anchorSize:9, anchorCornerRadius:3, padding:4 });
+  telUI.add(telTr);
+
+  telShowEmpty(true);
+
+  var cc = document.getElementById('tel-colors');
+  cc.innerHTML = TEL_COLORS.map(function(c){ return '<div class="tel-color' + (c === telColor ? ' active' : '') + '" data-c="' + c + '" style="background:' + c + '"></div>'; }).join('');
+  cc.querySelectorAll('.tel-color').forEach(function(el){ el.addEventListener('click', function(){ telColor = this.getAttribute('data-c'); cc.querySelectorAll('.tel-color').forEach(function(x){ x.classList.remove('active'); }); this.classList.add('active'); telRecolorSel(); }); });
+
+  document.querySelectorAll('#screen-telestrador .tel-tool[data-tool]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      telTool = this.getAttribute('data-tool');
+      document.querySelectorAll('#screen-telestrador .tel-tool[data-tool]').forEach(function(b){ b.classList.remove('active'); });
+      this.classList.add('active');
+      telCancelZone(); telPending = null; telClearPreview();
+      telSetDraggable(telTool === 'select');
+      if (telTool !== 'select') telDeselect();
+      var tips = { select:'Clique num objeto para mover. As alças redimensionam/giram. Duplo-clique no jogador edita o número. Delete apaga.', player:'Clique no campo para adicionar um jogador (holofote + número).', ball:'Clique para colocar a bola.', pass:'Clique no início e no fim do passe (seta curva).', move:'Clique no início e no fim do movimento (tracejado).', line:'Clique no início e no fim da linha reta.', rect:'Clique em dois cantos para criar o retângulo (destaque de espaço).', ellipse:'Clique em dois pontos para criar o círculo/elipse (destaque de jogador).', cone:'Clique no jogador com a bola e depois na direção do olhar.', zone:'Clique os cantos; duplo-clique para fechar a zona em perspectiva.', draw:'Pressione e arraste para desenhar livremente.', text:'Clique onde quer escrever.' };
+      document.getElementById('tel-tiphelp').textContent = tips[telTool] || '';
+      telStage.container().style.cursor = telTool === 'select' ? 'default' : 'crosshair';
+    });
+  });
+
+  document.getElementById('tel-upload').addEventListener('change', telUpload);
+  document.getElementById('tel-seek').addEventListener('input', function(){ if (telMedia && telMedia.type === 'video' && telMedia.el.duration){ telMedia.el.currentTime = (this.value / 1000) * telMedia.el.duration; } });
+  var telTrackEl = document.getElementById('tel-track'); if (telTrackEl) telTrackEl.addEventListener('click', telTrackSeek);
+
+  ['tel-p-stroke','tel-p-opacity','tel-p-arrow','tel-p-textsize'].forEach(function(id){ var el = document.getElementById(id); if (el) el.addEventListener('input', telPropInput); });
+  var fillEl = document.getElementById('tel-p-fill'); if (fillEl) fillEl.addEventListener('change', function(){ telApplyFill(this.checked); });
+  var dashSeg = document.getElementById('tel-p-dash'); if (dashSeg) dashSeg.querySelectorAll('button').forEach(function(b){ b.addEventListener('click', function(){ telSetSeg('tel-p-dash', this.getAttribute('data-v')); telApplyDash(this.getAttribute('data-v')); }); });
+
+  telStage.on('mousedown touchstart', telDown);
+  telStage.on('mousemove touchmove', telMove);
+  telStage.on('mouseup touchend', telUp);
+  telStage.on('dblclick dbltap', telDbl);
+
+  document.addEventListener('keydown', function(e){
+    var scr = document.getElementById('screen-telestrador');
+    if (!scr || !scr.classList.contains('active')) return;
+    var tag = (e.target.tagName || '').toLowerCase(); if (tag === 'input' || tag === 'textarea') return;
+    var mod = e.ctrlKey || e.metaKey;
+    if (mod && (e.key === 'z' || e.key === 'Z')){ e.preventDefault(); if (e.shiftKey) telRedo(); else telUndo(); }
+    else if (mod && (e.key === 'y' || e.key === 'Y')){ e.preventDefault(); telRedo(); }
+    else if (mod && (e.key === 'd' || e.key === 'D')){ e.preventDefault(); telDuplicateSel(); }
+    else if ((e.key === 'Delete' || e.key === 'Backspace') && telTr.nodes().length){ e.preventDefault(); telDeleteSel(); }
+    else if (e.key === 'Escape'){ if (telIsMaxed()){ document.getElementById('tel-workspace').classList.remove('tel-max'); telOnFsChange(); } telDeselect(); telCancelZone(); telPending = null; telClearPreview(); }
+  });
+
+  var selBtn = document.querySelector('#screen-telestrador .tel-tool[data-tool="select"]'); if (selBtn) selBtn.click();
+  telFit();
+  telUpdateHistBtns(); telRenderProps(); telCheckSaved();
+  window.addEventListener('resize', telFit);
+  document.addEventListener('fullscreenchange', telOnFsChange);
+  document.addEventListener('webkitfullscreenchange', telOnFsChange);
+}
+
+function telFit(){
+  if (!telStage) return;
+  var wrap = document.getElementById('tel-stage'); if (!wrap || !wrap.clientWidth) return;
+  var availW = wrap.clientWidth, availH = wrap.clientHeight || (availW * TEL_H / TEL_W);
+  var s = Math.min(availW / TEL_W, availH / TEL_H);
+  if (!isFinite(s) || s <= 0) s = availW / TEL_W;
+  telScale = Math.min(s, 2.4);
+  telStage.width(TEL_W * telScale); telStage.height(TEL_H * telScale); telStage.scale({ x:telScale, y:telScale }); telStage.batchDraw();
+}
+function telShowEmpty(on){ var e = document.getElementById('tel-empty'); if (e) e.style.display = on ? 'flex' : 'none'; }
+function telUseBlankPitch(){ telDrawPitch(); telShowEmpty(false); }
+function telIsFullscreen(){ return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+function telIsMaxed(){ var el = document.getElementById('tel-workspace'); return !!(el && el.classList.contains('tel-max')); }
+function telMaxFallback(el){ el.classList.add('tel-max'); telOnFsChange(); }
+function telToggleFullscreen(){
+  var el = document.getElementById('tel-workspace'); if (!el) return;
+  if (telIsMaxed()){ el.classList.remove('tel-max'); telOnFsChange(); return; }
+  if (telIsFullscreen()){ var ex = document.exitFullscreen || document.webkitExitFullscreen; if (ex) ex.call(document); return; }
+  var rq = el.requestFullscreen || el.webkitRequestFullscreen;
+  if (rq){ try { var p = rq.call(el); if (p && p.catch) p.catch(function(){ telMaxFallback(el); }); return; } catch(e){ telMaxFallback(el); return; } }
+  telMaxFallback(el);
+}
+function telOnFsChange(){ var fs = telIsFullscreen() || telIsMaxed(); var b = document.getElementById('tel-fs-btn'); if (b){ b.title = fs ? 'Sair da tela cheia (Esc)' : 'Tela cheia'; b.innerHTML = fs ? '<svg viewBox="0 0 24 24"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>' : '<svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>'; } setTimeout(telFit, 70); setTimeout(telFit, 260); }
+function telPos(){ var p = telStage.getPointerPosition(); return { x: Math.round(p.x / telScale), y: Math.round(p.y / telScale) }; }
+
+function telDrawPitch(){
+  telBg.destroyChildren(); telBgImage = null;
+  var W = TEL_W, H = TEL_H;
+  telBg.add(new Konva.Rect({ width:W, height:H, fill:'#1b7a3e' }));
+  for (var i = 0; i < 12; i += 2) telBg.add(new Konva.Rect({ x:i*W/12, width:W/12, height:H, fill:'rgba(255,255,255,0.035)' }));
+  var ln = { stroke:'rgba(255,255,255,0.8)', strokeWidth:2 };
+  telBg.add(new Konva.Rect(Object.assign({ x:W*0.03, y:H*0.06, width:W*0.94, height:H*0.88 }, ln)));
+  telBg.add(new Konva.Line(Object.assign({ points:[W/2, H*0.06, W/2, H*0.94] }, ln)));
+  telBg.add(new Konva.Circle(Object.assign({ x:W/2, y:H/2, radius:H*0.14 }, ln)));
+  telBg.add(new Konva.Circle({ x:W/2, y:H/2, radius:3, fill:'rgba(255,255,255,0.8)' }));
+  telBg.add(new Konva.Rect(Object.assign({ x:W*0.03, y:H*0.3, width:W*0.1, height:H*0.4 }, ln)));
+  telBg.add(new Konva.Rect(Object.assign({ x:W*0.87, y:H*0.3, width:W*0.1, height:H*0.4 }, ln)));
+  telBg.batchDraw();
+}
+
+function telSetBg(el, natW, natH){
+  TEL_H = Math.round(TEL_W * (natH / natW));
+  telBg.destroyChildren();
+  telBgImage = new Konva.Image({ image:el, width:TEL_W, height:TEL_H });
+  telBg.add(telBgImage); telBg.batchDraw();
+  telFit();
+}
+function telUpload(e){
+  var f = e.target.files && e.target.files[0]; if (!f) return;
+  var url = URL.createObjectURL(f);
+  if (telVideoAnim){ telVideoAnim.stop(); telVideoAnim = null; }
+  telReset();
+  if (f.type.indexOf('video') === 0){
+    var v = document.createElement('video'); v.src = url; v.muted = true; v.playsInline = true;
+    v.addEventListener('loadedmetadata', function(){ telMedia = { type:'video', el:v }; telSetBg(v, v.videoWidth, v.videoHeight); document.getElementById('tel-video-ctrls').style.display = 'flex'; document.getElementById('tel-timeline').style.display = 'block'; telShowEmpty(false); telEvents = []; telRenderMarkers(); v.currentTime = 0.05; telUpdateTime(); });
+    v.addEventListener('seeked', function(){ telBg.batchDraw(); telUpdateTime(); });
+    v.addEventListener('play', function(){ telVideoAnim = new Konva.Animation(function(){ telUpdateTime(); }, telBg); telVideoAnim.start(); telSetPlayBtn(true); });
+    v.addEventListener('pause', function(){ if (telVideoAnim){ telVideoAnim.stop(); telVideoAnim = null; } telBg.batchDraw(); telSetPlayBtn(false); telShowAllMarks(); });
+    v.addEventListener('ended', function(){ if (telVideoAnim){ telVideoAnim.stop(); telVideoAnim = null; } telSetPlayBtn(false); });
+  } else {
+    var img = new Image(); img.onload = function(){ telMedia = { type:'image', el:img }; telSetBg(img, img.naturalWidth, img.naturalHeight); document.getElementById('tel-video-ctrls').style.display = 'none'; document.getElementById('tel-timeline').style.display = 'none'; telShowEmpty(false); }; img.src = url;
+  }
+  e.target.value = '';
+}
+function telTogglePlay(){ if (!telMedia || telMedia.type !== 'video') return; var v = telMedia.el; if (v.paused) v.play(); else v.pause(); }
+function telSetSpeed(v){ if (telMedia && telMedia.type === 'video') telMedia.el.playbackRate = parseFloat(v); }
+function telFrameStep(dir){ if (!telMedia || telMedia.type !== 'video') return; var v = telMedia.el; if (!v.paused) v.pause(); var step = 1/25; v.currentTime = Math.max(0, Math.min((v.duration || 0), v.currentTime + dir*step)); }
+function telTimingSet(which){ var n = telTr.nodes()[0]; if (!n) return; if (!telMedia || telMedia.type !== 'video'){ alert('Disponível apenas no modo vídeo.'); return; } var t = telMedia.el.currentTime || 0; if (which === 'in') n.telTStart = t; else n.telTEnd = t; telUpdateTimingLabel(n); }
+function telTimingClear(){ var n = telTr.nodes()[0]; if (!n) return; n.telTStart = null; n.telTEnd = null; n.visible(true); telLayer.batchDraw(); telUpdateTimingLabel(n); }
+function telUpdateTimingLabel(n){ var el = document.getElementById('tel-tt-range'); if (!el) return; if (n.telTStart == null && n.telTEnd == null){ el.innerHTML = 'Sempre visível'; return; } var s = n.telTStart != null ? telFmt(n.telTStart) : 'início', e = n.telTEnd != null ? telFmt(n.telTEnd) : 'fim'; el.innerHTML = 'Aparece de <b>' + s + '</b> a <b>' + e + '</b>'; }
+function telApplyTiming(t){ telLayer.getChildren().forEach(function(n){ if (n.telTStart != null || n.telTEnd != null){ var vis = (n.telTStart == null || t >= n.telTStart) && (n.telTEnd == null || t <= n.telTEnd); n.visible(vis); } }); }
+function telShowAllMarks(){ var any = false; telLayer.getChildren().forEach(function(n){ if (n.telTStart != null || n.telTEnd != null){ n.visible(true); any = true; } }); if (any) telLayer.batchDraw(); }
+function telSetPlayBtn(p){ var b = document.getElementById('tel-playpause'); if (b) b.innerHTML = p ? '<svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>' : '<svg viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"/></svg>'; }
+function telUpdateTime(){ if (!telMedia || telMedia.type !== 'video') return; var v = telMedia.el, sk = document.getElementById('tel-seek'); var r = v.duration ? (v.currentTime / v.duration) : 0; if (v.duration) sk.value = r * 1000; document.getElementById('tel-time').textContent = telFmt(v.currentTime) + ' / ' + telFmt(v.duration || 0); var ph = document.getElementById('tel-playhead'), tf = document.getElementById('tel-track-fill'); if (ph) ph.style.left = (r*100) + '%'; if (tf) tf.style.width = (r*100) + '%'; telApplyTiming(v.currentTime); }
+function telFmt(s){ s = Math.floor(s || 0); return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); }
+function telAddEvent(){ if (!telMedia || telMedia.type !== 'video'){ alert('Carregue um vídeo para marcar eventos.'); return; } var t = telMedia.el.currentTime || 0; var def = 'Evento ' + (telEvents.length + 1); var label = prompt('Nome do evento (em ' + telFmt(t) + '):', def); if (label === null) return; telEvents.push({ t:t, label:(label || def) }); telEvents.sort(function(a,b){ return a.t - b.t; }); telRenderMarkers(); }
+function telRenderMarkers(){ var tr = document.getElementById('tel-track'); if (!tr) return; tr.querySelectorAll('.tel-marker').forEach(function(m){ m.remove(); }); var empty = document.getElementById('tel-tl-empty'); if (empty) empty.style.display = telEvents.length ? 'none' : 'block'; var dur = (telMedia && telMedia.type === 'video' && telMedia.el.duration) ? telMedia.el.duration : 0; if (!dur) return; telEvents.forEach(function(ev, i){ var m = document.createElement('div'); m.className = 'tel-marker'; m.style.left = ((ev.t/dur)*100) + '%'; m.setAttribute('data-label', telFmt(ev.t) + ' · ' + ev.label); m.title = 'Clique: ir para o lance · clique direito: remover'; m.addEventListener('click', function(e){ e.stopPropagation(); if (telMedia && telMedia.el){ telMedia.el.currentTime = ev.t; } }); m.addEventListener('contextmenu', function(e){ e.preventDefault(); telEvents.splice(i,1); telRenderMarkers(); }); tr.appendChild(m); }); }
+function telTrackSeek(e){ if (!telMedia || telMedia.type !== 'video' || !telMedia.el.duration) return; var tr = document.getElementById('tel-track'); var rect = tr.getBoundingClientRect(); var r = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width)); telMedia.el.currentTime = r * telMedia.el.duration; }
+
+function telSetDraggable(on){ telLayer.getChildren().forEach(function(n){ n.draggable(on); }); }
+function telSelect(node){ telTr.nodes([node]); telUI.batchDraw(); telRenderProps(); }
+function telDeselect(){ telTr.nodes([]); telUI.batchDraw(); telRenderProps(); }
+function telDeleteSel(){ var ns = telTr.nodes().slice(); if (!ns.length) return; ns.forEach(function(n){ n.remove(); }); telUndoStack.push({ type:'del', nodes:ns }); telRedoStack = []; telTr.nodes([]); telLayer.batchDraw(); telUI.batchDraw(); telUpdateHistBtns(); telRenderProps(); }
+
+function telDown(e){
+  var p = telPos();
+  if (telTool === 'select'){
+    if (e.target === telStage){ telDeselect(); return; }
+    var top = e.target; while (top.getParent() && top.getParent() !== telLayer) top = top.getParent();
+    if (top && top.getParent() === telLayer) telSelect(top);
+    return;
+  }
+  if (telTool === 'player') telAddPlayer(p.x, p.y);
+  else if (telTool === 'ball') telAddBall(p.x, p.y);
+  else if (telTool === 'text'){ var t = prompt('Texto:'); if (t) telAddText(p.x, p.y, t); }
+  else if (telTool === 'draw'){ telDrawing = true; telFreePts = [p.x, p.y]; telDrawFreePrev(); }
+  else if (telTool === 'pass' || telTool === 'move' || telTool === 'cone' || telTool === 'line' || telTool === 'rect' || telTool === 'ellipse'){
+    if (!telPending) telPending = p;
+    else {
+      var a = telPending, b = p;
+      if (telTool === 'cone') telAddCone(a.x,a.y,b.x,b.y);
+      else if (telTool === 'line') telAddLine(a.x,a.y,b.x,b.y);
+      else if (telTool === 'rect') telAddRect(a.x,a.y,b.x,b.y);
+      else if (telTool === 'ellipse') telAddEllipse(a.x,a.y,b.x,b.y);
+      else telAddArrow(a.x,a.y,b.x,b.y, telTool === 'move', telTool === 'pass');
+      telPending = null; telClearPreview();
+    }
+  }
+  else if (telTool === 'zone'){ if (!telZonePts) telZonePts = []; telZonePts.push(p); telDrawZonePrev(); }
+}
+function telMove(){
+  var p = telPos();
+  if (telDrawing){ telFreePts.push(p.x, p.y); telDrawFreePrev(); return; }
+  if (!telPending && !(telZonePts && telZonePts.length)) return;
+  if (telPending){
+    if (telTool === 'pass' || telTool === 'move' || telTool === 'cone' || telTool === 'line') telDrawPrevLine(telPending, p);
+    else if (telTool === 'rect') telDrawRectPrev(telPending, p);
+    else if (telTool === 'ellipse') telDrawEllipsePrev(telPending, p);
+  } else if (telZonePts && telZonePts.length) telDrawZonePrev(p);
+}
+function telUp(){ if (telDrawing){ telDrawing = false; telClearPreview(); telAddFree(telFreePts); telFreePts = null; } }
+function telDbl(e){
+  if (telTool === 'zone' && telZonePts && telZonePts.length >= 3){ telAddZone(telZonePts.slice()); telCancelZone(); return; }
+  var top = e && e.target;
+  while (top && top !== telStage && top.getParent && top.getParent() !== telLayer) top = top.getParent();
+  if (top && top.telType === 'text'){ var nv = prompt('Editar texto:', top.getText().text()); if (nv !== null){ top.getText().text(nv); telLayer.batchDraw(); } return; }
+  var p = telPos(), best = null, bd = 60;
+  telLayer.getChildren().forEach(function(n){ if (n.telType === 'player'){ var d = Math.hypot(n.x()-p.x, n.y()-p.y); if (d < bd){ bd = d; best = n; } } });
+  if (best){ var num = best.getChildren()[3]; var v = prompt('Número / rótulo do jogador:', num ? num.text() : ''); if (v !== null && num){ num.text(v); num.offsetX(num.width()/2); telLayer.batchDraw(); } }
+}
+
+function telPrevEnsure(type, factory){ if (telPreviewNode && telPreviewNode._ptype === type) return telPreviewNode; telClearPreview(); telPreviewNode = factory(); telPreviewNode._ptype = type; telUI.add(telPreviewNode); return telPreviewNode; }
+function telDrawPrevLine(a, b){ var n = telPrevEnsure('line', function(){ return new Konva.Line({ stroke:telColor, strokeWidth:2, dash:[8,6], listening:false }); }); n.closed(false); n.points([a.x, a.y, b.x, b.y]); n.stroke(telColor); telUI.batchDraw(); }
+function telDrawZonePrev(extra){ var pts = []; telZonePts.forEach(function(p){ pts.push(p.x, p.y); }); if (extra){ pts.push(extra.x, extra.y); } var n = telPrevEnsure('line', function(){ return new Konva.Line({ stroke:telColor, strokeWidth:2, dash:[8,6], listening:false }); }); n.closed(false); n.points(pts); n.stroke(telColor); telUI.batchDraw(); }
+function telDrawRectPrev(a, b){ var x = Math.min(a.x,b.x), y = Math.min(a.y,b.y), w = Math.abs(b.x-a.x), h = Math.abs(b.y-a.y); var n = telPrevEnsure('rect', function(){ return new Konva.Rect({ stroke:telColor, strokeWidth:2, dash:[8,6], cornerRadius:3, listening:false }); }); n.x(x); n.y(y); n.width(w); n.height(h); n.stroke(telColor); telUI.batchDraw(); }
+function telDrawEllipsePrev(a, b){ var cx = (a.x+b.x)/2, cy = (a.y+b.y)/2, rx = Math.abs(b.x-a.x)/2, ry = Math.abs(b.y-a.y)/2; var n = telPrevEnsure('ellipse', function(){ return new Konva.Ellipse({ stroke:telColor, strokeWidth:2, dash:[8,6], listening:false }); }); n.x(cx); n.y(cy); n.radiusX(rx); n.radiusY(ry); n.stroke(telColor); telUI.batchDraw(); }
+function telDrawFreePrev(){ var n = telPrevEnsure('free', function(){ return new Konva.Line({ stroke:telColor, strokeWidth:5, lineCap:'round', lineJoin:'round', tension:0.35, opacity:0.85, listening:false }); }); n.points(telFreePts.slice()); n.stroke(telColor); telUI.batchDraw(); }
+function telClearPreview(){ if (telPreviewNode){ telPreviewNode.destroy(); telPreviewNode = null; telUI.batchDraw(); } }
+function telCancelZone(){ telZonePts = null; telClearPreview(); }
+
+function telAddPlayer(x, y){
+  var col = telColor;
+  var g = new Konva.Group({ x:x, y:y, draggable:telTool === 'select' }); g.telType = 'player'; g.telColor = col;
+  g.add(new Konva.Rect({ x:-14, y:-112, width:28, height:112, listening:false, fillLinearGradientStartPoint:{ x:0, y:112 }, fillLinearGradientEndPoint:{ x:0, y:0 }, fillLinearGradientColorStops:[0, telRgba(col,0.34), 0.5, telRgba(col,0.09), 1, telRgba(col,0)] }));
+  g.add(new Konva.Ellipse({ radiusX:30, radiusY:12, listening:false, fillRadialGradientStartPoint:{ x:0, y:0 }, fillRadialGradientEndPoint:{ x:0, y:0 }, fillRadialGradientStartRadius:0, fillRadialGradientEndRadius:30, fillRadialGradientColorStops:[0, telRgba(col,0.5), 0.7, telRgba(col,0.18), 1, telRgba(col,0)] }));
+  g.add(new Konva.Ellipse({ radiusX:26, radiusY:11, stroke:col, strokeWidth:3, listening:false }));
+  var num = new Konva.Text({ text:String(telPlayerNum), fontSize:18, fontStyle:'bold', fill:'#fff', stroke:'rgba(0,0,0,.6)', strokeWidth:2, listening:false });
+  num.offsetX(num.width()/2); num.y(-33); g.add(num);
+  g.add(new Konva.Rect({ x:-16, y:-112, width:32, height:124, fill:'rgba(0,0,0,0.001)' }));
+  telLayer.add(g); telPushAdd(g); telLayer.batchDraw(); telPlayerNum++;
+}
+function telAddBall(x, y){
+  var g = new Konva.Group({ x:x, y:y, draggable:telTool === 'select' }); g.telType = 'ball';
+  g.add(new Konva.Circle({ radius:12, fill:'#fff', stroke:'#0b0f16', strokeWidth:1.5, listening:true, shadowColor:'#000', shadowBlur:6, shadowOpacity:0.4, shadowOffset:{ x:0, y:2 } }));
+  g.add(new Konva.RegularPolygon({ sides:5, radius:5, rotation:-18, fill:'#0b0f16', listening:false }));
+  for (var i = 0; i < 5; i++){ var a = -Math.PI/2 + i*2*Math.PI/5; g.add(new Konva.Line({ points:[Math.cos(a)*5, Math.sin(a)*5, Math.cos(a)*11, Math.sin(a)*11], stroke:'#0b0f16', strokeWidth:1.2, listening:false })); }
+  telLayer.add(g); telPushAdd(g); telLayer.batchDraw();
+}
+function telAddArrow(x1, y1, x2, y2, dashed, curved){
+  var pts, tens = 0;
+  if (curved){ var dx = x2-x1, dy = y2-y1, len = Math.hypot(dx,dy) || 1, off = Math.min(len*0.24, 75); var cx = (x1+x2)/2 - dy/len*off, cy = (y1+y2)/2 + dx/len*off; pts = [x1,y1,cx,cy,x2,y2]; tens = 0.5; }
+  else { pts = [x1,y1,x2,y2]; }
+  var a = new Konva.Arrow({ points:pts, tension:tens, stroke:telColor, fill:telColor, strokeWidth:6, pointerLength:16, pointerWidth:15, lineCap:'round', lineJoin:'round', draggable:telTool === 'select', shadowColor:'#000', shadowBlur:5, shadowOpacity:0.35, shadowOffset:{ x:1, y:2 }, dash: dashed ? [16,11] : undefined }); a.telType = 'arrow'; a.telColor = telColor; telLayer.add(a); telPushAdd(a); telLayer.batchDraw(); }
+function telAddCone(x1, y1, x2, y2){
+  var ang = Math.atan2(y2-y1, x2-x1) * 180 / Math.PI; var L = Math.max(120, Math.hypot(x2-x1, y2-y1) * 1.2);
+  var c = new Konva.Shape({ x:x1, y:y1, rotation:ang, draggable:telTool === 'select',
+    sceneFunc:function(ctx, shape){ var r = shape.getAttr('len'), cl = shape.getAttr('col'), sp = 0.42; var g = ctx.createLinearGradient(0,0,r,0); g.addColorStop(0, telRgba(cl,0.55)); g.addColorStop(1, telRgba(cl,0.04)); ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,r,-sp,sp); ctx.closePath(); ctx.fillStyle = g; ctx.fill(); ctx.fillStrokeShape(shape); },
+    hitFunc:function(ctx, shape){ var r = shape.getAttr('len'), sp = 0.42; ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,r,-sp,sp); ctx.closePath(); ctx.fillStrokeShape(shape); } });
+  c.setAttr('len', L); c.setAttr('col', telColor); c.telType = 'cone'; c.telColor = telColor;
+  telLayer.add(c); telPushAdd(c); telLayer.batchDraw();
+}
+function telStripeCanvas(col){ var c = document.createElement('canvas'); c.width = 16; c.height = 16; var x = c.getContext('2d'); x.fillStyle = telRgba(col,0.14); x.fillRect(0,0,16,16); x.strokeStyle = telRgba(col,0.6); x.lineWidth = 5; x.beginPath(); x.moveTo(-4,20); x.lineTo(20,-4); x.moveTo(4,28); x.lineTo(28,4); x.stroke(); return c; }
+function telAddZone(pts){
+  var flat = [], minY = Infinity, maxY = -Infinity;
+  pts.forEach(function(p){ flat.push(p.x, p.y); if (p.y < minY) minY = p.y; if (p.y > maxY) maxY = p.y; });
+  if (maxY - minY < 1) maxY = minY + 1;
+  var z = new Konva.Line({ points:flat, closed:true, stroke:telColor, strokeWidth:2.5, draggable:telTool === 'select',
+    fillLinearGradientStartPoint:{ x:0, y:maxY }, fillLinearGradientEndPoint:{ x:0, y:minY },
+    fillLinearGradientColorStops:[0, telRgba(telColor,0.42), 1, telRgba(telColor,0.08)],
+    shadowColor:'#000', shadowBlur:6, shadowOpacity:0.2 });
+  z.telType = 'zone'; z.telColor = telColor; z.telFillOn = true; telLayer.add(z); telPushAdd(z); telLayer.batchDraw();
+}
+function telAddText(x, y, str){ var lab = new Konva.Label({ x:x, y:y, draggable:telTool === 'select' }); lab.telType = 'text'; lab.add(new Konva.Tag({ fill:'rgba(0,0,0,.68)', cornerRadius:4 })); lab.add(new Konva.Text({ text:str, fontSize:17, fontStyle:'bold', fill:telColor, padding:7 })); lab.telColor = telColor; telLayer.add(lab); telPushAdd(lab); telLayer.batchDraw(); }
+function telAddRect(x1, y1, x2, y2){
+  var x = Math.min(x1,x2), y = Math.min(y1,y2), w = Math.abs(x2-x1), h = Math.abs(y2-y1);
+  if (w < 4 && h < 4){ w = 90; h = 60; }
+  var r = new Konva.Rect({ x:x, y:y, width:w, height:h, cornerRadius:3, stroke:telColor, strokeWidth:4, fill:'transparent', draggable:telTool === 'select', shadowColor:'#000', shadowBlur:5, shadowOpacity:0.3 });
+  r.telType = 'rect'; r.telColor = telColor; r.telFillOn = false; telLayer.add(r); telPushAdd(r); telLayer.batchDraw();
+}
+function telAddEllipse(x1, y1, x2, y2){
+  var cx = (x1+x2)/2, cy = (y1+y2)/2, rx = Math.abs(x2-x1)/2, ry = Math.abs(y2-y1)/2;
+  if (rx < 4 && ry < 4){ rx = 48; ry = 34; }
+  var el = new Konva.Ellipse({ x:cx, y:cy, radiusX:rx, radiusY:ry, stroke:telColor, strokeWidth:4, fill:'transparent', draggable:telTool === 'select', shadowColor:'#000', shadowBlur:5, shadowOpacity:0.3 });
+  el.telType = 'ellipse'; el.telColor = telColor; el.telFillOn = false; telLayer.add(el); telPushAdd(el); telLayer.batchDraw();
+}
+function telAddLine(x1, y1, x2, y2){
+  var l = new Konva.Line({ points:[x1,y1,x2,y2], stroke:telColor, strokeWidth:5, lineCap:'round', draggable:telTool === 'select', shadowColor:'#000', shadowBlur:4, shadowOpacity:0.3 });
+  l.telType = 'line'; l.telColor = telColor; telLayer.add(l); telPushAdd(l); telLayer.batchDraw();
+}
+function telAddFree(pts){
+  if (!pts || pts.length < 4) return;
+  var l = new Konva.Line({ points:pts, stroke:telColor, strokeWidth:5, lineCap:'round', lineJoin:'round', tension:0.35, draggable:telTool === 'select', shadowColor:'#000', shadowBlur:4, shadowOpacity:0.3 });
+  l.telType = 'free'; l.telColor = telColor; telLayer.add(l); telPushAdd(l); telLayer.batchDraw();
+}
+
+function telRecolorSel(){
+  telTr.nodes().forEach(function(n){
+    if (n.telType === 'arrow'){ n.stroke(telColor); n.fill(telColor); }
+    else if (n.telType === 'cone'){ n.setAttr('col', telColor); }
+    else if (n.telType === 'zone'){ n.stroke(telColor); n.fillLinearGradientColorStops([0, telRgba(telColor,0.42), 1, telRgba(telColor,0.08)]); n.telColor = telColor; }
+    else if (n.telType === 'text'){ n.getText().fill(telColor); }
+    else if (n.telType === 'player'){ telRecolorPlayer(n, telColor); }
+    else if (n.telType === 'line' || n.telType === 'free'){ n.stroke(telColor); n.telColor = telColor; }
+    else if (n.telType === 'rect' || n.telType === 'ellipse'){ n.stroke(telColor); n.telColor = telColor; if (n.telFillOn) n.fill(telRgba(telColor, 0.22)); }
+  });
+  telLayer.batchDraw();
+}
+function telRecolorPlayer(g, col){ var k = g.getChildren(); if (k[0]) k[0].fillLinearGradientColorStops([0, telRgba(col,0.34), 0.5, telRgba(col,0.09), 1, telRgba(col,0)]); if (k[1]) k[1].fillRadialGradientColorStops([0, telRgba(col,0.5), 0.7, telRgba(col,0.18), 1, telRgba(col,0)]); if (k[2]) k[2].stroke(col); g.telColor = col; }
+
+function telPushAdd(node){ telUndoStack.push({ type:'add', nodes:[node] }); telRedoStack = []; telUpdateHistBtns(); }
+function telUndo(){ var op = telUndoStack.pop(); if (!op) return; if (op.type === 'add') op.nodes.forEach(function(n){ n.remove(); }); else op.nodes.forEach(function(n){ telLayer.add(n); }); telRedoStack.push(op); telTr.nodes([]); telSetDraggable(telTool === 'select'); telLayer.batchDraw(); telUI.batchDraw(); telUpdateHistBtns(); telRenderProps(); }
+function telRedo(){ var op = telRedoStack.pop(); if (!op) return; if (op.type === 'add') op.nodes.forEach(function(n){ telLayer.add(n); }); else op.nodes.forEach(function(n){ n.remove(); }); telUndoStack.push(op); telTr.nodes([]); telSetDraggable(telTool === 'select'); telLayer.batchDraw(); telUI.batchDraw(); telUpdateHistBtns(); telRenderProps(); }
+function telUpdateHistBtns(){ var u = document.getElementById('tel-undo-btn'), r = document.getElementById('tel-redo-btn'); if (u) u.disabled = !telUndoStack.length; if (r) r.disabled = !telRedoStack.length; }
+function telDuplicateSel(){ var ns = telTr.nodes().slice(); if (!ns.length) return; var clones = []; ns.forEach(function(n){ var c = n.clone(); c.telType = n.telType; c.telColor = n.telColor; c.telFillOn = n.telFillOn; c.x(n.x()+22); c.y(n.y()+22); c.draggable(telTool === 'select'); telLayer.add(c); clones.push(c); }); telUndoStack.push({ type:'add', nodes:clones }); telRedoStack = []; telTr.nodes(clones); telLayer.batchDraw(); telUI.batchDraw(); telUpdateHistBtns(); telRenderProps(); }
+function telOrder(dir){ var ns = telTr.nodes(); if (!ns.length) return; ns.forEach(function(n){ if (dir === 'top') n.moveToTop(); else n.moveToBottom(); }); telLayer.batchDraw(); }
+function telReset(){ if (!telLayer) return; telLayer.destroyChildren(); if (telTr) telTr.nodes([]); telPlayerNum = 1; telPending = null; telDrawing = false; telFreePts = null; telCancelZone(); telUndoStack = []; telRedoStack = []; telLayer.batchDraw(); telUI.batchDraw(); telUpdateHistBtns(); telRenderProps(); }
+function telClear(){ if (!telLayer) return; if (telLayer.getChildren().length && !confirm('Limpar todas as marcações do quadro?')) return; telReset(); }
+
+// ── Painel de propriedades contextual ──
+function telRenderProps(){
+  var body = document.getElementById('tel-props-body'), empty = document.getElementById('tel-props-empty'); if (!body) return;
+  var n = telTr ? telTr.nodes()[0] : null;
+  if (!n){ body.style.display = 'none'; if (empty) empty.style.display = 'block'; return; }
+  if (empty) empty.style.display = 'none'; body.style.display = 'flex';
+  var t = n.telType;
+  function row(f, on){ var el = body.querySelector('.tel-prow[data-for="'+f+'"]'); if (el) el.style.display = on ? '' : 'none'; }
+  row('stroke', t==='arrow'||t==='line'||t==='free'||t==='rect'||t==='ellipse'||t==='zone'||t==='player');
+  row('opacity', true);
+  row('arrow', t==='arrow');
+  row('textsize', t==='text');
+  row('dash', t==='arrow'||t==='line'||t==='rect'||t==='ellipse');
+  row('fill', t==='rect'||t==='ellipse'||t==='zone');
+  row('order', true);
+  var isVideo = !!(telMedia && telMedia.type === 'video'); row('timing', isVideo); if (isVideo) telUpdateTimingLabel(n);
+  telSetRange('tel-p-stroke','tel-p-stroke-v', telNodeStroke(n), '');
+  telSetRange('tel-p-opacity','tel-p-opacity-v', Math.round(n.opacity()*100), '%');
+  if (t==='arrow') telSetRange('tel-p-arrow','tel-p-arrow-v', Math.round(n.pointerLength()), '');
+  if (t==='text') telSetRange('tel-p-textsize','tel-p-textsize-v', Math.round(n.getText().fontSize()), '');
+  telSetSeg('tel-p-dash', telNodeDashed(n) ? 'dashed' : 'solid');
+  var f = document.getElementById('tel-p-fill'); if (f) f.checked = !!n.telFillOn;
+}
+function telSetRange(id, vid, val, suf){ var r = document.getElementById(id), s = document.getElementById(vid); if (r) r.value = val; if (s) s.textContent = val + (suf||''); }
+function telSetSeg(id, v){ var seg = document.getElementById(id); if (!seg) return; seg.querySelectorAll('button').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-v')===v); }); }
+function telNodeStroke(n){ if (n.telType==='player'){ var k = n.getChildren()[2]; return k ? k.strokeWidth() : 3; } return n.strokeWidth ? n.strokeWidth() : 4; }
+function telNodeDashed(n){ var d = n.dash && n.dash(); return !!(d && d.length); }
+function telApplyStroke(v){ var n = telTr.nodes()[0]; if (!n) return; if (n.telType==='player'){ var k = n.getChildren()[2]; if (k) k.strokeWidth(+v); } else if (n.strokeWidth) n.strokeWidth(+v); telLayer.batchDraw(); }
+function telApplyOpacity(v){ var n = telTr.nodes()[0]; if (!n) return; n.opacity(v/100); telLayer.batchDraw(); }
+function telApplyArrow(v){ var n = telTr.nodes()[0]; if (!n || n.telType!=='arrow') return; n.pointerLength(+v); n.pointerWidth(Math.max(6, +v-1)); telLayer.batchDraw(); }
+function telApplyTextSize(v){ var n = telTr.nodes()[0]; if (!n || n.telType!=='text') return; n.getText().fontSize(+v); telLayer.batchDraw(); }
+function telApplyDash(v){ var n = telTr.nodes()[0]; if (!n || !n.dash) return; n.dash(v==='dashed' ? [16,11] : undefined); telLayer.batchDraw(); }
+function telApplyFill(on){ var n = telTr.nodes()[0]; if (!n) return; var col = n.telColor || telColor; n.telFillOn = on; if (n.telType==='zone'){ n.fillLinearGradientColorStops(on ? [0, telRgba(col,0.42), 1, telRgba(col,0.08)] : [0,'rgba(0,0,0,0)',1,'rgba(0,0,0,0)']); } else if (n.fill){ n.fill(on ? telRgba(col,0.22) : 'transparent'); } telLayer.batchDraw(); }
+function telPropInput(e){ var id = e.target.id, v = e.target.value; if (id==='tel-p-stroke'){ telSetRange('tel-p-stroke','tel-p-stroke-v',v,''); telApplyStroke(v); } else if (id==='tel-p-opacity'){ telSetRange('tel-p-opacity','tel-p-opacity-v',v,'%'); telApplyOpacity(v); } else if (id==='tel-p-arrow'){ telSetRange('tel-p-arrow','tel-p-arrow-v',v,''); telApplyArrow(v); } else if (id==='tel-p-textsize'){ telSetRange('tel-p-textsize','tel-p-textsize-v',v,''); telApplyTextSize(v); } }
+function telExport(){ if (!telStage) return; telDeselect(); telCancelZone(); try { var url = telStage.toDataURL({ pixelRatio: 1/telScale }); var a = document.createElement('a'); a.href = url; a.download = 'quadro-tatico.png'; document.body.appendChild(a); a.click(); a.remove(); } catch(err){ alert('Não foi possível exportar: ' + err.message); } }
+
+// ── Salvar / retomar análise (localStorage) ──
+function telImageDataURL(){ try { var im = telMedia.el; var c = document.createElement('canvas'); c.width = im.naturalWidth || im.width; c.height = im.naturalHeight || im.height; c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); return c.toDataURL('image/jpeg', 0.85); } catch(e){ return null; } }
+function telSerializeNode(n){
+  var b = { t:n.telType, x:n.x(), y:n.y(), rot:n.rotation(), sx:n.scaleX(), sy:n.scaleY(), op:n.opacity(), col:n.telColor || null };
+  if (n.telTStart != null) b.ts = n.telTStart; if (n.telTEnd != null) b.te = n.telTEnd;
+  var t = n.telType;
+  if (t === 'player'){ b.num = n.getChildren()[3].text(); }
+  else if (t === 'arrow'){ b.points = n.points(); b.sw = n.strokeWidth(); b.pl = n.pointerLength(); b.dash = !!(n.dash() && n.dash().length); }
+  else if (t === 'line' || t === 'free'){ b.points = n.points(); b.sw = n.strokeWidth(); b.dash = !!(n.dash() && n.dash().length); }
+  else if (t === 'rect'){ b.w = n.width(); b.h = n.height(); b.sw = n.strokeWidth(); b.dash = !!(n.dash() && n.dash().length); b.fillOn = !!n.telFillOn; }
+  else if (t === 'ellipse'){ b.rx = n.radiusX(); b.ry = n.radiusY(); b.sw = n.strokeWidth(); b.dash = !!(n.dash() && n.dash().length); b.fillOn = !!n.telFillOn; }
+  else if (t === 'zone'){ b.points = n.points(); b.sw = n.strokeWidth(); b.fillOn = (n.telFillOn !== false); }
+  else if (t === 'cone'){ b.len = n.getAttr('len'); }
+  else if (t === 'text'){ b.text = n.getText().text(); b.fs = n.getText().fontSize(); }
+  return b;
+}
+function telRebuild(b){
+  function last(){ return telLayer.getChildren()[telLayer.getChildren().length - 1]; }
+  var prevColor = telColor, prevTool = telTool; telTool = 'select'; if (b.col) telColor = b.col;
+  var t = b.t, n = null, p;
+  if (t === 'player'){ var pn = telPlayerNum; telAddPlayer(b.x, b.y); n = last(); if (b.num != null){ var num = n.getChildren()[3]; num.text(String(b.num)); num.offsetX(num.width()/2); } telPlayerNum = pn; }
+  else if (t === 'ball'){ telAddBall(b.x, b.y); n = last(); }
+  else if (t === 'arrow'){ p = b.points; var curved = p.length >= 6; telAddArrow(p[0], p[1], curved ? p[4] : p[2], curved ? p[5] : p[3], b.dash, curved); n = last(); if (b.sw) n.strokeWidth(b.sw); if (b.pl) n.pointerLength(b.pl); }
+  else if (t === 'line'){ p = b.points; telAddLine(p[0], p[1], p[p.length-2], p[p.length-1]); n = last(); n.points(p); if (b.sw) n.strokeWidth(b.sw); if (b.dash) n.dash([16,11]); }
+  else if (t === 'free'){ telAddFree(b.points); n = last(); if (b.sw) n.strokeWidth(b.sw); if (b.dash) n.dash([16,11]); }
+  else if (t === 'rect'){ telAddRect(b.x, b.y, b.x + b.w, b.y + b.h); n = last(); if (b.sw) n.strokeWidth(b.sw); if (b.dash) n.dash([16,11]); if (b.fillOn){ n.telFillOn = true; n.fill(telRgba(b.col || telColor, 0.22)); } }
+  else if (t === 'ellipse'){ telAddEllipse(b.x - b.rx, b.y - b.ry, b.x + b.rx, b.y + b.ry); n = last(); if (b.sw) n.strokeWidth(b.sw); if (b.dash) n.dash([16,11]); if (b.fillOn){ n.telFillOn = true; n.fill(telRgba(b.col || telColor, 0.22)); } }
+  else if (t === 'zone'){ var pts = []; for (var i = 0; i < b.points.length; i += 2) pts.push({ x:b.points[i], y:b.points[i+1] }); telAddZone(pts); n = last(); if (b.sw) n.strokeWidth(b.sw); if (b.fillOn === false){ n.telFillOn = false; n.fillLinearGradientColorStops([0,'rgba(0,0,0,0)',1,'rgba(0,0,0,0)']); } }
+  else if (t === 'cone'){ telAddCone(b.x, b.y, b.x + 10, b.y); n = last(); n.setAttr('len', b.len); }
+  else if (t === 'text'){ telAddText(b.x, b.y, b.text); n = last(); if (b.fs) n.getText().fontSize(b.fs); }
+  if (n){ n.x(b.x); n.y(b.y); n.rotation(b.rot || 0); n.scaleX(b.sx || 1); n.scaleY(b.sy || 1); n.opacity(b.op == null ? 1 : b.op); if (b.ts != null) n.telTStart = b.ts; if (b.te != null) n.telTEnd = b.te; }
+  telColor = prevColor; telTool = prevTool;
+}
+function telSaveAnalysis(){
+  if (!telLayer) return;
+  var kids = telLayer.getChildren();
+  var hasPitch = (!telBgImage && telBg.getChildren().length > 0), media;
+  if (telMedia && telMedia.type === 'image'){ var d = telImageDataURL(); if (!d){ alert('Não foi possível capturar a imagem.'); return; } media = { type:'image', data:d }; }
+  else if (telMedia && telMedia.type === 'video'){ media = { type:'video' }; }
+  else if (hasPitch || kids.length){ media = { type:'pitch' }; }
+  else { alert('Nada para salvar ainda — importe uma mídia ou use o campo em branco.'); return; }
+  var rec = { v:1, tw:TEL_W, th:TEL_H, media:media, nodes:kids.map(telSerializeNode), at:Date.now() };
+  try { localStorage.setItem('capixastat_tel', JSON.stringify(rec)); }
+  catch(e){ alert('Não foi possível salvar (armazenamento cheio). ' + e.message); return; }
+  telCheckSaved();
+  alert(media.type === 'video'
+    ? 'Marcações salvas neste navegador.\n\nObservação: o arquivo de vídeo não pode ser re-armazenado pelo navegador. Ao retomar, as marcações voltam sobre um campo em branco — recarregue o vídeo manualmente se precisar.'
+    : 'Análise salva neste navegador. Para retomar, use “Retomar análise salva” na tela inicial do Quadro Tático.');
+}
+function telLoadAnalysis(){
+  var raw; try { raw = localStorage.getItem('capixastat_tel'); } catch(e){}
+  if (!raw){ alert('Nenhuma análise salva encontrada.'); return; }
+  var rec; try { rec = JSON.parse(raw); } catch(e){ alert('Análise salva corrompida.'); return; }
+  telReset(); TEL_W = rec.tw || 1280;
+  function finish(){ telShowEmpty(false); (rec.nodes || []).forEach(telRebuild); telUndoStack = []; telRedoStack = []; telUpdateHistBtns(); telSetDraggable(telTool === 'select'); telRenderProps(); telLayer.batchDraw(); telFit(); }
+  if (rec.media && rec.media.type === 'image' && rec.media.data){
+    var img = new Image(); img.onload = function(){ telMedia = { type:'image', el:img }; telSetBg(img, img.naturalWidth, img.naturalHeight); document.getElementById('tel-video-ctrls').style.display = 'none'; document.getElementById('tel-timeline').style.display = 'none'; finish(); }; img.src = rec.media.data;
+  } else { TEL_H = rec.th || 720; telDrawPitch(); finish(); if (rec.media && rec.media.type === 'video') alert('O vídeo não pode ser restaurado pelo navegador. As marcações foram recolocadas sobre um campo em branco; recarregue o vídeo se desejar.'); }
+}
+function telCheckSaved(){ var b = document.getElementById('tel-resume-btn'); if (!b) return; var has = false; try { has = !!localStorage.getItem('capixastat_tel'); } catch(e){} b.style.display = has ? 'inline-flex' : 'none'; }
+
 document.addEventListener('DOMContentLoaded', function() {
+  // ── Restaura a sessão (mantém logado ao dar F5) e a última tela aberta ──
+  try {
+    var _savedUser = getCurrentUser();
+    if (_savedUser) {
+      updateSidebarUser(_savedUser);
+      enterApp();
+      var _scr = localStorage.getItem('capixastat_screen');
+      var _pid = localStorage.getItem('capixastat_profileid');
+      if (_scr === 'perfil' && _pid && PLAYERS[_pid]) {
+        setTimeout(function(){ showPlayer(_pid); }, 60);
+      } else if (_scr && _scr !== 'dashboard') {
+        var _nav = document.querySelector('[data-screen="' + _scr + '"]');
+        setTimeout(function(){ goTo(_scr, _nav); }, 60);
+      }
+    }
+  } catch (e) { console.warn('Falha ao restaurar sessão:', e); }
+
   setTimeout(updateGlobalStats, 50);
   loadLiveData();
   // Sincroniza label do botão de tema
