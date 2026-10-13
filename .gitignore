@@ -26,3 +26,7 @@ dist-ssr
 # Arquivos de trabalho (scraping, dumps de dados, geração do relatório) — uso local, não vão pro GitHub
 _scratch/
 *.docx
+
+# POC de visão computacional: pesos do YOLO (baixados automaticamente) e cache do Python
+poc-cv/*.pt
+poc-cv/__pycache__/
