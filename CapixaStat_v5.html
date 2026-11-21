@@ -1875,6 +1875,13 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .timing-box { background:var(--bg-raised); border-radius:10px; padding:9px 12px; font-size:13px; color:var(--text-2) }
 .timing-box small { display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--text-3); margin-bottom:2px }
 .timing-box b { color:var(--text-1); font-family:var(--font-mono) }
+
+/* P5 */
+.md-presets { margin-bottom:10px }
+.md-destaque { display:flex; flex-wrap:wrap; align-items:center; gap:14px; padding:10px 12px; margin-bottom:12px; border-radius:10px; background:var(--brand-dim); border:1px solid var(--brand-glow) }
+.md-destaque small { display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--text-3) }
+.md-destaque > div:first-child b { display:block; font-size:16px; color:var(--text-1) } .md-destaque > div:first-child span { font-size:12px; color:var(--text-2) }
+.md-d-n { text-align:center } .md-d-n b { display:block; font-family:var(--font-mono); font-size:20px; color:var(--text-1) }
 </style>
 </head>
 <body>
@@ -4177,6 +4184,30 @@ function teamFormDots(comp, time) {
     var r = _dashResult(j, time);
     return '<i class="' + r + '" title="' + j.data + ' · ' + j.home + ' ' + j.gh + '–' + j.ga + ' ' + j.away + '">' + r + '</i>';
   }).join('') + '</span>';
+}
+
+
+// ── P5: destaque da partida (participação em gols nos incidentes reais) e presets ──
+function mdPreset(btn) {
+  btn.parentElement.querySelectorAll('.vf-seg').forEach(function (b) { b.classList.toggle('active', b === btn); });
+  var p = btn.getAttribute('data-p');
+  document.querySelectorAll('#md-stats-content .fm-stat-row').forEach(function (r) { r.style.display = (p === 'all' || r.getAttribute('data-cat') === p) ? '' : 'none'; });
+}
+function mdDestaque(j, inc) {
+  if (!inc || !inc.length) return '';
+  var t = {};
+  var add = function (nome, lado, k) { if (!nome) return; var x = t[nome] = t[nome] || { nome: nome, lado: lado, g: 0, a: 0, c: 0 }; x[k]++; };
+  inc.forEach(function (e) {
+    var lado = e.isHome ? j.home : j.away;
+    if (e.type === 'goal' && !e.ownGoal) { add(e.player, lado, 'g'); if (e.assist) add(e.assist, lado, 'a'); }
+    if (e.type === 'card') add(e.player, lado, 'c');
+  });
+  var arr = Object.values(t).filter(function (x) { return x.g + x.a > 0; }).sort(function (a, b) { return (b.g * 2 + b.a) - (a.g * 2 + a.a) || a.c - b.c; });
+  if (!arr.length) return '';
+  var d = arr[0];
+  return '<div class="md-destaque"><div><small>Destaque da partida</small><b>' + d.nome + '</b><span>' + d.lado + '</span></div>' +
+    '<div class="md-d-n"><b>' + d.g + '</b><small>gols</small></div><div class="md-d-n"><b>' + d.a + '</b><small>assist.</small></div><div class="md-d-n"><b>' + d.c + '</b><small>cartões</small></div>' +
+    '<span class="cs-src real" title="Critério: maior participação em gols (gol vale 2, assistência 1). Não é a nota oficial.">participação em gols</span></div>';
 }
 
 // ── P4: gols e cartões por faixa de 15 min e por tempo, a partir dos incidentes reais ──
@@ -11167,12 +11198,15 @@ function openJogoDetail(cacheKey, idx) {
   document.getElementById('md-events-list').innerHTML = tlHtml;
 
   // ── Stats ──
+  // P5: categoria de cada estatística (presets Ofensivas / Defensivas / Todas)
+  var STAT_CAT = { 'Posse de Bola': 'of', 'Finalizações': 'of', 'Chutes ao Alvo': 'of', 'Escanteios': 'of', 'Impedimentos': 'of',
+    'Faltas': 'def', 'Cartões Amarelos': 'def', 'Cartões Vermelhos': 'def' };
   function createBar(lbl, vH, vA, fmt) {
     fmt = fmt || '';
     var total = (vH + vA) || 1;
     var pctH = (vH / total) * 100;
     var pctA = 100 - pctH;
-    return '<div class="fm-stat-row">' +
+    return '<div class="fm-stat-row" data-cat="' + (STAT_CAT[lbl] || 'of') + '">' +
       '<div class="fm-stat-lbl">' + lbl + '</div>' +
       '<div class="fm-stat-bars">' +
         '<div class="fm-val">' + vH + fmt + '</div>' +
@@ -11200,21 +11234,13 @@ function openJogoDetail(cacheKey, idx) {
                       ? createBar('Cartões Vermelhos', s.vermelhos.h,    s.vermelhos.a         ) : '') +
       (s.impedimentos ? createBar('Impedimentos',      s.impedimentos.h, s.impedimentos.a      ) : '');
   } else {
-    var seed = (j.home + j.away + j.data).split('').reduce(function(a,c){return a+c.charCodeAt(0);},0);
-    var rnd  = function(i){ var x=Math.sin(seed*9301+i*49297)*233280; return x-Math.floor(x); };
-    var diff = j.gh - j.ga;
-    var homePow = Math.round(Math.max(30, Math.min(70, 50 + diff*10 + rnd(1)*24 - 12)));
-    var sH = Math.floor((homePow*0.3) + j.gh*2.5 + 2);
-    var sA = Math.floor(((100-homePow)*0.3) + j.ga*2.5 + 2);
-    statsHtml = '<div style="font-size:11px;color:var(--text-3);text-align:center;margin-bottom:8px"><i class="fas fa-info-circle"></i> Simulação (sem dados oficiais)</div>' +
-      teamHeader +
-      createBar('Posse de Bola',    homePow,                    100-homePow,                    '%') +
-      createBar('Finalizações',     sH,                         sA                                 ) +
-      createBar('Chutes ao Alvo',   j.gh+Math.floor(sH*0.4),   j.ga+Math.floor(sA*0.4)            ) +
-      createBar('Escanteios',       Math.floor(rnd(2)*8+2),     Math.floor(rnd(3)*8+2)             ) +
-      createBar('Faltas',           10+j.gh,                    10+j.ga                            ) +
-      createBar('Cartões Amarelos', Math.floor(j.ga*0.5)+1,     Math.floor(j.gh*0.5)+1             );
+    // P5: a v4 gerava posse/chutes/escanteios "simulados" aqui. Removido: sem dado oficial, não mostramos número.
+    statsHtml = '<div class="cs-est-banner"><span class="cs-status info">Sem dados</span><span>Esta partida não tem estatísticas oficiais na fonte. Para gerar números próprios, marque as ações em <b class="team-link" onclick="goTo(\'scout\')">Scout ao Vivo</b>.</span></div>';
   }
+  // P5: presets de estatísticas + destaque da partida
+  if (s) statsHtml = '<div class="vf-scope md-presets" role="group" aria-label="Filtro de estatísticas">' +
+      '<button class="vf-seg active" data-p="all" onclick="mdPreset(this)">Todas</button><button class="vf-seg" data-p="of" onclick="mdPreset(this)">Ofensivas</button><button class="vf-seg" data-p="def" onclick="mdPreset(this)">Defensivas</button></div>' + statsHtml;
+  statsHtml = mdDestaque(j, rawInc) + statsHtml;
   document.getElementById('md-stats-content').innerHTML = statsHtml;
 
   // ── Classificação ──

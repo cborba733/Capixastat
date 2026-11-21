@@ -141,7 +141,7 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 **Alta:** ✅ R1 · ✅ I1 · ✅ L1 · ✅ I4 · ✅ D1 · ✅ D2 · ✅ D3 · ✅ A4 · ✅ P1 · ✅ F1 · ✅ F2 · ✅ T1 · ✅ B4 ·
 ✅ A1 · ✅ A2 · ✅ A3 · ✅ B1 · ✅ B2 · ✅ B3 · ✅ L2 · ✅ R2 · ✅ R3 · ✅ V1 · ✅ X1 · ✅ P2
 **Dados externos:** ✅ pesquisa de fontes · ✅ integração TheSportsDB (rotina + banco + fonte/data na tela)
-**Média:** ✅ A5 · ✅ A7 · ✅ A8 · ✅ P4 · ⬜ P5 · ⬜ F3 · ⬜ F4 · ⬜ T2 · ⬜ T3 · ⬜ X2 · ⬜ Q2 · ⬜ B6 · ⬜ V5 ·
+**Média:** ✅ A5 · ✅ A7 · ✅ A8 · ✅ P4 · ✅ P5 · ⬜ F3 · ⬜ F4 · ⬜ T2 · ⬜ T3 · ⬜ X2 · ⬜ Q2 · ⬜ B6 · ⬜ V5 ·
 ⬜ I2 · ⬜ I3 · ⬜ M2 · ⬜ M4 · ⬜ R5 · ⬜ D4 · ⬜ A6 · ⬜ A9 · ⬜ P3 · ⬜ F5 · ⬜ T4 · ⬜ X3 · ⬜ Q1 · ⬜ B5 ·
 ⬜ V2 · ⬜ V4 · ⬜ L3 · ⬜ M1 · ⬜ R4 · ⬜ Q3 · ⬜ V3
 **Baixa:** ⬜ A10 · ⬜ X4 · ⬜ Q4 · ⬜ V6 · ⬜ M3 · ⬜ P6 · ⬜ F6 · ✅ B7 · ⬜ L4
@@ -307,6 +307,11 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 - **Classificação calculada:** o plano grátis do TheSportsDB devolve só 5 times; `GET /api/fontes/classificacao`
   calcula a tabela completa a partir dos jogos importados (`calcularTabela`, `origem:'calculada'` + aviso na tela).
   Importação real testada: 45 jogos do Capixabão 2026, status ok. Mata-mata não existe nessa fonte.
+
+- **P5:** detalhe da partida: "Destaque da partida" (`mdDestaque` — maior participação em gols nos incidentes reais;
+  gol=2, assist.=1; não é nota oficial) + presets Todas/Ofensivas/Defensivas (`mdPreset`, `data-cat`). **Removidas as
+  estatísticas "simuladas"** que a v4 inventava quando não havia dado oficial (agora aviso + link p/ Scout ao Vivo).
+  Teste: usar `?v=algo` na URL para evitar cache do navegador.
 
 ### ONDE PAROU (21/11, madrugada — limite de uso)
 Próximos itens Média, nesta ordem: P5, F3, F4, T2, T3, X2, Q2, B6, V5, I2, I3, M2, M4, R5 (dif. baixa); depois D4, A6,
