@@ -146,7 +146,7 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 **Média:** ✅ A5 · ✅ A7 · ✅ A8 · ✅ P4 · ✅ P5 · ✅ F3 · ✅ F4 · ✅ T2 · ✅ T3 · ✅ X2 · ✅ Q2 · ✅ B6 · ✅ V5 ·
 ✅ I2 · ✅ I3 · ✅ M2 · ✅ M4 · ✅ R5 · ✅ D4 · ✅ A6 · ✅ A9 · ✅ P3 · ✅ F5 · ✅ T4 · ✅ X3 · ✅ Q1 · ✅ B5 ·
 ✅ V2 · ✅ V4 · ✅ L3 · ✅ M1 · ✅ R4 · ✅ Q3 · ✅ V3
-**Baixa:** ✅ A10 · ✅ X4 · ✅ Q4 · ✅ V6 · ⬜ M3 · ⬜ P6 · ⬜ F6 · ✅ B7 · ⬜ L4
+**Baixa:** ✅ A10 · ✅ X4 · ✅ Q4 · ✅ V6 · ✅ M3 · ⬜ P6 · ⬜ F6 · ✅ B7 · ⬜ L4
 
 ### Notas por item
 - **R1:** `--text-3` escuro `#4a6a7a`→`#8299aa`, `--text-2` →`#a9bccb`; tema claro: text-3 `#56667a`,
@@ -463,6 +463,11 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
   câmera móvel, campo parcial, troca de ID, árbitro/reserva, resolução; alternativa câmera fixa: celular em tripé alto,
   duas câmeras fixas, panorâmica automática tipo Veo/Pixellot/Trace; próximos passos). Resumo no `poc-cv/README.md` e
   card "Limites" na tela Análise de Vídeo. **O PDF do relatório não foi editado** — o Caio cola a seção no documento.
+
+- **M3:** selo **"editado"** (amarelo tracejado) quando algo salvo é alterado: na Vitrine, ao mudar qualquer campo de um
+  filtro salvo escolhido (`vfCheckEditado`, botão **atualizar** → `vfUpdateSaved`); no Simulador, ao mexer num lance
+  salvo aberto (`simCheckEditado` compara com a foto do momento em que foi salvo/aberto; botão **salvar** grava com o
+  mesmo nome). Corrigido de quebra: a lista de filtros salvos perdia a seleção a cada redesenho da Vitrine.
 
 ### ONDE PAROU (21/11, madrugada — limite de uso)
 Próximos itens Média (dif. média): D4, A6,

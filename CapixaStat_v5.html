@@ -2044,6 +2044,11 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .dossie-tm-bars i { width:14px; border-radius:3px 3px 0 0; min-height:2px }
 .dossie-tm-bars i.pro, .dossie-leg.pro { background:#22c55e } .dossie-tm-bars i.contra, .dossie-leg.contra { background:#f87171 }
 .dossie-leg { display:inline-block; width:9px; height:9px; border-radius:2px; vertical-align:middle }
+
+/* M3 */
+.cs-editado { display:inline-flex; align-items:center; gap:6px; font-size:11.5px; font-weight:700; color:var(--warn); border:1px dashed var(--warn); border-radius:999px; padding:2px 4px 2px 10px; white-space:nowrap }
+.cs-editado[hidden] { display:none }
+.cs-editado button { background:var(--warn); color:#111; border:0; border-radius:999px; font-size:11px; font-weight:700; padding:2px 8px; cursor:pointer }
 </style>
 </head>
 <body>
@@ -2433,7 +2438,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
           <div class="vf-status">
             <span id="vf-count"></span>
             <span class="vf-saved">
-              <select id="vf-saved" class="form-select" onchange="vfApplySaved(this.value)" aria-label="Filtros salvos"></select>
+              <select id="vf-saved" class="form-select" onchange="vfApplySaved(this.value)" aria-label="Filtros salvos"></select><span id="vf-editado" class="cs-editado" hidden>editado <button type="button" onclick="vfUpdateSaved()" title="Gravar as mudanças no filtro salvo">atualizar</button></span>
               <button class="btn btn-ghost btn-sm" onclick="vfSave()">Salvar filtro</button>
               <button class="btn btn-ghost btn-sm" onclick="vfDeleteSaved()" title="Excluir o filtro salvo selecionado">Excluir</button>
               <button class="btn btn-ghost btn-sm" onclick="vfClear()">Limpar</button>
@@ -3201,6 +3206,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
           <div class="topbar-left"><h1>Simulador de Lances</h1><p>Monte o lance em quadros, escreva a legenda de cada um e reproduza a animação</p></div>
           <div class="topbar-right">
             <select id="sim-saved" class="form-select" style="width:auto;min-width:170px" onchange="simLoad(this.value)" aria-label="Lances salvos"></select>
+            <span id="sim-editado" class="cs-editado" hidden>editado <button type="button" onclick="simSave(true)" title="Gravar as mudanças no lance salvo">salvar</button></span>
             <button class="btn btn-ghost btn-sm" onclick="simSave()">Salvar lance</button>
             <button class="btn btn-ghost btn-sm" onclick="simExportPNG()">Exportar PNG</button>
             <button class="btn btn-ghost btn-sm" id="sim-video-btn" onclick="simExportVideo()" title="Grava a animação do lance em vídeo (WebM ou MP4, conforme o navegador)">Exportar vídeo</button>
@@ -4221,7 +4227,7 @@ function simDefaultFrame() {
   return { caption: '', pos: pos };
 }
 function simNew() {
-  SIM.tokens = simTokens(); SIM.frames = [simDefaultFrame()]; SIM.cur = 0; SIM.nome = '';
+  SIM.tokens = simTokens(); SIM.frames = [simDefaultFrame()]; SIM.cur = 0; SIM.nome = ''; SIM.snap = null;
   var sel = document.getElementById('sim-saved'); if (sel) sel.value = '';
   simRender();
 }
@@ -4320,6 +4326,7 @@ function simRender(posOverride) {
   document.getElementById('sim-caption-view').textContent = (SIM.frames.length > 1 ? 'Q' + (SIM.cur + 1) + ' · ' : '') + (fr.caption || '');
   document.getElementById('sim-caption-view').style.display = fr.caption || SIM.frames.length > 1 ? 'block' : 'none';
   var cap = document.getElementById('sim-caption'); if (cap && document.activeElement !== cap) cap.value = fr.caption || '';
+  simCheckEditado(); // M3
   document.getElementById('sim-frames').innerHTML = SIM.frames.map(function (f, i) {
     return '<button class="sim-q' + (i === SIM.cur ? ' active' : '') + '" role="tab" aria-selected="' + (i === SIM.cur) + '" onclick="simGo(' + i + ')">Q' + (i + 1) + (f.caption ? '<i></i>' : '') + '</button>';
   }).join('');
@@ -4349,7 +4356,7 @@ function simCopy(f) { return { caption: '', pos: JSON.parse(JSON.stringify(f.pos
 function simAddFrame() { var f = simCopy(SIM.frames[SIM.frames.length - 1]); SIM.frames.push(f); SIM.cur = SIM.frames.length - 1; simRender(); document.getElementById('sim-caption').focus(); }
 function simDupFrame() { var f = simCopy(SIM.frames[SIM.cur]); f.caption = SIM.frames[SIM.cur].caption; SIM.frames.splice(SIM.cur + 1, 0, f); SIM.cur++; simRender(); }
 function simDelFrame() { if (SIM.frames.length < 2) { csToast('O lance precisa de pelo menos um quadro'); return; } SIM.frames.splice(SIM.cur, 1); SIM.cur = Math.max(0, SIM.cur - 1); simRender(); }
-function simSetCaption(v) { SIM.frames[SIM.cur].caption = v; var cv = document.getElementById('sim-caption-view'); cv.textContent = (SIM.frames.length > 1 ? 'Q' + (SIM.cur + 1) + ' · ' : '') + v; cv.style.display = 'block'; }
+function simSetCaption(v) { SIM.frames[SIM.cur].caption = v; simCheckEditado(); var cv = document.getElementById('sim-caption-view'); cv.textContent = (SIM.frames.length > 1 ? 'Q' + (SIM.cur + 1) + ' · ' : '') + v; cv.style.display = 'block'; }
 function simSpeed(v) { SIM.speed = v; document.querySelectorAll('[data-sp]').forEach(function (b) { b.classList.toggle('active', +b.getAttribute('data-sp') === v); }); }
 function simStop() { SIM.playing = false; cancelAnimationFrame(SIM.raf); var b = document.getElementById('sim-play'); if (b) { b.textContent = '▶'; b.setAttribute('aria-label', 'Reproduzir'); } }
 function simPlay() {
@@ -4434,18 +4441,27 @@ function simRenderSaved() {
   var sel = document.getElementById('sim-saved'); if (!sel) return;
   sel.innerHTML = '<option value="">Lances salvos…</option>' + simSavedAll().map(function (l, i) { return '<option value="' + i + '">' + l.nome + ' (' + l.frames.length + ' quadros)</option>'; }).join('');
 }
-function simSave() {
-  var nome = prompt('Nome do lance:', SIM.nome || 'Ultrapassagem pela direita');
+function simSnap() { return JSON.stringify(SIM.frames); }
+function simCheckEditado() { // M3
+  var tag = document.getElementById('sim-editado'); if (!tag) return;
+  tag.hidden = !(SIM.nome && SIM.snap && SIM.snap !== simSnap());
+}
+function simSave(mesmoNome) {
+  var nome = mesmoNome && SIM.nome ? SIM.nome : prompt('Nome do lance:', SIM.nome || 'Ultrapassagem pela direita');
   if (!nome) return;
   var antes = simSavedAll().filter(function (l) { return l.nome === nome; })[0] || {};
   var all = simSavedAll().filter(function (l) { return l.nome !== nome; });
   all.push({ nome: nome.slice(0, 60), frames: SIM.frames, tokens: SIM.tokens, salvoEm: new Date().toISOString(), tags: antes.tags || [], partida: antes.partida || '' }); // Q1
   try { localStorage.setItem('capixastat_v5_lances', JSON.stringify(all)); } catch (e) { csToast('Não foi possível salvar (armazenamento cheio)'); return; }
-  SIM.nome = nome; simRenderSaved(); csToast('Lance "' + nome + '" salvo');
+  SIM.nome = nome; SIM.snap = simSnap(); simRenderSaved();
+  var sel = document.getElementById('sim-saved'); if (sel) sel.value = String(simSavedAll().map(function (l) { return l.nome; }).indexOf(nome.slice(0, 60)));
+  simCheckEditado(); csToast('Lance "' + nome + '" salvo');
 }
 function simLoad(i) {
   var l = simSavedAll()[+i]; if (!l) return;
-  simStop(); SIM.frames = JSON.parse(JSON.stringify(l.frames)); SIM.tokens = l.tokens || simTokens(); SIM.cur = 0; SIM.nome = l.nome; simRender();
+  simStop(); SIM.frames = JSON.parse(JSON.stringify(l.frames)); SIM.tokens = l.tokens || simTokens(); SIM.cur = 0; SIM.nome = l.nome; SIM.snap = simSnap();
+  var sel = document.getElementById('sim-saved'); if (sel) sel.value = String(i);
+  simRender();
 }
 
 // ── Q3: exportar o lance animado em vídeo (canvas + MediaRecorder, sem biblioteca) ──
@@ -12721,7 +12737,9 @@ function vfInitSelects() {
 function vfSavedAll() { try { return JSON.parse(localStorage.getItem('capixastat_v5_filtros') || '[]'); } catch (e) { return []; } }
 function vfRenderSaved() {
   var sel = document.getElementById('vf-saved'); if (!sel) return;
+  var antes = sel.value; // M3: mantém o filtro escolhido ao redesenhar
   sel.innerHTML = '<option value="">Filtros salvos…</option>' + vfSavedAll().map(function (f, i) { return '<option value="' + i + '">' + f.nome + '</option>'; }).join('');
+  if (antes !== '' && +antes < vfSavedAll().length) sel.value = antes;
 }
 function vfSave() {
   var nome = prompt('Nome do filtro (ex.: Atacantes sub-23 com 450+ min):');
@@ -12730,21 +12748,36 @@ function vfSave() {
   VF_FIELDS.forEach(function (id) { f.v[id] = vfVal(id); });
   var all = vfSavedAll(); all.push(f);
   try { localStorage.setItem('capixastat_v5_filtros', JSON.stringify(all)); } catch (e) {}
-  vfRenderSaved(); csToast('Filtro "' + f.nome + '" salvo');
+  vfRenderSaved(); document.getElementById('vf-saved').value = String(all.length - 1); vfCheckEditado(); csToast('Filtro "' + f.nome + '" salvo');
 }
 function vfApplySaved(i) {
   var f = vfSavedAll()[+i]; if (!f) return;
   VF_FIELDS.forEach(function (id) { var el = document.getElementById(id); if (!el) return; if (el.type === 'checkbox') el.checked = !!f.v[id]; else el.value = f.v[id] || ''; });
   vfSetScope(f.scope || 'elenco');
 }
+// M3: avisa quando o filtro salvo escolhido foi alterado
+function vfCheckEditado() {
+  var sel = document.getElementById('vf-saved'), tag = document.getElementById('vf-editado'); if (!sel || !tag) return;
+  var f = sel.value === '' ? null : vfSavedAll()[+sel.value];
+  var mudou = !!f && ((f.scope || 'elenco') !== VF_STATE.scope || VF_FIELDS.some(function (id) { var v = vfVal(id), w = f.v[id]; return typeof v === 'boolean' ? v !== !!w : String(v || '') !== String(w || ''); }));
+  tag.hidden = !mudou;
+}
+function vfUpdateSaved() {
+  var sel = document.getElementById('vf-saved'); if (!sel || sel.value === '') return;
+  var all = vfSavedAll(), f = all[+sel.value]; if (!f) return;
+  f.scope = VF_STATE.scope; f.v = {}; VF_FIELDS.forEach(function (id) { f.v[id] = vfVal(id); });
+  try { localStorage.setItem('capixastat_v5_filtros', JSON.stringify(all)); } catch (e) {}
+  vfCheckEditado(); csToast('Filtro "' + f.nome + '" atualizado');
+}
 function vfDeleteSaved() {
   var sel = document.getElementById('vf-saved'); if (!sel || sel.value === '') return;
   var all = vfSavedAll(); var f = all[+sel.value];
   if (!f || !confirm('Excluir o filtro "' + f.nome + '"?')) return;
   all.splice(+sel.value, 1); try { localStorage.setItem('capixastat_v5_filtros', JSON.stringify(all)); } catch (e) {}
-  vfRenderSaved();
+  sel.value = ''; vfRenderSaved(); vfCheckEditado();
 }
 function vfClear() {
+  var sv = document.getElementById('vf-saved'); if (sv) sv.value = '';
   VF_FIELDS.forEach(function (id) { var el = document.getElementById(id); if (!el) return; if (el.type === 'checkbox') el.checked = false; else if (el.tagName === 'SELECT') el.selectedIndex = 0; else el.value = ''; });
   renderVitrineJogadores();
 }
@@ -12983,6 +13016,7 @@ function renderVitrineTabela(arr, grid) {
 }
 
 function renderVitrineJogadores() {
+  setTimeout(function () { try { vfCheckEditado(); } catch (e) {} }, 0); // M3
   vfInitSelects();
   if (!VF_STATE._ctxAplicado) { VF_STATE._ctxAplicado = true; var _vc = document.getElementById('vf-comp'); if (_vc && CTX_STATS_KEY[CS_CTX.comp]) _vc.value = CTX_STATS_KEY[CS_CTX.comp]; }
   var r = vfFilteredPlayers(), arr = r.arr;
