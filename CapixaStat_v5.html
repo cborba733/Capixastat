@@ -1994,6 +1994,9 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .va-kpis { display:grid; grid-template-columns:repeat(8, 1fr); gap:10px }
 .va-kpi { background:var(--bg-raised); border-radius:8px; padding:8px 10px } .va-kpi small { display:block; font-size:11px; color:var(--text-3) } .va-kpi b { font-family:var(--font-mono); font-size:16px; color:var(--text-1) }
 #va-resumo, #va-analise { margin-bottom:14px }
+
+/* V3 */
+.va-an { display:grid; grid-template-columns:1fr 1fr; gap:14px }
 </style>
 </head>
 <body>
@@ -3937,8 +3940,82 @@ function vaRender() {
   try { vaRenderAnalise(); } catch (e) { console.warn('V3', e); }
   vaDesenhar();
 }
-function vaExtraSvg() { return ''; }
-function vaRenderAnalise() {}
+// ── V3: análises do CSV — posições médias, mapa de calor real e compactação quadro a quadro ──
+var VA_OPT = { calorTime: 'A', bloco: true };
+function vaPontosTime(linhas, t) { return linhas.filter(function (r) { return r.classe !== 'bola' && (VA.ids[r.id] || {}).time === t; }).map(function (r) { return [r.x, r.y]; }); }
+function vaBloco(pts) {
+  if (pts.length < 3) return null;
+  var xs = pts.map(function (p) { return p[0]; }), ys = pts.map(function (p) { return p[1]; }), h = convexHull(pts);
+  return { hull: h, area: polyArea(h), prof: Math.max.apply(null, xs) - Math.min.apply(null, xs), larg: Math.max.apply(null, ys) - Math.min.apply(null, ys) };
+}
+function vaExtraSvg(linhas) {
+  if (!VA_OPT.bloco) return '';
+  var h = '';
+  ['A', 'B'].forEach(function (t) {
+    var b = vaBloco(vaPontosTime(linhas, t)); if (!b) return;
+    h += '<polygon points="' + b.hull.map(function (p) { return p[0].toFixed(2) + ',' + p[1].toFixed(2); }).join(' ') + '" fill="' + VA_COR[t] + '" fill-opacity=".13" stroke="' + VA_COR[t] + '" stroke-width=".35" stroke-dasharray="1.2 .8"/>';
+  });
+  return h;
+}
+function vaMedias() {
+  var acc = {};
+  VA.linhas.forEach(function (r) { if (r.classe === 'bola') return; var a = acc[r.id] = acc[r.id] || { x: 0, y: 0, n: 0 }; a.x += r.x; a.y += r.y; a.n++; });
+  return Object.keys(acc).map(function (id) { var a = acc[id]; return { id: id, x: a.x / a.n, y: a.y / a.n, n: a.n, time: (VA.ids[id] || {}).time || '' }; });
+}
+function vaCalor(t, nx, ny) {
+  var g = []; for (var i = 0; i < nx * ny; i++) g.push(0);
+  var tot = 0;
+  VA.linhas.forEach(function (r) {
+    if (r.classe === 'bola' ? t !== 'bola' : (VA.ids[r.id] || {}).time !== t) return;
+    var cx = Math.floor(r.x / 105 * nx), cy = Math.floor(r.y / 68 * ny);
+    if (cx < 0 || cy < 0 || cx >= nx || cy >= ny) return;
+    g[cy * nx + cx]++; tot++;
+  });
+  return { g: g, tot: tot, max: Math.max.apply(null, g) };
+}
+function vaSerieCompactacao() {
+  var passo = Math.max(1, Math.ceil(VA.lista.length / 300)), out = { q: [], A: [], B: [] };
+  for (var k = 0; k < VA.lista.length; k += passo) {
+    var q = VA.lista[k], L = VA.quadros[q]; out.q.push(((q - 1) / VA.fps).toFixed(1));
+    ['A', 'B'].forEach(function (t) { var b = vaBloco(vaPontosTime(L, t)); out[t].push(b ? Math.round(b.area) : null); });
+  }
+  var med = function (arr) { var v = arr.filter(function (x) { return x != null; }); return v.length ? Math.round(v.reduce(function (a, b) { return a + b; }, 0) / v.length) : null; };
+  out.medA = med(out.A); out.medB = med(out.B);
+  return out;
+}
+function vaRenderAnalise() {
+  var el = document.getElementById('va-analise'); if (!el) return;
+  var temTimes = Object.values(VA.ids).some(function (o) { return o.time === 'A' || o.time === 'B'; });
+  // posições médias
+  var med = vaMedias(), h1 = simPitchSvg();
+  med.forEach(function (m) {
+    var r = 1.2 + Math.min(1.2, m.n / VA.lista.length * 1.2);
+    h1 += '<g transform="translate(' + m.x.toFixed(2) + ' ' + m.y.toFixed(2) + ')"><circle r="' + (r + .6).toFixed(2) + '" fill="' + VA_COR[m.time] + '" stroke="#0a0f18" stroke-width=".3" opacity="' + (m.n / VA.lista.length < .3 ? .55 : 1) + '"/><text y=".6" text-anchor="middle" font-size="1.6" font-weight="800" fill="#0a0f18" font-family="DM Sans, sans-serif">' + m.id + '</text><title>ID ' + m.id + ' · presente em ' + Math.round(m.n / VA.lista.length * 100) + '% dos quadros</title></g>';
+  });
+  // mapa de calor
+  var nx = 21, ny = 14, c = vaCalor(VA_OPT.calorTime, nx, ny), h2 = simPitchSvg(), cor = VA_OPT.calorTime === 'bola' ? '255,255,255' : VA_OPT.calorTime === 'A' ? '251,146,60' : '91,149,255';
+  c.g.forEach(function (v, i) { if (!v) return; var x = (i % nx) * 105 / nx, y = Math.floor(i / nx) * 68 / ny;
+    h2 += '<rect x="' + x.toFixed(2) + '" y="' + y.toFixed(2) + '" width="' + (105 / nx).toFixed(2) + '" height="' + (68 / ny).toFixed(2) + '" fill="rgba(' + cor + ',' + (0.12 + 0.78 * v / c.max).toFixed(2) + ')"><title>' + Math.round(v / c.tot * 100) + '% das posições</title></rect>'; });
+  var sc = vaSerieCompactacao();
+  el.innerHTML = '<div class="va-an">' +
+    '<div class="card"><div class="card-title">Posições médias <span>média de x e y de cada ID no clipe</span></div><svg viewBox="-3 -3 111 74" class="va-pitch" role="img" aria-label="Posições médias por ID">' + h1 + '</svg>' +
+      '<div class="dash-sub" style="text-align:left">Círculo apagado = ID presente em menos de 30% dos quadros (o rastreador pode ter trocado o número).</div></div>' +
+    '<div class="card"><div class="card-title">Mapa de calor real <span><select class="form-select" style="width:auto" onchange="VA_OPT.calorTime=this.value;vaRenderAnalise()" aria-label="Time do mapa de calor">' +
+      [['A', 'Time A'], ['B', 'Time B'], ['bola', 'Bola']].map(function (o) { return '<option value="' + o[0] + '"' + (VA_OPT.calorTime === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></span></div>' +
+      '<svg viewBox="-3 -3 111 74" class="va-pitch" role="img" aria-label="Mapa de calor">' + h2 + '</svg><div class="dash-sub" style="text-align:left">' + c.tot + ' posições em células de 5 × 4,9 m. ' + (temTimes || VA_OPT.calorTime === 'bola' ? '' : 'Sem coluna de time no CSV.') + '</div></div>' +
+    '</div>' +
+    '<div class="card" style="margin-top:14px"><div class="card-title">Compactação ao longo do clipe <span><label class="sim-chk"><input type="checkbox"' + (VA_OPT.bloco ? ' checked' : '') + ' onchange="VA_OPT.bloco=this.checked;vaDesenhar()"> mostrar bloco na visão de cima</label></span></div>' +
+      (temTimes ? '<canvas id="chartVaComp" height="90"></canvas><div class="dash-sub" style="text-align:left">Área do polígono que liga os jogadores de cada time (m²). Média: time A <b>' + (sc.medA == null ? '—' : sc.medA + ' m²') + '</b> · time B <b>' + (sc.medB == null ? '—' : sc.medB + ' m²') + '</b>. Inclui o goleiro quando ele aparece no enquadramento.</div>'
+        : '<div class="tl2-empty">Precisa da coluna de time (rode com <code>--times</code>).</div>') + '</div>';
+  if (temTimes) setTimeout(function () {
+    var cc = _chartColors();
+    mkChart('chartVaComp', { type: 'line', data: { labels: sc.q, datasets: [
+      { label: 'Time A', data: sc.A, borderColor: VA_COR.A, backgroundColor: 'transparent', pointRadius: 0, borderWidth: 2, spanGaps: true },
+      { label: 'Time B', data: sc.B, borderColor: VA_COR.B, backgroundColor: 'transparent', pointRadius: 0, borderWidth: 2, spanGaps: true }] },
+      options: { responsive: true, animation: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { labels: { color: cc.legend } } },
+        scales: { x: { title: { display: true, text: 'segundos', color: cc.tick }, ticks: { color: cc.tick, maxTicksLimit: 12 }, grid: { color: cc.grid } }, y: { title: { display: true, text: 'm²', color: cc.tick }, ticks: { color: cc.tick }, grid: { color: cc.grid } } } } });
+  }, 60);
+}
 
 // ══════════════════════════════════════════════════════════════════
 // P2: SCOUT AO VIVO — eventos {partida, atletaId, tipo, resultado, minuto, x, y} (formato do B3)

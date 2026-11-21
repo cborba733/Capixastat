@@ -145,7 +145,7 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 **Dados externos:** ✅ pesquisa de fontes · ✅ integração TheSportsDB (rotina + banco + fonte/data na tela)
 **Média:** ✅ A5 · ✅ A7 · ✅ A8 · ✅ P4 · ✅ P5 · ✅ F3 · ✅ F4 · ✅ T2 · ✅ T3 · ✅ X2 · ✅ Q2 · ✅ B6 · ✅ V5 ·
 ✅ I2 · ✅ I3 · ✅ M2 · ✅ M4 · ✅ R5 · ✅ D4 · ✅ A6 · ✅ A9 · ✅ P3 · ✅ F5 · ✅ T4 · ✅ X3 · ✅ Q1 · ✅ B5 ·
-✅ V2 · ✅ V4 · ⬜ L3 · ⬜ M1 · ⬜ R4 · ⬜ Q3 · ⬜ V3
+✅ V2 · ✅ V4 · ⬜ L3 · ⬜ M1 · ⬜ R4 · ⬜ Q3 · ✅ V3
 **Baixa:** ⬜ A10 · ⬜ X4 · ⬜ Q4 · ⬜ V6 · ⬜ M3 · ⬜ P6 · ⬜ F6 · ✅ B7 · ⬜ L4
 
 ### Notas por item
@@ -414,6 +414,12 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
   (`vaSync` por tempo×fps, `vaIrQuadro` pelo controle deslizante), IDs coloridos pelo time mais votado; resumo (quadros,
   duração, FPS, IDs por time, % de quadros com bola). Sem CSV mostra estado vazio — nenhum dado inventado.
   Testado com CSV sintético gerado só no console (não salvo). Sincronia com vídeo real não testada (sem vídeo de jogo aqui).
+
+- **V3:** CSV `quadro, tempo_s, id, classe, time, x_px, y_px, x_m, y_m` (coluna `time` do V2) e, na Análise de Vídeo:
+  **posições médias** por ID (`vaMedias`, apagado se < 30% dos quadros), **mapa de calor real** por time ou bola
+  (`vaCalor`, grade 21 × 14), **compactação ao longo do clipe** (área do fecho convexo por time, quadro a quadro, até 300
+  pontos — `vaSerieCompactacao`, reusa `convexHull`/`polyArea` do X3) e polígono do bloco na visão de cima
+  (`vaExtraSvg`). Testado com CSV sintético no console.
 
 ### ONDE PAROU (21/11, madrugada — limite de uso)
 Próximos itens Média (dif. média): D4, A6,
