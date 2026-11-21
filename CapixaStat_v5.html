@@ -1680,6 +1680,23 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
   background:var(--bg-overlay); color:var(--text-1); border:1px solid var(--border-md); border-radius:10px; padding:10px 16px; font-size:13px; font-weight:600;
   box-shadow:0 8px 30px rgba(0,0,0,.35); transition:all .25s ease }
 #cs-toast.show { opacity:1; transform:translate(-50%, 0) }
+
+/* T1: vitrine do clube */
+.time-destaques { display:grid; grid-template-columns:1.1fr 1fr 1fr 1fr; gap:14px; margin:14px 0 }
+@media (max-width: 1200px) { .time-destaques { grid-template-columns:1fr 1fr } }
+.dest-row { display:flex; align-items:center; gap:8px; padding:6px 4px; border-radius:8px; cursor:pointer }
+.dest-row:hover { background:var(--bg-raised) }
+.dest-pos { width:16px; font-size:12px; font-weight:700; color:var(--text-3); text-align:center }
+.dest-av { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; overflow:hidden; flex-shrink:0 }
+.dest-av img { width:100%; height:100%; object-fit:cover }
+.dest-nm { flex:1; min-width:0; font-size:13px; font-weight:600; color:var(--text-1); display:flex; flex-direction:column; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+.dest-nm small { font-size:11px; font-weight:400; color:var(--text-3) }
+.dest-val { font-family:var(--font-mono); font-size:16px; color:var(--text-1) }
+.dest-val small { font-size:10px; color:var(--text-3) }
+.mini-form { display:inline-flex; gap:3px }
+.mini-form i { width:18px; height:18px; border-radius:50%; font-style:normal; font-size:10px; font-weight:800; color:#fff; display:inline-flex; align-items:center; justify-content:center }
+.mini-form i.V { background:var(--ok) } .mini-form i.E { background:#64748b } .mini-form i.D { background:var(--danger) }
+.cls-form-h { text-align:center }
 </style>
 </head>
 <body>
@@ -2542,6 +2559,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
           <div id="time-hero-section"></div>
           <!-- Anterior / Próxima partida -->
           <div id="time-last-next" class="team-last-next"></div>
+          <!-- T1: forma + destaques do elenco (padrão "vitrine do clube") -->
+          <div id="time-destaques" class="time-destaques"></div>
           <!-- Layout principal: calendário + tabs -->
           <div class="time-layout">
             <div id="time-cal-wrap"></div>
@@ -3283,6 +3302,45 @@ function renderDashAlerts() {
   }
   html += '<div class="cs-metric"><b class="cs-metric-tag">Métrica</b><span>Lesão e carga (ACWR) ficam <b>estimadas</b> até a comissão registrar sRPE e bem-estar em Formação. Cartões são dado real da temporada.</span></div>';
   el.innerHTML = html;
+}
+
+
+// ── T1: Meu Time como "vitrine do clube" ──────────────────────────
+function teamFormDots(comp, time) {
+  var jogos = (comp.jogos || []).filter(function (j) { return (j.home === time || j.away === time) && j.gh !== undefined && j.gh !== null; })
+    .map(function (j) { return Object.assign({ _d: _parseJogoDate(j.data) }, j); })
+    .sort(function (a, b) { return (a._d || 0) - (b._d || 0); }).slice(-5);
+  if (!jogos.length) return '<span style="color:var(--text-3)">—</span>';
+  return '<span class="mini-form">' + jogos.map(function (j) {
+    var r = _dashResult(j, time);
+    return '<i class="' + r + '" title="' + j.data + ' · ' + j.home + ' ' + j.gh + '–' + j.ga + ' ' + j.away + '">' + r + '</i>';
+  }).join('') + '</span>';
+}
+function renderTimeDestaques(c, allMatches) {
+  var el = document.getElementById('time-destaques');
+  if (!el) return;
+  var elenco = Object.values(PLAYERS).filter(function (p) { return p.clube === c.nome; });
+  var played = allMatches.filter(function (m) { return m.gh !== undefined && m.gh !== null && m._date; }).sort(function (a, b) { return b._date - a._date; });
+  var last5 = played.slice(0, 5).reverse();
+  var pts = 0;
+  var dots = last5.map(function (m) { var r = _dashResult(m, c.nome); pts += r === 'V' ? 3 : r === 'E' ? 1 : 0; return '<div class="form-dot ' + r + '" title="' + m.data + ' · ' + m.home + ' ' + m.gh + '–' + m.ga + ' ' + m.away + '">' + r + '</div>'; }).join('');
+  var tot = played.reduce(function (a, m) { var r = _dashResult(m, c.nome); a[r]++; return a; }, { V: 0, E: 0, D: 0 });
+  function top(lista, campo, fmt, unidade) {
+    var arr = lista.filter(function (p) { return (+p[campo] || 0) > 0; }).sort(function (a, b) { return (+b[campo]) - (+a[campo]); }).slice(0, 3);
+    if (!arr.length) return '<div class="tl2-empty" style="padding:8px">Sem dados</div>';
+    return arr.map(function (p, i) {
+      return '<div class="dest-row" onclick="window._profileExplicit=true;showPlayer(\'' + p.id + '\');goTo(\'perfil\')">' +
+        '<span class="dest-pos">' + (i + 1) + '</span><span class="dest-av" style="background:' + (p.color ? p.color + ',.14)' : 'var(--brand-dim)') + ';color:' + (p.pointColor || 'var(--brand)') + '">' + (typeof playerAvatarInner === 'function' ? playerAvatarInner(p) : p.iniciais) + '</span>' +
+        '<span class="dest-nm">' + p.nome + '<small>' + p.pos + '</small></span><b class="dest-val">' + fmt(p[campo]) + (unidade ? '<small> ' + unidade + '</small>' : '') + '</b></div>';
+    }).join('');
+  }
+  el.innerHTML =
+    '<div class="card"><div class="dash-mini-lbl"><span>Forma — últimos ' + last5.length + ' (recente à direita)</span><span>' + (last5.length ? Math.round(pts / (last5.length * 3) * 100) + '% aprov.' : '') + '</span></div>' +
+      '<div class="form-dots">' + (dots || '<span class="tl2-empty">Sem jogos</span>') + '</div>' +
+      '<div class="dash-sub" style="text-align:left">Temporada: <b>' + tot.V + '</b> V · <b>' + tot.E + '</b> E · <b>' + tot.D + '</b> D em ' + played.length + ' jogos</div></div>' +
+    '<div class="card"><div class="dash-mini-lbl"><span>Artilheiros</span><span>gols</span></div>' + top(elenco, 'gols', function (v) { return v; }) + '</div>' +
+    '<div class="card"><div class="dash-mini-lbl"><span>Assistências</span><span>passes p/ gol</span></div>' + top(elenco, 'assists', function (v) { return v; }) + '</div>' +
+    '<div class="card"><div class="dash-mini-lbl"><span>Melhor avaliados</span><span>score 0–100</span></div>' + top(elenco, 'score', function (v) { return (+v).toFixed(0); }) + '</div>';
 }
 
 // ── D1: topo da Visão Geral (próximo jogo + forma) ────────────────
@@ -10333,7 +10391,7 @@ function renderClassTable(containerId, comp, highlightTeams, defaultGroup) {
 
   function buildTable(groupRows) {
     if (!groupRows || !groupRows.length) return '<div style="color:var(--text-3);font-size:12px;padding:12px">Sem dados</div>';
-    var t = '<table class="md-class-table"><thead><tr><th>#</th><th style="text-align:left">Time</th><th>PJ</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th><th>PTS</th></tr></thead><tbody>';
+    var t = '<table class="md-class-table"><thead><tr><th>#</th><th style="text-align:left">Time</th><th>PJ</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th><th>PTS</th><th class="cls-form-h">Forma</th></tr></thead><tbody>';
     groupRows.forEach(function(row) {
       var hl = highlightTeams && (highlightTeams.indexOf(row.time) !== -1) ? ' class="md-class-highlight"' : '';
       var tBadgeUrl = (CLUBS[row.time] && CLUBS[row.time].escudo) || (typeof EXTRA_BADGES !== 'undefined' && EXTRA_BADGES[row.time]) || '';
@@ -10342,7 +10400,8 @@ function renderClassTable(containerId, comp, highlightTeams, defaultGroup) {
       t += '<tr' + hl + '><td>' + row.pos + '</td>' +
         '<td style="text-align:left"><div style="display:flex;align-items:center;cursor:pointer" onclick="showTeam(\'' + tSafe + '\')">' + tImg + '<span class="team-link">' + row.time + '</span></div></td>' +
         '<td>' + row.pj + '</td><td>' + row.v + '</td><td>' + row.e + '</td><td>' + row.d + '</td>' +
-        '<td>' + row.gp + '</td><td>' + row.gs + '</td><td>' + row.sg + '</td><td><strong>' + row.pts + '</strong></td></tr>';
+        '<td>' + row.gp + '</td><td>' + row.gs + '</td><td>' + row.sg + '</td><td><strong>' + row.pts + '</strong></td>' +
+        '<td class="cls-form">' + teamFormDots(comp, row.time) + '</td></tr>';
     });
     t += '</tbody></table>';
     return t;
@@ -13103,6 +13162,7 @@ function renderTeamScreen() {
   });
 
   _renderTimeLastNext(c, allMatches);
+  try { renderTimeDestaques(c, allMatches); } catch (e) { console.warn('T1', e); }
   _renderTimeCalendar(c, allMatches);
 
   _timeActiveComp = (c.competicoes || [])[0] || null;
