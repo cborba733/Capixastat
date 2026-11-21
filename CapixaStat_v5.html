@@ -1973,6 +1973,18 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .comp-card { display:grid; grid-template-columns:repeat(3, auto); gap:4px 16px; padding:8px 12px; border-left:3px solid; border-radius:8px; background:var(--bg-raised); font-size:12.5px; color:var(--text-2) }
 .comp-card > b:first-child { grid-column:1 / -1; color:var(--text-1) }
 .comp-card span b { font-family:var(--font-mono); color:var(--text-1) }
+
+/* Q1 */
+.sim-lib { margin-top:14px }
+.sim-lib-bar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:10px } .sim-lib-bar > .form-input { width:280px }
+.sim-lib-tags { display:flex; gap:6px; flex-wrap:wrap }
+.sim-lib-tags .chip { border:1px solid var(--border-md); background:var(--bg-raised); color:var(--text-2); border-radius:999px; padding:3px 10px; font-size:12px; cursor:pointer }
+.sim-lib-tags .chip.on { background:var(--brand-fill); border-color:var(--brand-fill); color:#fff }
+.sim-lib-tab { width:100%; border-collapse:collapse; font-size:13px }
+.sim-lib-tab th { text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--text-3); padding:6px 8px; border-bottom:1px solid var(--border) }
+.sim-lib-tab td { padding:6px 8px; border-bottom:1px solid var(--border); color:var(--text-2); vertical-align:middle }
+.sim-lib-tab td.num { font-family:var(--font-mono) } .sim-lib-tab td.act { white-space:nowrap; text-align:right }
+.sim-lib-tab .form-input, .sim-lib-tab .form-select { width:100%; min-width:150px; padding:5px 8px; font-size:12.5px }
 </style>
 </head>
 <body>
@@ -3131,6 +3143,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
               <div id="sim-comp-out" class="comp-out" hidden></div>
               <div class="cs-metric"><b class="cs-metric-tag">Como usar</b><span>Arraste jogadores e bola para montar o Q1. Clique em <b>+ Quadro</b> (copia as posições), mova quem se desloca e escreva a legenda. <b>▶</b> anima de um quadro para o outro. Azul = seu clube, laranja = adversário.</span></div>
             </div>
+            <div class="card sim-lib" id="sim-lib"></div>
           </div>
         </div>
       </div>
@@ -3990,6 +4003,7 @@ function compactacao(pos, side) {
 }
 function simCompSvg(pos) {
   var chk = document.getElementById('sim-comp'), out = document.getElementById('sim-comp-out');
+  var selLado = document.getElementById('sim-comp-lado'); if (selLado) selLado.style.display = chk && chk.checked ? '' : 'none';
   if (!chk || !chk.checked) { if (out) out.hidden = true; return ''; }
   var lado = document.getElementById('sim-comp-lado').value, lados = lado === 'both' ? ['home', 'away'] : [lado], h = '', txt = '';
   lados.forEach(function (sd) {
@@ -4097,16 +4111,65 @@ function simPlay() {
   };
   SIM.raf = requestAnimationFrame(step);
 }
+
+// ── Q1: biblioteca de lances salvos — lista com busca, tags e partida vinculada ──
+var SIM_LIB = { q: '', tag: '' };
+function simLibWrite(all) { try { localStorage.setItem('capixastat_v5_lances', JSON.stringify(all)); return true; } catch (e) { csToast('Não foi possível salvar'); return false; } }
+function simLibPartidas() {
+  var u = getCurrentUser(), clube = u ? resolveClube(u.clube) : null; if (!clube) return [];
+  return _getClubAllMatches(clube).filter(function (j) { return j.gh != null; }).sort(function (a, b) { return (b._date || 0) - (a._date || 0); }).map(function (j) {
+    var d = j._date ? new Date(j._date).toLocaleDateString('pt-BR') : '';
+    return { id: j.home + '|' + j.away + '|' + d, label: d + ' · ' + j.home + ' ' + j.gh + '×' + j.ga + ' ' + j.away };
+  });
+}
+function simLibRender() {
+  var el = document.getElementById('sim-lib'); if (!el) return;
+  var all = simSavedAll(), parts = simLibPartidas();
+  var tags = {}; all.forEach(function (l) { (l.tags || []).forEach(function (t) { tags[t] = (tags[t] || 0) + 1; }); });
+  var q = SIM_LIB.q.toLowerCase();
+  var lista = all.map(function (l, i) { return { l: l, i: i }; }).filter(function (o) {
+    if (SIM_LIB.tag && (o.l.tags || []).indexOf(SIM_LIB.tag) < 0) return false;
+    return !q || (o.l.nome + ' ' + (o.l.tags || []).join(' ') + ' ' + (o.l.partida || '')).toLowerCase().indexOf(q) >= 0;
+  }).sort(function (a, b) { return (b.l.salvoEm || '') < (a.l.salvoEm || '') ? -1 : 1; });
+  var partOpts = function (sel) { return '<option value="">— sem partida —</option>' + parts.map(function (p) { return '<option value="' + escAttr(p.label) + '"' + (p.label === sel ? ' selected' : '') + '>' + p.label + '</option>'; }).join(''); };
+  el.innerHTML = '<div class="card-title">Biblioteca de lances <span>' + all.length + ' salvo(s)</span></div>' +
+    '<div class="sim-lib-bar"><input class="form-input" placeholder="Buscar por nome, tag ou partida" value="' + escAttr(SIM_LIB.q) + '" oninput="SIM_LIB.q=this.value;simLibRender();this.focus();this.setSelectionRange(this.value.length,this.value.length)" aria-label="Buscar lances">' +
+    '<div class="sim-lib-tags"><button class="chip' + (SIM_LIB.tag ? '' : ' on') + '" onclick="SIM_LIB.tag=\'\';simLibRender()">Todas</button>' +
+    Object.keys(tags).sort().map(function (t) { return '<button class="chip' + (SIM_LIB.tag === t ? ' on' : '') + '" onclick="SIM_LIB.tag=\'' + escAttr(t).replace(/'/g, "\\'") + '\';simLibRender()">' + t + ' <small>' + tags[t] + '</small></button>'; }).join('') + '</div></div>' +
+    (lista.length ? '<table class="sim-lib-tab"><thead><tr><th>Lance</th><th>Tags (separe por vírgula)</th><th>Partida</th><th>Quadros</th><th>Salvo em</th><th></th></tr></thead><tbody>' +
+      lista.map(function (o) { var l = o.l, i = o.i;
+        return '<tr><td><b>' + l.nome + '</b></td>' +
+          '<td><input class="form-input" value="' + escAttr((l.tags || []).join(', ')) + '" placeholder="ex.: bola parada, ataque" onchange="simLibSet(' + i + ',\'tags\',this.value)" aria-label="Tags de ' + escAttr(l.nome) + '"></td>' +
+          '<td><select class="form-select" onchange="simLibSet(' + i + ',\'partida\',this.value)" aria-label="Partida de ' + escAttr(l.nome) + '">' + partOpts(l.partida || '') + '</select></td>' +
+          '<td class="num">' + l.frames.length + '</td><td>' + (l.salvoEm ? new Date(l.salvoEm).toLocaleDateString('pt-BR') : '—') + '</td>' +
+          '<td class="act"><button class="btn btn-ghost btn-sm" onclick="simLoad(' + i + ');document.getElementById(\'sim-svg\').scrollIntoView({behavior:\'smooth\',block:\'center\'})">Abrir</button><button class="btn btn-ghost btn-sm" onclick="simLibDel(' + i + ')" aria-label="Excluir ' + escAttr(l.nome) + '">Excluir</button></td></tr>';
+      }).join('') + '</tbody></table>'
+      : '<div class="tl2-empty">' + (all.length ? 'Nenhum lance com esse filtro.' : 'Nenhum lance salvo. Monte um lance e clique em <b>Salvar lance</b>.') + '</div>');
+}
+function simLibSet(i, campo, v) {
+  var all = simSavedAll(); if (!all[i]) return;
+  if (campo === 'tags') all[i].tags = v.split(',').map(function (t) { return t.trim().toLowerCase().slice(0, 24); }).filter(Boolean).filter(function (t, k, a) { return a.indexOf(t) === k; }).slice(0, 8);
+  else all[i].partida = v;
+  if (simLibWrite(all)) { simLibRender(); csToast('Lance atualizado'); }
+}
+function simLibDel(i) {
+  var all = simSavedAll(); if (!all[i] || !confirm('Excluir o lance "' + all[i].nome + '"?')) return;
+  all.splice(i, 1); if (simLibWrite(all)) simRenderSaved();
+}
+function escAttr(v) { return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+
 function simSavedAll() { try { return JSON.parse(localStorage.getItem('capixastat_v5_lances') || '[]'); } catch (e) { return []; } }
 function simRenderSaved() {
+  try { simLibRender(); } catch (e) { console.warn('Q1', e); }
   var sel = document.getElementById('sim-saved'); if (!sel) return;
   sel.innerHTML = '<option value="">Lances salvos…</option>' + simSavedAll().map(function (l, i) { return '<option value="' + i + '">' + l.nome + ' (' + l.frames.length + ' quadros)</option>'; }).join('');
 }
 function simSave() {
   var nome = prompt('Nome do lance:', SIM.nome || 'Ultrapassagem pela direita');
   if (!nome) return;
+  var antes = simSavedAll().filter(function (l) { return l.nome === nome; })[0] || {};
   var all = simSavedAll().filter(function (l) { return l.nome !== nome; });
-  all.push({ nome: nome.slice(0, 60), frames: SIM.frames, tokens: SIM.tokens, salvoEm: new Date().toISOString() });
+  all.push({ nome: nome.slice(0, 60), frames: SIM.frames, tokens: SIM.tokens, salvoEm: new Date().toISOString(), tags: antes.tags || [], partida: antes.partida || '' }); // Q1
   try { localStorage.setItem('capixastat_v5_lances', JSON.stringify(all)); } catch (e) { csToast('Não foi possível salvar (armazenamento cheio)'); return; }
   SIM.nome = nome; simRenderSaved(); csToast('Lance "' + nome + '" salvo');
 }
