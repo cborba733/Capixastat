@@ -127,8 +127,12 @@ test('Dados externos: importador TheSportsDB (fonte simulada) grava jogos, class
     const p = await req('GET', '/api/fontes/partidas?competicao=capixabao&temporada=2026');
     assert.equal(p.body.partidas.length, 2);
     assert.equal(p.body.partidas[0].fonte, 'thesportsdb');
+    // a fonte (simulada) devolveu só 1 time, mas há 4 times nos jogos → tabela calculada a partir dos jogos
     const c = await req('GET', '/api/fontes/classificacao?competicao=capixabao&temporada=2026');
-    assert.equal(c.body.classificacao[0].forma, 'LWWDW');
+    assert.equal(c.body.origem, 'calculada');
+    assert.equal(c.body.classificacao.length, 4);
+    assert.equal(c.body.classificacao[0].time, 'Vitória-ES');
+    assert.equal(c.body.classificacao[0].pts, 3);
     const s = await req('GET', '/api/fontes/status');
     assert.equal(s.body.importacoes[0].status, 'ok');
     // reimportar não duplica (atualiza)

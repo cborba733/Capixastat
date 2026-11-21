@@ -304,5 +304,15 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
   15 min (barras divergentes `chartTiming`), 1º × 2º tempo, pico de gols e cartões; cobertura "N de M jogos com eventos".
   Chave dos incidentes: `INCIDENTS[compId|home|away|gh|ga]`.
 
+- **Classificação calculada:** o plano grátis do TheSportsDB devolve só 5 times; `GET /api/fontes/classificacao`
+  calcula a tabela completa a partir dos jogos importados (`calcularTabela`, `origem:'calculada'` + aviso na tela).
+  Importação real testada: 45 jogos do Capixabão 2026, status ok. Mata-mata não existe nessa fonte.
+
+### ONDE PAROU (21/11, madrugada — limite de uso)
+Próximos itens Média, nesta ordem: P5, F3, F4, T2, T3, X2, Q2, B6, V5, I2, I3, M2, M4, R5 (dif. baixa); depois D4, A6,
+A9, P3, F5, T4, X3, Q1, B5, V2, V4, L3, M1, R4; depois Q3, V3; depois Baixa. Segunda à noite: só revisão.
+Pendências do Caio: rodar `backend/schema.sql` no Supabase, publicar API no Render (`render.yaml`), opcional
+conta API-Football (`API_FOOTBALL_KEY` no backend/.env).
+
 ## Trabalhos futuros
 _(preencher na revisão de segunda-feira com o que não der tempo)_

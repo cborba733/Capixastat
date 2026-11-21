@@ -3502,7 +3502,7 @@ async function renderFontesExternas() {
     var q = '?competicao=' + EXT.comp + '&temporada=' + EXT.temporada;
     var rs = await Promise.all([fetch(API_URL + '/api/fontes/status'), fetch(API_URL + '/api/fontes/partidas' + q), fetch(API_URL + '/api/fontes/classificacao' + q)]);
     if (!rs[0].ok) throw new Error('status ' + rs[0].status);
-    st = await rs[0].json(); jogos = (await rs[1].json()).partidas || []; tab = (await rs[2].json()).classificacao || [];
+    st = await rs[0].json(); jogos = (await rs[1].json()).partidas || []; var tabJ = await rs[2].json(); tab = tabJ.classificacao || []; EXT.avisoTab = tabJ.aviso || '';
   } catch (e) {
     el.innerHTML = '<div class="card-title">Dados externos</div><div class="cs-est-banner" style="margin:0"><span class="cs-status info">API offline</span><span>A importação automática roda no backend (' + API_URL + '). Com a API no ar, aqui aparecem os jogos e a classificação atualizados diariamente, com fonte e data.</span></div>';
     return;
@@ -3533,6 +3533,7 @@ async function renderFontesExternas() {
       { key: 'atualizado_em', label: 'Atualizado', fmt: function (v) { return extFmtDT(v); } }
     ], jogos.map(function (j) { return Object.assign({ placar: '' }, j); }), { id: 'ext-jogos', sortKey: 'data', sortDir: 'desc', label: 'Jogos importados', empty: 'Nenhum jogo importado ainda para esta competição.' });
   } else {
+    if (EXT.avisoTab) body.insertAdjacentHTML('beforebegin', '<div class="ext-proc"><span class="cs-src est">Calculada</span> ' + EXT.avisoTab + '</div>');
     csTable(body, [
       { key: 'posicao', label: '#', num: true }, { key: 'time', label: 'Time', sticky: true },
       { key: 'pj', label: 'PJ', num: true }, { key: 'v', label: 'V', num: true }, { key: 'e', label: 'E', num: true }, { key: 'd', label: 'D', num: true },
