@@ -34,3 +34,6 @@ poc-cv/__pycache__/
 # Segredos (chaves de API, senha do banco) — nunca versionar
 .env
 **/.env
+
+# Configuração local do Claude Code
+.claude/
