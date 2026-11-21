@@ -2006,9 +2006,26 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .ctx-sel option { background:var(--bg-raised); color:var(--text-1) }
 .ctx-off { font-style:italic }
 .ctx-x { background:none; border:0; color:var(--text-3); cursor:pointer; font-size:14px; line-height:1; padding:0 2px } .ctx-x:hover { color:var(--danger) }
+
+/* R4: foco visível, leitor de tela e tabela alternativa dos gráficos */
+:focus-visible { outline:2px solid var(--brand); outline-offset:2px; border-radius:4px }
+.nav-item:focus-visible { outline-offset:-2px }
+.sr-only { position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0 }
+.cs-skip { position:absolute; left:12px; top:-60px; z-index:1000; background:var(--brand-fill); color:#fff; padding:8px 14px; border-radius:8px; font-weight:600; text-decoration:none }
+.cs-skip:focus { top:10px }
+.cs-chart-alt { margin-top:4px }
+.cs-chart-alt.mini { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0) }
+.cs-chart-alt-btn { background:none; border:0; padding:2px 0; color:var(--text-3); font-size:11px; cursor:pointer; text-decoration:underline dotted; font-family:inherit }
+.cs-chart-alt-btn:hover { color:var(--brand) }
+.cs-chart-alt-tab:not(.sr-only) { max-height:260px; overflow:auto; margin-top:6px; border:1px solid var(--border); border-radius:8px }
+.cs-chart-alt-tab table { width:100%; border-collapse:collapse; font-size:12px }
+.cs-chart-alt-tab caption { text-align:left; padding:6px 8px; color:var(--text-2); font-weight:600 }
+.cs-chart-alt-tab th, .cs-chart-alt-tab td { padding:4px 8px; border-bottom:1px solid var(--border); text-align:left; color:var(--text-2) }
+.cs-chart-alt-tab td { font-family:var(--font-mono) }
 </style>
 </head>
 <body>
+<a href="#main-conteudo" class="cs-skip" onclick="var m=document.querySelector('.screen.active .content')||document.querySelector('.main');if(m){m.setAttribute('tabindex','-1');m.focus();}return false;">Pular para o conteúdo</a>
 
 <!-- ══════════════════════════════════════════
      LOGIN
@@ -3298,7 +3315,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 
               <div id="tel-video-ctrls" class="tel-videobar">
                 <button class="tel-vbtn" onclick="telFrameStep(-1)" title="Quadro anterior"><svg viewBox="0 0 24 24"><path d="m11 19-7-7 7-7"/><path d="M20 5v14"/></svg></button>
-                <button class="tel-play" id="tel-playpause" onclick="telTogglePlay()"><svg viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"/></svg></button>
+                <button class="tel-play" id="tel-playpause" onclick="telTogglePlay()" aria-label="Reproduzir ou pausar"><svg viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"/></svg></button>
                 <button class="tel-vbtn" onclick="telFrameStep(1)" title="Próximo quadro"><svg viewBox="0 0 24 24"><path d="m13 19 7-7-7-7"/><path d="M4 5v14"/></svg></button>
                 <input type="range" id="tel-seek" class="tel-seek" min="0" max="1000" value="0">
                 <span id="tel-time" class="tel-time">0:00 / 0:00</span>
@@ -12965,6 +12982,7 @@ function goTo(screenId, navEl) {
   if (navEl) navEl.classList.add('active');
   document.querySelector('.main').scrollTo({top:0, behavior: csReduceMotion() ? 'auto' : 'smooth'}); // M4
   try { ctxBarRender(screenId); } catch (e) { console.warn('L3', e); }
+  setTimeout(function () { try { csA11yScan(); } catch (e) {} }, 400); // R4
   // Lembra a tela atual (restaurada ao recarregar a página)
   try {
     localStorage.setItem('capixastat_screen', screenId);
@@ -13046,11 +13064,75 @@ function _refreshChartDefaults() {
   legend = { labels: { color: c.legend, font: { size: 11 }, boxWidth: 12, padding: 16 } };
 }
 
+
+// ══════════════════════════════════════════════════════════════════
+// R4: teclado e leitor de tela
+// ══════════════════════════════════════════════════════════════════
+// 1) Tabela alternativa para cada gráfico (lida pelo leitor de tela; botão "Ver dados" mostra na tela)
+function csChartTabela(id) {
+  var ch = chartInstances[id], cv = document.getElementById(id); if (!ch || !cv) return;
+  var card = cv.closest('.card'), titulo = card && card.querySelector('.card-title');
+  var nome = (titulo ? titulo.childNodes[0].textContent : id).trim() || id;
+  cv.setAttribute('role', 'img');
+  cv.setAttribute('aria-label', 'Gráfico: ' + nome + '. Os dados estão na tabela logo abaixo.');
+  var d = ch.data || {}, labels = d.labels || [], ds = (d.datasets || []).filter(function (x) { return !x.hidden; });
+  if (!ds.length) return;
+  var fmt = function (v) { if (v == null) return '—'; if (typeof v === 'object') v = v.y != null ? v.y : v.r != null ? v.r : JSON.stringify(v); return typeof v === 'number' ? (Math.round(v * 100) / 100).toLocaleString('pt-BR') : String(v); };
+  var n = Math.max(labels.length, ds.reduce(function (m, x) { return Math.max(m, (x.data || []).length); }, 0));
+  var lim = Math.min(n, 120);
+  var html = '<table><caption>' + nome + (n > lim ? ' (primeiras ' + lim + ' de ' + n + ' linhas)' : '') + '</caption><thead><tr><th scope="col">Item</th>' +
+    ds.map(function (x) { return '<th scope="col">' + (x.label || 'Valor') + '</th>'; }).join('') + '</tr></thead><tbody>';
+  for (var i = 0; i < lim; i++) {
+    var lab = labels[i]; lab = Array.isArray(lab) ? lab.join(' ') : (lab == null ? String(i + 1) : lab);
+    html += '<tr><th scope="row">' + lab + '</th>' + ds.map(function (x) { return '<td>' + fmt((x.data || [])[i]) + '</td>'; }).join('') + '</tr>';
+  }
+  html += '</tbody></table>';
+  var box = document.querySelector('.cs-chart-alt[data-for="' + id + '"]');
+  if (!box) {
+    box = document.createElement('div'); box.className = 'cs-chart-alt'; box.setAttribute('data-for', id);
+    box.innerHTML = '<button type="button" class="cs-chart-alt-btn" aria-expanded="false" onclick="csChartTabelaToggle(this)">Ver dados em tabela</button><div class="cs-chart-alt-tab sr-only"></div>';
+    // canvas sozinho num invólucro com altura fixa: a tabela vai depois do invólucro para não apertar o gráfico
+    var par = cv.parentElement, alvo = (par && par.children.length === 1 && !par.classList.contains('card') && (par.style.height || par.style.maxHeight)) ? par : cv;
+    alvo.insertAdjacentElement('afterend', box);
+  }
+  var w = cv.getBoundingClientRect().width || (cv.parentElement && cv.parentElement.getBoundingClientRect().width) || 0;
+  box.classList.toggle('mini', /mini/i.test(id) || (w > 0 && w < 200)); // gráfico miniatura: tabela só para leitor de tela
+  box.querySelector('.cs-chart-alt-tab').innerHTML = html;
+}
+function csChartTabelaToggle(btn) {
+  var tab = btn.nextElementSibling, abrir = tab.classList.contains('sr-only');
+  tab.classList.toggle('sr-only', !abrir); btn.setAttribute('aria-expanded', abrir); btn.textContent = abrir ? 'Esconder tabela' : 'Ver dados em tabela';
+}
+// 2) Elementos clicáveis que não são botão (itens do menu, linhas, chips) entram no Tab e respondem a Enter/Espaço
+function csA11yScan(raiz) {
+  (raiz || document).querySelectorAll('div[onclick], span[onclick], li[onclick], tr[onclick], td[onclick], img[onclick]').forEach(function (el) {
+    if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '0');
+    if (!el.hasAttribute('role')) el.setAttribute('role', 'button');
+  });
+  // botões só com ícone: usa o title (ou o texto do ícone) como nome acessível
+  (raiz || document).querySelectorAll('button:not([aria-label]), a:not([aria-label]), label.btn:not([aria-label])').forEach(function (b) {
+    if ((b.textContent || '').replace(/[\s×✕⏮⏭▶⏸◀▶+\-]/g, '').length) return;
+    var nome = b.getAttribute('title') || b.getAttribute('data-tip') || (b.querySelector('[title]') || {}).title || (b.id === 'tel-playpause' ? 'Reproduzir ou pausar' : '');
+    if (nome) b.setAttribute('aria-label', nome);
+  });
+  document.querySelectorAll('.nav-item.active').forEach(function (n) { n.setAttribute('aria-current', 'page'); });
+  document.querySelectorAll('.nav-item:not(.active)').forEach(function (n) { n.removeAttribute('aria-current'); });
+}
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  var el = e.target;
+  if (!el || !el.getAttribute || el.getAttribute('role') !== 'button' || !el.hasAttribute('onclick')) return;
+  if (/^(BUTTON|A|INPUT|SELECT|TEXTAREA)$/.test(el.tagName)) return;
+  e.preventDefault(); el.click();
+});
+document.addEventListener('DOMContentLoaded', function () { try { csA11yScan(); } catch (e) {} });
+
 function mkChart(id, cfg) {
   if (chartInstances[id]) { chartInstances[id].destroy(); }
   const el = document.getElementById(id);
   if (!el) return;
   chartInstances[id] = new Chart(el, cfg);
+  try { csChartTabela(id); } catch (e) { console.warn('R4', e); }
 }
 
 // ── Dashboard charts ─────────────────────────

@@ -145,7 +145,7 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 **Dados externos:** ✅ pesquisa de fontes · ✅ integração TheSportsDB (rotina + banco + fonte/data na tela)
 **Média:** ✅ A5 · ✅ A7 · ✅ A8 · ✅ P4 · ✅ P5 · ✅ F3 · ✅ F4 · ✅ T2 · ✅ T3 · ✅ X2 · ✅ Q2 · ✅ B6 · ✅ V5 ·
 ✅ I2 · ✅ I3 · ✅ M2 · ✅ M4 · ✅ R5 · ✅ D4 · ✅ A6 · ✅ A9 · ✅ P3 · ✅ F5 · ✅ T4 · ✅ X3 · ✅ Q1 · ✅ B5 ·
-✅ V2 · ✅ V4 · ✅ L3 · ✅ M1 · ⬜ R4 · ⬜ Q3 · ✅ V3
+✅ V2 · ✅ V4 · ✅ L3 · ✅ M1 · ✅ R4 · ⬜ Q3 · ✅ V3
 **Baixa:** ⬜ A10 · ⬜ X4 · ⬜ Q4 · ⬜ V6 · ⬜ M3 · ⬜ P6 · ⬜ F6 · ✅ B7 · ⬜ L4
 
 ### Notas por item
@@ -430,6 +430,13 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
   esmaecem (alpha 0,18) e a grade/eixo ao fundo é coberta por um véu da cor do card (sobra o valor + tooltip); ponto em
   hover maior (raio 6). Vale para todos os gráficos com eixos; desliga com `plugins: { csFocus: false }`.
   Testado no Elo do Meu Time (foco no dataset certo e volta ao normal no mouseout).
+
+- **R4:** acessibilidade de teclado e leitor de tela: foco visível global (`:focus-visible`, contorno da marca); link
+  **"Pular para o conteúdo"** (primeiro Tab); `csA11yScan` (no carregamento e a cada troca de tela) dá `tabindex=0` +
+  `role=button` a divs/spans/linhas clicáveis (itens do menu etc.), que passam a responder a Enter/Espaço, marca o item
+  ativo com `aria-current=page` e nomeia botões só com ícone pelo `title`/`data-tip` (0 botões sem nome). Todo gráfico
+  criado por `mkChart` ganha `role=img` + `aria-label` e uma **tabela alternativa** (`csChartTabela`) — escondida para
+  leitor de tela e visível no link "Ver dados em tabela" (gráficos miniatura só para leitor de tela).
 
 ### ONDE PAROU (21/11, madrugada — limite de uso)
 Próximos itens Média (dif. média): D4, A6,
