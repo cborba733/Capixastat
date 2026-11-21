@@ -3945,6 +3945,40 @@ function regAtletaToggle() {
     : '<option value="">Escolha o clube primeiro</option>';
 }
 
+
+// ══════════════════════════════════════════════════════════════════
+// R5: acessibilidade dos gráficos (plugin global do Chart.js)
+//  1) tema claro: cores antigas fixas que não chegam a 3:1 no branco são trocadas por versões escuras
+//  2) várias séries: formato de ponto e traço diferentes, para não depender só da cor
+// ══════════════════════════════════════════════════════════════════
+var CS_A11Y_RGB = { '34,197,94': '21,128,61', '56,189,248': '3,105,161', '251,191,36': '180,83,9', '167,139,250': '109,40,217',
+  '248,113,113': '185,28,28', '6,182,212': '14,116,144', '74,222,128': '21,128,61', '96,165,250': '29,78,216', '239,68,68': '185,28,28', '59,130,246': '29,78,216' };
+var CS_A11Y_HEX = { '#22c55e': '#15803d', '#38bdf8': '#0369a1', '#fbbf24': '#b45309', '#a78bfa': '#6d28d9', '#f87171': '#b91c1c', '#06b6d4': '#0e7490', '#4ade80': '#15803d', '#60a5fa': '#1d4ed8', '#ef4444': '#b91c1c', '#3b82f6': '#1d4ed8', '#5b95ff': '#1d4ed8' };
+function csA11yColor(c) {
+  if (typeof c !== 'string') return c;
+  var low = c.toLowerCase().replace(/\s/g, '');
+  if (CS_A11Y_HEX[low]) return CS_A11Y_HEX[low];
+  return c.replace(/(rgba?\(\s*)(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i, function (m, pre, r, g, b) { var k = r + ',' + g + ',' + b; return CS_A11Y_RGB[k] ? pre + CS_A11Y_RGB[k] : m; });
+}
+var CS_PONTOS = ['circle', 'rect', 'triangle', 'rectRot', 'crossRot', 'star'];
+(function () {
+  if (!window.Chart) return;
+  Chart.register({ id: 'csA11y', beforeUpdate: function (chart) {
+    var light = (typeof _isLightTheme === 'function') && _isLightTheme();
+    var ds = (chart.config.data && chart.config.data.datasets) || [];
+    ds.forEach(function (d, i) {
+      if (light) ['backgroundColor', 'borderColor', 'pointBackgroundColor', 'pointBorderColor'].forEach(function (k) {
+        if (Array.isArray(d[k])) d[k] = d[k].map(csA11yColor); else if (typeof d[k] === 'string') d[k] = csA11yColor(d[k]);
+      });
+      var tipo = d.type || chart.config.type;
+      if (ds.length > 1 && (tipo === 'line' || tipo === 'radar')) {
+        if (!d._csA11y) { d.pointStyle = d.pointStyle || CS_PONTOS[i % CS_PONTOS.length]; if (i > 0 && !d.borderDash) d.borderDash = i % 2 ? [6, 4] : [2, 3]; d._csA11y = true; }
+        if (d.pointRadius === 0 && tipo === 'line') d.pointRadius = 2.5;
+      }
+    });
+  } });
+})();
+
 // ══════════════════════════════════════════════════════════════════
 // B1: nuvem — o que antes ficava só no navegador vai para o banco (/api/dados/:chave)
 // Qualquer gravação no localStorage destas chaves agenda o envio (1,5 s depois da última mudança).
