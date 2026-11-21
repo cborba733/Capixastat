@@ -1,0 +1,6 @@
+fastapi==0.115.6
+uvicorn==0.34.0
+pandas>=2.2
+# só para os testes
+httpx>=0.27
+pytest>=8

@@ -110,6 +110,16 @@ npm start                     # usa DATABASE_URL e JWT_SECRET do .env (copie de 
   manual: `node importar/thesportsdb.js --competicao capixabao --temporada 2026`
 - Publicação: `render.yaml` na raiz (Render → New → Blueprint)
 
+🐍 Serviço de cálculos em Python (pasta `servico-python/`)
+```
+cd servico-python
+python -m pip install -r requirements.txt
+python -m pytest -q                       # 8 testes
+python -m uvicorn app:app --port 8000     # documentação em http://localhost:8000/docs
+```
+FastAPI + Pandas com as mesmas fórmulas da plataforma: percentis por 90 min, Elo e xG (por chute e por zona).
+Conferido com os 136 jogos reais de 2026: Elo idêntico ao da tela Meu Time.
+
 🎥 Exibição em Vídeo
 Vídeo demonstrando o funcionamento e a explicação do projeto:
 

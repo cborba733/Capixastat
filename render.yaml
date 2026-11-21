@@ -17,3 +17,13 @@ services:
         sync: false
       - key: CORS_ORIGIN
         sync: false
+
+  # B5: serviço de cálculos em Python (FastAPI + Pandas) — opcional, plano gratuito
+  - type: web
+    name: capixastat-calculos
+    runtime: python
+    rootDir: .
+    buildCommand: pip install -r servico-python/requirements.txt
+    startCommand: cd servico-python && uvicorn app:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /saude
+    plan: free
