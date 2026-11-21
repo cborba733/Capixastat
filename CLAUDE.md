@@ -145,7 +145,7 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 **Dados externos:** ✅ pesquisa de fontes · ✅ integração TheSportsDB (rotina + banco + fonte/data na tela)
 **Média:** ✅ A5 · ✅ A7 · ✅ A8 · ✅ P4 · ✅ P5 · ✅ F3 · ✅ F4 · ✅ T2 · ✅ T3 · ✅ X2 · ✅ Q2 · ✅ B6 · ✅ V5 ·
 ✅ I2 · ✅ I3 · ✅ M2 · ✅ M4 · ✅ R5 · ✅ D4 · ✅ A6 · ✅ A9 · ✅ P3 · ✅ F5 · ✅ T4 · ✅ X3 · ✅ Q1 · ✅ B5 ·
-✅ V2 · ✅ V4 · ✅ L3 · ✅ M1 · ✅ R4 · ⬜ Q3 · ✅ V3
+✅ V2 · ✅ V4 · ✅ L3 · ✅ M1 · ✅ R4 · ✅ Q3 · ✅ V3
 **Baixa:** ⬜ A10 · ⬜ X4 · ⬜ Q4 · ⬜ V6 · ⬜ M3 · ⬜ P6 · ⬜ F6 · ✅ B7 · ⬜ L4
 
 ### Notas por item
@@ -437,6 +437,13 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
   ativo com `aria-current=page` e nomeia botões só com ícone pelo `title`/`data-tip` (0 botões sem nome). Todo gráfico
   criado por `mkChart` ganha `role=img` + `aria-label` e uma **tabela alternativa** (`csChartTabela`) — escondida para
   leitor de tela e visível no link "Ver dados em tabela" (gráficos miniatura só para leitor de tela).
+
+- **Q3:** botão **Exportar vídeo** no Simulador (`simExportVideo`, `simDesenharCanvas`): desenha o lance quadro a quadro
+  num canvas 1280 × 916 (campo + jogadores + legenda Qn + rodapé CapixaStat/clube/data), mesma animação da tela
+  (pausa 650 ms + transição 1100 ms suavizada, respeita a velocidade), grava com `MediaRecorder` a 30 fps e baixa **MP4**
+  (Chrome/Edge atuais) ou **WebM**. Usa `setTimeout` para não parar com a aba em segundo plano. Testado: 2 quadros →
+  MP4 de 2,7 s, 114 KB, conteúdo conferido lendo um quadro do vídeo. **GIF não foi feito** (precisaria de biblioteca;
+  MP4 já abre no WhatsApp/Instagram) — ver Trabalhos futuros.
 
 ### ONDE PAROU (21/11, madrugada — limite de uso)
 Próximos itens Média (dif. média): D4, A6,

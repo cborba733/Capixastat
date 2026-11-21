@@ -3178,6 +3178,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
             <select id="sim-saved" class="form-select" style="width:auto;min-width:170px" onchange="simLoad(this.value)" aria-label="Lances salvos"></select>
             <button class="btn btn-ghost btn-sm" onclick="simSave()">Salvar lance</button>
             <button class="btn btn-ghost btn-sm" onclick="simExportPNG()">Exportar PNG</button>
+            <button class="btn btn-ghost btn-sm" id="sim-video-btn" onclick="simExportVideo()" title="Grava a animação do lance em vídeo (WebM ou MP4, conforme o navegador)">Exportar vídeo</button>
             <button class="btn btn-primary btn-sm" onclick="simNew()">+ Novo lance</button>
           </div>
         </div>
@@ -4421,6 +4422,86 @@ function simLoad(i) {
   var l = simSavedAll()[+i]; if (!l) return;
   simStop(); SIM.frames = JSON.parse(JSON.stringify(l.frames)); SIM.tokens = l.tokens || simTokens(); SIM.cur = 0; SIM.nome = l.nome; simRender();
 }
+
+// ── Q3: exportar o lance animado em vídeo (canvas + MediaRecorder, sem biblioteca) ──
+function simDesenharCanvas(ctx, W, H, pos, legenda) {
+  var k = W / 111, X = function (m) { return (m + 3) * k; }, Y = function (m) { return (m + 3) * k; };
+  ctx.fillStyle = '#1b5e33'; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = 'rgba(255,255,255,.035)'; for (var i = 0; i < 10; i++) ctx.fillRect(X(i * 10.5), Y(0), 5.25 * k, 68 * k);
+  ctx.strokeStyle = 'rgba(255,255,255,.55)'; ctx.lineWidth = .35 * k;
+  var R = function (x, y, w, h) { ctx.strokeRect(X(x), Y(y), w * k, h * k); };
+  R(0, 0, 105, 68); R(0, 13.84, 16.5, 40.32); R(0, 24.84, 5.5, 18.32); R(88.5, 13.84, 16.5, 40.32); R(99.5, 24.84, 5.5, 18.32); R(-1.6, 30.34, 1.6, 7.32); R(105, 30.34, 1.6, 7.32);
+  ctx.beginPath(); ctx.moveTo(X(52.5), Y(0)); ctx.lineTo(X(52.5), Y(68)); ctx.stroke();
+  ctx.beginPath(); ctx.arc(X(52.5), Y(34), 9.15 * k, 0, Math.PI * 2); ctx.stroke();
+  SIM.tokens.forEach(function (t) {
+    var q = pos[t.id]; if (!q) return;
+    ctx.beginPath();
+    if (t.side === 'ball') { ctx.arc(X(q[0]), Y(q[1]), 1.05 * k, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill(); ctx.lineWidth = .3 * k; ctx.strokeStyle = '#111'; ctx.stroke(); return; }
+    ctx.arc(X(q[0]), Y(q[1]), 2.1 * k, 0, Math.PI * 2); ctx.fillStyle = t.side === 'home' ? '#2563eb' : '#ea580c'; ctx.fill();
+    ctx.lineWidth = .35 * k; ctx.strokeStyle = '#fff'; ctx.stroke();
+    ctx.fillStyle = '#fff'; ctx.font = '800 ' + (2 * k).toFixed(0) + 'px DM Sans, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(t.label, X(q[0]), Y(q[1]) + .1 * k);
+  });
+  if (legenda) {
+    ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(0, 0, W, 56);
+    ctx.fillStyle = '#fff'; ctx.font = '600 26px DM Sans, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(legenda, 22, 29);
+  }
+}
+function simExportVideo() {
+  if (SIM.frames.length < 2) { csToast('Adicione pelo menos 2 quadros para gerar o vídeo'); return; }
+  if (!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) { csToast('Este navegador não grava vídeo do canvas — use Chrome ou Edge'); return; }
+  var tipos = ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm'];
+  var mime = tipos.filter(function (t) { return MediaRecorder.isTypeSupported(t); })[0];
+  if (!mime) { csToast('Nenhum formato de vídeo disponível neste navegador'); return; }
+  simStop();
+  var W = 1280, H = Math.round(W * 74 / 111), FOOT = 64;
+  var cv = document.createElement('canvas'); cv.width = W; cv.height = H + FOOT;
+  var ctx = cv.getContext('2d'), stream = cv.captureStream(30), rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 5e6 }), partes = [];
+  rec.ondataavailable = function (e) { if (e.data && e.data.size) partes.push(e.data); };
+  var btn = document.getElementById('sim-video-btn'); if (btn) { btn.disabled = true; btn.textContent = 'Gravando…'; }
+  var u = getCurrentUser(), rodape = 'Simulador de lances · ' + (u ? resolveClube(u.clube) : '') + ' · ' + new Date().toLocaleDateString('pt-BR');
+  var vel = SIM.speed || 1, HOLD = 650 / vel, TRANS = 1100 / vel, FIM = 1200;
+  var total = (SIM.frames.length - 1) * (HOLD + TRANS) + FIM;
+  var quadro = function (t) { // estado do lance no instante t (ms)
+    var seg = Math.floor(t / (HOLD + TRANS)), n = SIM.frames.length;
+    if (seg >= n - 1) return { pos: SIM.frames[n - 1].pos, cap: 'Q' + n + (SIM.frames[n - 1].caption ? ' · ' + SIM.frames[n - 1].caption : '') };
+    var dt = t - seg * (HOLD + TRANS);
+    if (dt < HOLD) return { pos: SIM.frames[seg].pos, cap: 'Q' + (seg + 1) + (SIM.frames[seg].caption ? ' · ' + SIM.frames[seg].caption : '') };
+    var kk = Math.min(1, (dt - HOLD) / TRANS), e = kk < .5 ? 2 * kk * kk : 1 - Math.pow(-2 * kk + 2, 2) / 2;
+    var A = SIM.frames[seg].pos, B = SIM.frames[seg + 1].pos, P = {};
+    Object.keys(B).forEach(function (id) { var a = A[id] || B[id]; P[id] = [a[0] + (B[id][0] - a[0]) * e, a[1] + (B[id][1] - a[1]) * e]; });
+    return { pos: P, cap: 'Q' + (seg + 2) + (SIM.frames[seg + 1].caption ? ' · ' + SIM.frames[seg + 1].caption : '') };
+  };
+  var desenhar = function (t) {
+    var f = quadro(t);
+    ctx.save(); simDesenharCanvas(ctx, W, H, f.pos, f.cap); ctx.restore();
+    ctx.fillStyle = '#0a0f18'; ctx.fillRect(0, H, W, FOOT);
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#5b95ff'; ctx.font = '700 26px Space Grotesk, sans-serif'; ctx.fillText('CapixaStat', 22, H + FOOT / 2);
+    ctx.fillStyle = '#a9bccb'; ctx.font = '400 19px DM Sans, sans-serif'; ctx.fillText(rodape + (SIM.nome ? ' · ' + SIM.nome : ''), 190, H + FOOT / 2);
+  };
+  desenhar(0);
+  rec.onstop = function () {
+    var ext = mime.indexOf('mp4') >= 0 ? 'mp4' : 'webm';
+    var blob = new Blob(partes, { type: mime.split(';')[0] }), a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'capixastat-lance' + (SIM.nome ? '-' + SIM.nome.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : '') + '.' + ext;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+    if (btn) { btn.disabled = false; btn.textContent = 'Exportar vídeo'; }
+    csToast('Vídeo ' + ext.toUpperCase() + ' gerado (' + (blob.size / 1048576).toFixed(1) + ' MB, ' + (total / 1000).toFixed(1) + ' s)');
+    simExportVideo._ultimo = { mime: mime, bytes: blob.size, ms: total };
+  };
+  rec.start(250);
+  var t0 = performance.now();
+  // setTimeout (e não requestAnimationFrame) para continuar gravando mesmo com a aba em segundo plano
+  var tick = function () {
+    var t = performance.now() - t0;
+    desenhar(Math.min(t, total));
+    if (t < total) setTimeout(tick, 1000 / 30); else setTimeout(function () { rec.stop(); stream.getTracks().forEach(function (tr) { tr.stop(); }); }, 150);
+  };
+  tick();
+  csToast('Gravando o lance (' + (total / 1000).toFixed(1) + ' s)…');
+}
+
 function simExportPNG() {
   var svg = document.getElementById('sim-svg'); if (!svg) return;
   var W = 1600, H = Math.round(W * 74 / 111), FOOT = 70;
