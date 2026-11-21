@@ -114,6 +114,42 @@ A coleta automática no SofaScore passou a ser bloqueada (403).
 
 ## Melhorias aprovadas
 
-Proposta completa (Etapa 3) em **`PROPOSTA_MELHORIAS.md`**, com IDs (D1, A1, P2…), prioridade e
-dificuldade. Status: **aguardando aprovação**. Quando o Caio aprovar, listar aqui os IDs aprovados,
-a ordem combinada e o status de cada um (pendente / em andamento / feito).
+Proposta completa (Etapa 3) em **`PROPOSTA_MELHORIAS.md`**. **Todos os itens foram aprovados**
+(20/11/2026). Entrega: **terça 24/11/2026**. Segunda à noite: parar de criar coisas novas, só
+revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
+
+### Regras combinadas para a implementação
+- Trabalhar em **`CapixaStat_v5.html`**. **Não alterar a v4.** O React (`web-react/`) está parado.
+- Backup do estado original: `backup/CapixaStat_v4_original.html` + commit `b450ed6`
+  ("backup antes das melhorias"). Git local (sem remoto configurado), `core.autocrlf=false`.
+- **Um commit por item**, com o ID na mensagem (ex.: "R1: ajuste de contraste").
+- Depois de cada item: abrir a v5 e checar que não há erro no console (os 403 de fotos de
+  jogadores em CDNs externos já existiam na v4 e podem ser ignorados).
+  Teste: servidor estático `python -m http.server 5510` na pasta do projeto, abrir
+  `http://localhost:5510/CapixaStat_v5.html`; para entrar sem backend, no console:
+  `localStorage.setItem('capixastat_token','teste-local'); localStorage.setItem('capixastat_current', JSON.stringify({nome:'Caio Borba', clube:'Rio Branco ES', funcao:'Analista de Desempenho'}))` e recarregar.
+  Teste rápido de todas as telas: chamar `goTo(id, navEl)` para cada `.nav-item[data-screen]`.
+- Ordem: prioridade Alta (primeiro R1, I1, L1, I4; depois dificuldade baixa → média → alta),
+  depois Média, depois Baixa. Resumo curto ao Caio a cada bloco.
+- **Dados externos** (depois dos itens Alta): só fontes que permitem acesso (API oficial/plano
+  gratuito, dados abertos, download). Nada de burlar bloqueio (403 do SofaScore) nem scraping
+  proibido pelos termos. Rotina que busca → salva no PostgreSQL → atualiza 1x/dia ou por rodada; telas
+  leem do banco. Registrar fonte e data (B7) e mostrar na tela. Chaves só em `.env` (nunca no
+  HTML/git) — se precisar de cadastro, pedir ao Caio. Mínimo aceitável: 1 fonte + 1 competição.
+
+### Status dos itens (✅ feito · ⏳ em andamento · ⬜ pendente)
+**Alta:** ✅ R1 · ⬜ I1 · ⬜ L1 · ⬜ I4 · ⬜ D1 · ⬜ D2 · ⬜ D3 · ⬜ A4 · ⬜ P1 · ⬜ F1 · ⬜ F2 · ⬜ T1 · ⬜ B4 ·
+⬜ A1 · ⬜ A2 · ⬜ A3 · ⬜ B1 · ⬜ B2 · ⬜ B3 · ⬜ L2 · ⬜ R2 · ⬜ R3 · ⬜ V1 · ⬜ X1 · ⬜ P2
+**Dados externos:** ⬜ pesquisa de fontes · ⬜ integração (rotina + banco + fonte/data na tela)
+**Média:** ⬜ A5 · ⬜ A7 · ⬜ A8 · ⬜ P4 · ⬜ P5 · ⬜ F3 · ⬜ F4 · ⬜ T2 · ⬜ T3 · ⬜ X2 · ⬜ Q2 · ⬜ B6 · ⬜ V5 ·
+⬜ I2 · ⬜ I3 · ⬜ M2 · ⬜ M4 · ⬜ R5 · ⬜ D4 · ⬜ A6 · ⬜ A9 · ⬜ P3 · ⬜ F5 · ⬜ T4 · ⬜ X3 · ⬜ Q1 · ⬜ B5 ·
+⬜ V2 · ⬜ V4 · ⬜ L3 · ⬜ M1 · ⬜ R4 · ⬜ Q3 · ⬜ V3
+**Baixa:** ⬜ A10 · ⬜ X4 · ⬜ Q4 · ⬜ V6 · ⬜ M3 · ⬜ P6 · ⬜ F6 · ⬜ B7 · ⬜ L4
+
+### Notas por item
+- **R1:** `--text-3` escuro `#4a6a7a`→`#8299aa`, `--text-2` →`#a9bccb`; tema claro: text-3 `#56667a`,
+  verde `#15803d`, vermelho `#b91c1c`, azul `#0369a1`, âmbar `#b45309`, ciano `#0e7490`; eixos e
+  legendas dos gráficos com cor sólida; cores fixas apagadas do Quadro Tático trocadas por tokens.
+
+## Trabalhos futuros
+_(preencher na revisão de segunda-feira com o que não der tempo)_
