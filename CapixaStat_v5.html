@@ -12611,6 +12611,10 @@ function _weeklyLoads(p) {
   wk.push(Math.round(chronicBase * af));
   return wk; // [4 semanas; índice 3 = semana atual]
 }
+
+// F3: método do ACWR (sma = média simples, ewma = média móvel exponencial)
+var ACWR_METODO = (function () { try { return localStorage.getItem('capixastat_v5_acwr') || 'sma'; } catch (e) { return 'sma'; } })();
+function setAcwrMetodo(m) { ACWR_METODO = m; try { localStorage.setItem('capixastat_v5_acwr', m); } catch (e) {} renderCarga(); try { renderDashAlerts(); } catch (e) {} }
 function computeACWR(p) {
   // F1: se houver sRPE real com histórico (semanas anteriores > 0), usa dado real; senão, o modelo da v4 (estimado)
   const realWk = (typeof realWeeklyLoads === 'function') ? realWeeklyLoads(p.id) : [0,0,0,0];
@@ -12618,7 +12622,10 @@ function computeACWR(p) {
   const isReal = realChronic > 0 && realWk[3] > 0;
   const wk = isReal ? realWk : _weeklyLoads(p);
   const acute = wk[3];                                  // carga aguda (semana atual)
-  const chronic = (wk[0] + wk[1] + wk[2]) / 3;          // carga crônica (3 semanas anteriores)
+  // F3: crônica por média simples (SMA) ou média móvel exponencial (EWMA, λ = 2/(N+1), N = 3 semanas)
+  let chronic;
+  if (ACWR_METODO === 'ewma') { const lam = 2 / (3 + 1); chronic = wk[0]; for (let k = 1; k < 3; k++) chronic = lam * wk[k] + (1 - lam) * chronic; }
+  else chronic = (wk[0] + wk[1] + wk[2]) / 3;
   const ratio = chronic > 0 ? acute / chronic : 0;
   let zone, cls;
   if (ratio < 0.8) { zone = 'Subcarga'; cls = 'acwr-low'; }
@@ -12691,14 +12698,17 @@ function renderCarga() {
     ? `${_acRisco > 0 ? _acRisco + ' atleta(s) em zona de RISCO (ACWR > 1.5) — reduzir carga. ' : ''}${_acAlerta > 0 ? _acAlerta + ' em alerta (1.3–1.5). ' : ''}${_acIdeal} na zona ideal (0.8–1.3)${_acSub > 0 ? `, ${_acSub} em subcarga` : ''}.`
     : `${_acIdeal} atleta(s) na zona ideal de carga (ACWR 0.8–1.3)${_acSub > 0 ? ` e ${_acSub} em subcarga (< 0.8)` : ''}. Nenhum em zona de risco.`;
   const acwrH = `<div class="card" style="padding:16px">
-    <div class="card-title">Gestão de Carga — ACWR <span class="badge badge-ds">DS</span><span class="tac-tip" data-tip="ACWR = Razão Carga Aguda (semana atual) ÷ Carga Crônica (média de 4 semanas). Métrica profissional de gestão de carga e risco de lesão: 0.8–1.3 é a zona ideal; abaixo indica subcarga; acima de 1.3 o risco de lesão cresce. As cargas semanais são modeladas pelo perfil de intensidade; o cálculo do ACWR segue o padrão da ciência do esporte.">?</span></div>
+    <div class="card-title">Gestão de Carga — ACWR <span class="badge badge-ds">DS</span><span class="tac-tip" data-tip="ACWR = Carga Aguda (semana atual) ÷ Carga Crônica (3 semanas anteriores, média simples ou EWMA). Faixas de referência: 0.8–1.3 zona ideal; abaixo, subcarga; acima de 1.3, pico de carga a acompanhar. É um sinal de alerta, não uma previsão de lesão. As cargas semanais são modeladas pelo perfil de intensidade; o cálculo do ACWR segue o padrão da ciência do esporte.">?</span></div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 10px">
       <div style="flex:1;min-width:90px;text-align:center;padding:10px;border-radius:8px;background:rgba(34,197,94,.12)"><div style="font-size:22px;font-weight:800;color:#22c55e">${_acIdeal}</div><div style="font-size:11px;color:var(--text-3)">Zona ideal</div></div>
       <div style="flex:1;min-width:90px;text-align:center;padding:10px;border-radius:8px;background:rgba(56,189,248,.12)"><div style="font-size:22px;font-weight:800;color:#38bdf8">${_acSub}</div><div style="font-size:11px;color:var(--text-3)">Subcarga</div></div>
       <div style="flex:1;min-width:90px;text-align:center;padding:10px;border-radius:8px;background:rgba(251,191,36,.12)"><div style="font-size:22px;font-weight:800;color:#fbbf24">${_acAlerta}</div><div style="font-size:11px;color:var(--text-3)">Alerta</div></div>
       <div style="flex:1;min-width:90px;text-align:center;padding:10px;border-radius:8px;background:rgba(248,113,113,.12)"><div style="font-size:22px;font-weight:800;color:#f87171">${_acRisco}</div><div style="font-size:11px;color:var(--text-3)">Risco</div></div>
     </div>
-    <p class="chart-insight">${acwrInsight}</p></div>`;
+    <p class="chart-insight">${acwrInsight}</p>
+    <div class="guia-row"><span style="font-size:12px;color:var(--text-2)">Cálculo da carga crônica:</span>
+      <div class="vf-scope" role="group" aria-label="Método do ACWR"><button class="vf-seg ${ACWR_METODO === 'sma' ? 'active' : ''}" onclick="setAcwrMetodo('sma')">Média simples</button><button class="vf-seg ${ACWR_METODO === 'ewma' ? 'active' : ''}" onclick="setAcwrMetodo('ewma')">EWMA</button></div></div>
+    <div class="cs-metric"><b class="cs-metric-tag">Leia como alerta</b><span>O ACWR <b>não prevê lesão</b>: estudos (Impellizzeri et al., 2020–2021) mostram que a razão pode gerar associações artificiais e que o resultado muda conforme o método. Use as faixas para <b>conversar</b> com a comissão sobre picos de carga, junto com o bem-estar e o histórico do atleta. A EWMA dá mais peso às semanas recentes.</span></div></div>`;
 
   const chartH = `<div class="card" style="padding:16px">
     <div class="card-title">Carga por Atleta — Semana Atual</div>
