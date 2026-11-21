@@ -1634,6 +1634,13 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .dash-alert { display:flex; align-items:center; gap:8px; padding:5px 6px; border-radius:8px; cursor:pointer }
 .dash-alert:hover { background:var(--bg-raised) }
 .dash-alert-nm { flex:1; font-size:13px; color:var(--text-1); font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+
+/* A4: valores estimados = pontilhado */
+.ov-bar.est .fil { background-image: repeating-linear-gradient(135deg, rgba(0,0,0,.28) 0 3px, transparent 3px 7px) }
+.ov-bar.est .trk { outline:1px dashed color-mix(in srgb, var(--warn) 55%, transparent); outline-offset:1px }
+.ov-legend { margin-top:8px; font-size:11px; color:var(--text-3); display:flex; gap:6px; align-items:center; flex-wrap:wrap }
+.cs-est-banner { display:flex; gap:10px; align-items:center; padding:9px 12px; margin-bottom:14px; border-radius:10px;
+  border:1px dashed var(--warn); background:color-mix(in srgb, var(--warn) 7%, transparent); font-size:12.5px; color:var(--text-2) }
 </style>
 </head>
 <body>
@@ -2119,8 +2126,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
             .mini-radar-box{flex:1;min-width:0;height:330px}
             .ov-bar{display:flex;align-items:center;gap:9px;font-size:12.5px}
             .ov-bar .lbl{width:82px;color:var(--text-2);flex-shrink:0}
-            .ov-bar .trk{flex:1;height:7px;background:var(--border);border-radius:4px;overflow:hidden}
-            .ov-bar .fil{height:100%;border-radius:4px}
+            .ov-bar .trk{flex:1;min-width:70px;height:7px;background:var(--border);border-radius:4px;overflow:hidden}
+            .ov-bar .fil{display:block;height:100%;border-radius:4px} /* A4: corrigido — sem display:block a barra ficava com largura 0 (bug da v4) */
             .ov-bar .val{width:38px;text-align:right;font-weight:800;color:var(--text-1);font-size:13px}
             .ov-stat-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
             .ov-stat-row:last-child{border-bottom:none}
@@ -2970,6 +2977,24 @@ function enterApp() {
 // ── Atualizar KPIs com dados reais ───────────
 
 
+
+
+// ── A4: aviso de dado estimado nas abas da Formação ──
+var FORM_EST_TABS = {
+  carga: 'Cargas e status são estimados (modelo) até a comissão registrar sRPE e bem-estar nesta tela.',
+  fisico: 'Peso e flexibilidade são simulados — aguardando aferição real do clube.',
+  antropometria: 'Medidas antropométricas simuladas — aguardando avaliação real do clube.'
+};
+function applyFormEstBanner(name) {
+  var panel = document.getElementById('ftab-' + name);
+  if (!panel || !FORM_EST_TABS[name]) return;
+  if (name === 'carga' && typeof hasRealLoadData === 'function' && hasRealLoadData()) return;
+  if (panel.querySelector('.cs-est-banner')) return;
+  var b = document.createElement('div');
+  b.className = 'cs-est-banner';
+  b.innerHTML = '<span class="cs-src est">Estimado</span><span>' + FORM_EST_TABS[name] + '</span>';
+  panel.insertBefore(b, panel.firstChild);
+}
 
 // ── D3: chip "Métrica" — explica cada gráfico e diz se o dado é real ou estimado ──
 // real: true = dado real da temporada; false = estimado/simulado; 'misto' = parte real, parte estimada
@@ -5094,13 +5119,17 @@ function _drawPerfilRadar(p) {
 function renderOverview(p) {
   var axes = ['Finalização','Passes','Dribles','Físico','Disciplina','Consistência'];
   var r = (Array.isArray(p.radar) && p.radar.length === 6) ? p.radar : [50,50,50,50,50,50];
-  var barColors = ['#22c55e','#38bdf8','#a78bfa','#fbbf24','#f87171','#22c55e'];
+  var barColors = [0,1,2,3,4,5].map(csData); // I1: paleta de dados
 
-  // Atributos — barras
+  // Atributos — barras. A4: eixos estimados (ou atleta sem estatística real) ficam pontilhados
+  var _real = (typeof _hasRealStats === 'function') ? _hasRealStats(p) : true;
+  var EST_AXES = { 2: 'referência por posição (não há dado público de dribles)', 3: 'aproximado por jogos disputados', 5: 'aproximado por jogos disputados' };
   var barsEl = document.getElementById('p-atributos');
   if (barsEl) barsEl.innerHTML = axes.map(function(ax, i){
-    return '<div class="ov-bar"><span class="lbl">' + ax + '</span><span class="trk"><span class="fil" style="width:' + r[i] + '%;background:' + barColors[i] + '"></span></span><span class="val">' + r[i] + '%</span></div>';
-  }).join('');
+    var est = !_real || EST_AXES[i];
+    var why = !_real ? 'atleta sem estatísticas reais — valores de referência' : EST_AXES[i];
+    return '<div class="ov-bar' + (est ? ' est' : '') + '"' + (est ? ' title="Estimado: ' + why + '"' : '') + '><span class="lbl">' + ax + '</span><span class="trk"><span class="fil" style="width:' + r[i] + '%;background-color:' + barColors[i] + '"></span></span><span class="val' + (est ? ' cs-est-val' : '') + '">' + r[i] + '%</span></div>';
+  }).join('') + '<div class="ov-legend"><span class="cs-src real">Real</span> sólido · <span class="cs-src est">Estimado</span> pontilhado — passe o mouse para ver o motivo</div>';
   // mini radar
   setTimeout(function(){
     var _rc = _chartColors();
@@ -10778,7 +10807,7 @@ function switchFormTab(name, btn) {
   else if (name === 'carga')        renderCarga();
   else if (name === 'fisico')       renderFisico();
   else if (name === 'antropometria') renderAntropometria();
-  setTimeout(function () { try { applyMetricChips(); } catch (e) {} }, 300);
+  setTimeout(function () { try { applyMetricChips(); applyFormEstBanner(name); } catch (e) {} }, 300);
 }
 
 // ── 1. MICROCICLO ─────────────────────────────

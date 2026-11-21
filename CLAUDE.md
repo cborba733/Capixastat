@@ -138,7 +138,7 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
   HTML/git) — se precisar de cadastro, pedir ao Caio. Mínimo aceitável: 1 fonte + 1 competição.
 
 ### Status dos itens (✅ feito · ⏳ em andamento · ⬜ pendente)
-**Alta:** ✅ R1 · ✅ I1 · ✅ L1 · ✅ I4 · ✅ D1 · ✅ D2 · ✅ D3 · ⬜ A4 · ⬜ P1 · ⬜ F1 · ⬜ F2 · ⬜ T1 · ⬜ B4 ·
+**Alta:** ✅ R1 · ✅ I1 · ✅ L1 · ✅ I4 · ✅ D1 · ✅ D2 · ✅ D3 · ✅ A4 · ⬜ P1 · ⬜ F1 · ⬜ F2 · ⬜ T1 · ⬜ B4 ·
 ⬜ A1 · ⬜ A2 · ⬜ A3 · ⬜ B1 · ⬜ B2 · ⬜ B3 · ⬜ L2 · ⬜ R2 · ⬜ R3 · ⬜ V1 · ⬜ X1 · ⬜ P2
 **Dados externos:** ⬜ pesquisa de fontes · ⬜ integração (rotina + banco + fonte/data na tela)
 **Média:** ⬜ A5 · ⬜ A7 · ⬜ A8 · ⬜ P4 · ⬜ P5 · ⬜ F3 · ⬜ F4 · ⬜ T2 · ⬜ T3 · ⬜ X2 · ⬜ Q2 · ⬜ B6 · ⬜ V5 ·
@@ -179,6 +179,11 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 - **D3:** `METRIC_NOTES` (id do canvas → texto + real/misto/estimado) e `applyMetricChips()` acrescentam o
   chip "Métrica" ao card de cada gráfico (chamado no `goTo`, no `enterApp` e no `switchFormTab`). Ao criar
   gráfico novo, **adicionar a entrada em `METRIC_NOTES`**.
+
+- **A4:** perfil › atributos: eixos estimados (Dribles, Físico, Consistência, ou todos se o atleta não tem
+  estatística real) com barra hachurada + contorno pontilhado + tooltip do motivo e legenda. Formação:
+  `applyFormEstBanner(tab)` mostra faixa "Estimado" em Carga/Físico/Antropometria (Carga some quando
+  `hasRealLoadData()` — F1 — for verdadeiro). Corrigido bug da v4: `.ov-bar .fil` sem `display:block`.
 
 ## Trabalhos futuros
 _(preencher na revisão de segunda-feira com o que não der tempo)_
