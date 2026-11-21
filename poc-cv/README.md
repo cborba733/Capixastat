@@ -45,12 +45,25 @@ python -m unittest test_homografia.py               # 7 testes (só precisa de n
 ```
 - Matemática própria (DLT com numpy), comentada linha a linha — o OpenCV só abre a janela de clique.
 - Usa o **pé do jogador** (centro da base da caixa) e descarta o que cai fora do gramado (torcida, banco).
-- `posicoes.csv`: `quadro, tempo_s, id, classe, x_px, y_px, x_m, y_m`.
+- `posicoes.csv`: `quadro, tempo_s, id, classe, time, x_px, y_px, x_m, y_m` (`time` vazio sem `--times`).
 - **Limite:** a calibração só vale enquanto a câmera não se mexe. Na transmissão é preciso recalibrar
   a cada corte de câmera; com câmera tática fixa, calibra-se uma vez só.
 
+## V2 — Separação de times pela cor da camisa — `times.py`
+```bash
+python example_tracking.py --video clip.mp4 --calib calib.json --times --out saida/
+python -m pytest -q                                   # 14 testes (homografia, times e o laço com YOLO falso)
+```
+- **Máscara do gramado:** pixel verde (G bem maior que R e B) é ignorado ao medir a cor.
+- **Só o tronco:** faixa do peito (20–50 % da altura da caixa, metade central) — calção, meião e cabeça ficam de fora.
+- **KMeans (k = 2)** em numpy sobre as cores coletadas nos primeiros 25 quadros → time **A** (camisa mais clara)
+  e **B**. Quem fica longe dos dois centros (árbitro, goleiros) vira **outro**.
+- **Voto por ID:** cada jogador rastreado fica com o time mais votado ao longo do vídeo (um quadro com sombra não troca o time).
+- **Banco e torcida:** se quase não há grama logo abaixo dos pés, a pessoa é descartada.
+- Vídeo anotado com caixas laranja (A), azuis (B) e cinza (outro); coluna `time` no `posicoes.csv`.
+
 ## Para onde evolui
-- **Separar por time** (cor da camisa) e filtrar quem não é jogador.
+- ~~**Separar por time**~~ — feito (V2, acima).
 - ~~**Homografia**~~ — feito (V1, acima). Próximo: mapa de calor e posições médias a partir do CSV.
 - **Câmera tática fixa** → tracking e métricas diretamente aproveitáveis.
 - **Aba de Análise de Vídeo no CapixaStat** consumindo os resultados (vídeo anotado + dados).

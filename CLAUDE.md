@@ -145,7 +145,7 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 **Dados externos:** ✅ pesquisa de fontes · ✅ integração TheSportsDB (rotina + banco + fonte/data na tela)
 **Média:** ✅ A5 · ✅ A7 · ✅ A8 · ✅ P4 · ✅ P5 · ✅ F3 · ✅ F4 · ✅ T2 · ✅ T3 · ✅ X2 · ✅ Q2 · ✅ B6 · ✅ V5 ·
 ✅ I2 · ✅ I3 · ✅ M2 · ✅ M4 · ✅ R5 · ✅ D4 · ✅ A6 · ✅ A9 · ✅ P3 · ✅ F5 · ✅ T4 · ✅ X3 · ✅ Q1 · ✅ B5 ·
-⬜ V2 · ⬜ V4 · ⬜ L3 · ⬜ M1 · ⬜ R4 · ⬜ Q3 · ⬜ V3
+✅ V2 · ⬜ V4 · ⬜ L3 · ⬜ M1 · ⬜ R4 · ⬜ Q3 · ⬜ V3
 **Baixa:** ⬜ A10 · ⬜ X4 · ⬜ Q4 · ⬜ V6 · ⬜ M3 · ⬜ P6 · ⬜ F6 · ✅ B7 · ⬜ L4
 
 ### Notas por item
@@ -402,6 +402,12 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
   V5). 8 testes `pytest` passando. Conferido via HTTP a partir do navegador: 136 jogos reais → Elo idêntico ao da tela
   (dif. 0,0 nos 29 clubes); xG igual ao JS (< 0,0001). Serviço `capixastat-calculos` adicionado ao `render.yaml`
   (opcional). A plataforma continua calculando no navegador; o serviço é a versão testável/reutilizável das fórmulas.
+
+- **V2:** `poc-cv/times.py` (só numpy): máscara do gramado, cor mediana do tronco sem grama, KMeans k=2 próprio,
+  "outro" para árbitro/goleiro (distância ao centro), voto por ID e descarte de banco/torcida (sem grama sob os pés).
+  `example_tracking.py --times` aprende as cores nos 25 primeiros quadros (guardados e processados depois), pinta as caixas
+  por time e grava a coluna `time` no `posicoes.csv`. Testes: `test_times.py` (6) + `test_tracking_mock.py` (laço completo
+  com cv2/YOLO falsos) → 14 testes no poc-cv. Não foi rodado em vídeo real (sem GPU/ultralytics nesta máquina).
 
 ### ONDE PAROU (21/11, madrugada — limite de uso)
 Próximos itens Média (dif. média): D4, A6,
