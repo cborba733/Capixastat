@@ -142,7 +142,7 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 ✅ A1 · ✅ A2 · ✅ A3 · ✅ B1 · ✅ B2 · ✅ B3 · ✅ L2 · ✅ R2 · ✅ R3 · ✅ V1 · ✅ X1 · ✅ P2
 **Dados externos:** ✅ pesquisa de fontes · ✅ integração TheSportsDB (rotina + banco + fonte/data na tela)
 **Média:** ✅ A5 · ✅ A7 · ✅ A8 · ✅ P4 · ✅ P5 · ✅ F3 · ✅ F4 · ✅ T2 · ✅ T3 · ✅ X2 · ✅ Q2 · ✅ B6 · ✅ V5 ·
-✅ I2 · ⬜ I3 · ⬜ M2 · ⬜ M4 · ⬜ R5 · ⬜ D4 · ⬜ A6 · ⬜ A9 · ⬜ P3 · ⬜ F5 · ⬜ T4 · ⬜ X3 · ⬜ Q1 · ⬜ B5 ·
+✅ I2 · ✅ I3 · ⬜ M2 · ⬜ M4 · ⬜ R5 · ⬜ D4 · ⬜ A6 · ⬜ A9 · ⬜ P3 · ⬜ F5 · ⬜ T4 · ⬜ X3 · ⬜ Q1 · ⬜ B5 ·
 ⬜ V2 · ⬜ V4 · ⬜ L3 · ⬜ M1 · ⬜ R4 · ⬜ Q3 · ⬜ V3
 **Baixa:** ⬜ A10 · ⬜ X4 · ⬜ Q4 · ⬜ V6 · ⬜ M3 · ⬜ P6 · ⬜ F6 · ✅ B7 · ⬜ L4
 
@@ -342,7 +342,10 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 
 - **I2:** Barlow Condensed (Google Fonts) em `--font-cond` para títulos de página, de seção, logo (itálico) e KPIs;
   `font-variant-numeric: tabular-nums` nos números. Guia visual atualizado.
-  (Pendência para revisão: o Quadro Tático ainda usa verde `#00e676` próprio nos botões/realces.)
+
+- **I3:** logo SVG (bola azul com barras brancas + barra rosa) no menu (`.cs-logo`) e como favicon; regras de uso no Guia
+  visual; exportação PNG do Quadro Tático (`telExport`) com rodapé "CapixaStat · Quadro Tático · data". O verde
+  próprio do Quadro Tático (`#00e676`) foi trocado pelo azul de marca.
 
 ### ONDE PAROU (21/11, madrugada — limite de uso)
 Próximos itens Média, nesta ordem: P5, F3, F4, T2, T3, X2, Q2, B6, V5, I2, I3, M2, M4, R5 (dif. baixa); depois D4, A6,

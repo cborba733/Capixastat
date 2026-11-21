@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CapixaStat — Plataforma de Análise do Futebol Capixaba</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%232563eb'/><rect x='9' y='15' width='3.4' height='8' rx='1' fill='%23fff'/><rect x='14.3' y='10' width='3.4' height='13' rx='1' fill='%23fff'/><rect x='19.6' y='13' width='3.4' height='10' rx='1' fill='%23f472b6'/></svg>">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Barlow+Condensed:ital,wght@0,600;0,700;1,700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -1917,6 +1918,9 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .kpi-value, .dest-val, .rg-result b, .tl2-min, .p90-v, .sc-time, .score-num, .insight-score, .profile-stat-val, .team-stat-val { font-variant-numeric:tabular-nums }
 .kpi-value { font-family:var(--font-cond); font-weight:700; letter-spacing:.3px }
 @media (max-width: 768px) { .topbar-left h1 { font-size:20px } }
+
+/* I3: logo */
+.cs-logo { width:26px; height:26px; flex-shrink:0 } .cs-logo.lg { width:56px; height:56px }
 </style>
 </head>
 <body>
@@ -2041,7 +2045,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
     <!-- SIDEBAR -->
     <nav class="sidebar">
       <div class="sidebar-logo">
-        <div class="sidebar-logo-name">CapixaStat</div>
+        <div class="sidebar-logo-name"><svg class="cs-logo" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="#2563eb"/><rect x="9" y="15" width="3.4" height="8" rx="1" fill="#fff"/><rect x="14.3" y="10" width="3.4" height="13" rx="1" fill="#fff"/><rect x="19.6" y="13" width="3.4" height="10" rx="1" fill="#f472b6"/></svg>CapixaStat</div>
         <div class="sidebar-logo-sub">Futebol Capixaba · 2026</div>
       </div>
 
@@ -2881,31 +2885,31 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
         .tel-tool{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:1px solid transparent;background:transparent;color:#8696b0;cursor:pointer;transition:background .12s,color .12s,border-color .12s;position:relative;padding:0}
         .tel-tool svg{width:20px;height:20px;stroke-width:2;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
         .tel-tool:hover{background:rgba(255,255,255,.05);color:#f0f4ff}
-        .tel-tool.active{background:rgba(0,230,118,.14);color:#00e676;border-color:rgba(0,230,118,.35)}
+        .tel-tool.active{background:rgba(91,149,255,.14);color:#5b95ff;border-color:rgba(91,149,255,.35)}
         .tel-tool[data-tip]:hover::after{content:attr(data-tip);position:absolute;left:calc(100% + 11px);top:50%;transform:translateY(-50%);background:#05080f;color:#dfe6f2;font-size:12px;font-weight:600;padding:5px 9px;border-radius:7px;white-space:nowrap;border:1px solid var(--border);z-index:40;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.4)}
         .tel-rdiv{width:30px;height:1px;background:var(--border);margin:5px 0;flex-shrink:0}
         .tel-swatches{display:flex;flex-direction:column;align-items:center;gap:7px}
         .tel-color{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid rgba(255,255,255,.14);transition:transform .1s}
         .tel-color:hover{transform:scale(1.14)}
-        .tel-color.active{border-color:#fff;box-shadow:0 0 0 3px rgba(0,230,118,.35)}
+        .tel-color.active{border-color:#fff;box-shadow:0 0 0 3px rgba(91,149,255,.35)}
         .tel-stage{position:relative;flex:1 1 auto;min-height:0;width:100%;background:#070b14;border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 50px rgba(0,0,0,.45)}
         .tel-stage #tel-konva{line-height:0}
         .tel-stage #tel-konva canvas{display:block}
         .tel-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:24px;z-index:5;background:radial-gradient(120% 120% at 50% 35%,#0b1220 0%,#070b14 70%)}
-        .tel-empty-ic{width:64px;height:64px;display:flex;align-items:center;justify-content:center;border-radius:18px;background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.28)}
-        .tel-empty-ic svg{width:30px;height:30px;stroke:#00e676;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+        .tel-empty-ic{width:64px;height:64px;display:flex;align-items:center;justify-content:center;border-radius:18px;background:rgba(91,149,255,.1);border:1px solid rgba(91,149,255,.28)}
+        .tel-empty-ic svg{width:30px;height:30px;stroke:#5b95ff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
         .tel-empty h3{margin:0;font-size:18px;font-weight:800;color:#eef3fb;letter-spacing:-.2px}
         .tel-empty p{margin:0;font-size:13px;color:#8696b0;max-width:400px;line-height:1.55}
         .tel-empty-actions{display:flex;gap:10px;margin-top:4px;flex-wrap:wrap;justify-content:center}
         .tel-empty-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:#0d1626;color:#c7d2e8;transition:border-color .12s,color .12s,background .12s}
         .tel-empty-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-        .tel-empty-btn.primary{background:#00e676;color:#04140a;border-color:#00e676}
+        .tel-empty-btn.primary{background:#5b95ff;color:#04140a;border-color:#5b95ff}
         .tel-empty-btn.primary svg{stroke:#04140a}
         .tel-empty-btn.primary:hover{background:#00c766}
         .tel-empty-btn:not(.primary):hover{border-color:rgba(255,255,255,.22);color:#fff}
         .tel-empty-hint{font-size:12px;color:var(--text-3);margin-top:2px}
         .tel-videobar{display:none;align-items:center;gap:13px;background:#0d1626;border:1px solid var(--border);border-radius:12px;padding:9px 14px}
-        .tel-play{width:42px;height:34px;display:flex;align-items:center;justify-content:center;background:rgba(0,230,118,.14);color:#00e676;border:1px solid rgba(0,230,118,.32);border-radius:9px;cursor:pointer}
+        .tel-play{width:42px;height:34px;display:flex;align-items:center;justify-content:center;background:rgba(91,149,255,.14);color:#5b95ff;border:1px solid rgba(91,149,255,.32);border-radius:9px;cursor:pointer}
         .tel-play svg{width:15px;height:15px;fill:currentColor;stroke:none}
         .tel-vbtn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:#0a0f1a;color:#aab6cc;border:1px solid var(--border);border-radius:8px;cursor:pointer;flex-shrink:0}
         .tel-vbtn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -2913,21 +2917,21 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
         .tel-speed{background:#0a0f1a;color:#c7d2e8;border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;padding:7px 8px;cursor:pointer;outline:none;flex-shrink:0}
         .tel-timing-box{display:flex;flex-direction:column;gap:8px;background:#0a0f1a;border:1px solid var(--border);border-radius:9px;padding:10px}
         .tel-timing-box .tt-range{font-size:12px;color:#8696b0;font-family:'JetBrains Mono',monospace;text-align:center}
-        .tel-timing-box .tt-range b{color:#00e676;font-weight:700}
+        .tel-timing-box .tt-range b{color:#5b95ff;font-weight:700}
         .tel-timing-btns{display:flex;gap:6px}
         .tel-seek{flex:1;-webkit-appearance:none;appearance:none;height:5px;border-radius:3px;background:#1a2540;cursor:pointer;outline:none}
-        .tel-seek::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:#00e676;cursor:pointer;box-shadow:0 0 0 3px rgba(0,230,118,.22)}
-        .tel-seek::-moz-range-thumb{width:15px;height:15px;border:none;border-radius:50%;background:#00e676;cursor:pointer}
+        .tel-seek::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:#5b95ff;cursor:pointer;box-shadow:0 0 0 3px rgba(91,149,255,.22)}
+        .tel-seek::-moz-range-thumb{width:15px;height:15px;border:none;border-radius:50%;background:#5b95ff;cursor:pointer}
         .tel-time{font-size:12px;color:#8696b0;font-family:'JetBrains Mono',monospace;min-width:92px;text-align:right}
         .tel-timeline{display:none;background:#0d1626;border:1px solid var(--border);border-radius:12px;padding:10px 14px 13px}
         .tel-tl-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
         .tel-tl-title{font-size:11px;font-weight:700;letter-spacing:.7px;color:#8696b0;text-transform:uppercase}
-        .tel-tl-add{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#00e676;background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.32);border-radius:7px;padding:5px 11px;cursor:pointer}
+        .tel-tl-add{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#5b95ff;background:rgba(91,149,255,.12);border:1px solid rgba(91,149,255,.32);border-radius:7px;padding:5px 11px;cursor:pointer}
         .tel-tl-add svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round}
-        .tel-tl-add:hover{background:rgba(0,230,118,.2)}
+        .tel-tl-add:hover{background:rgba(91,149,255,.2)}
         .tel-track{position:relative;height:38px;background:#070b14;border:1px solid var(--border);border-radius:8px;cursor:pointer;overflow:hidden}
-        .tel-track-fill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,rgba(0,230,118,.16),rgba(0,230,118,.04));pointer-events:none}
-        .tel-playhead{position:absolute;top:0;bottom:0;left:0;width:2px;background:#00e676;box-shadow:0 0 7px rgba(0,230,118,.8);pointer-events:none;z-index:3}
+        .tel-track-fill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,rgba(91,149,255,.16),rgba(91,149,255,.04));pointer-events:none}
+        .tel-playhead{position:absolute;top:0;bottom:0;left:0;width:2px;background:#5b95ff;box-shadow:0 0 7px rgba(91,149,255,.8);pointer-events:none;z-index:3}
         .tel-marker{position:absolute;top:0;bottom:0;width:3px;margin-left:-1.5px;background:#f59e0b;cursor:pointer;z-index:2}
         .tel-marker::before{content:'';position:absolute;top:4px;left:50%;transform:translateX(-50%);width:9px;height:9px;border-radius:50%;background:#f59e0b;border:2px solid #0d1626}
         .tel-marker:hover::after{content:attr(data-label);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#05080f;color:#ffce7a;font-size:11px;font-weight:600;padding:3px 7px;border-radius:5px;white-space:nowrap;border:1px solid var(--border);z-index:6;box-shadow:0 3px 9px rgba(0,0,0,.45)}
@@ -2937,7 +2941,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
         .tel-act{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:9px;border:1px solid var(--border);background:#0d1626;color:#c7d2e8;font-size:12.5px;font-weight:600;cursor:pointer;transition:border-color .12s,color .12s}
         .tel-act svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
         .tel-act:hover{border-color:rgba(255,255,255,.22);color:#fff}
-        .tel-act.primary{background:#00e676;color:#04140a;border-color:#00e676}
+        .tel-act.primary{background:#5b95ff;color:#04140a;border-color:#5b95ff}
         .tel-act.primary svg{stroke:#04140a}
         .tel-act.primary:hover{background:#00c766;color:#04140a}
         .tel-act.danger:hover{border-color:rgba(248,113,113,.4);color:#f87171}
@@ -2948,20 +2952,20 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
         .tel-props-body{display:flex;flex-direction:column;gap:14px}
         .tel-prow{display:flex;flex-direction:column;gap:7px}
         .tel-prow>label{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:600;color:#aab6cc}
-        .tel-prow>label span{color:#00e676;font-family:'JetBrains Mono',monospace;font-size:12px}
+        .tel-prow>label span{color:#5b95ff;font-family:'JetBrains Mono',monospace;font-size:12px}
         .tel-prow input[type=range]{-webkit-appearance:none;appearance:none;height:4px;border-radius:3px;background:#1a2540;cursor:pointer;outline:none}
-        .tel-prow input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#00e676;cursor:pointer}
-        .tel-prow input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-radius:50%;background:#00e676;cursor:pointer}
+        .tel-prow input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:#5b95ff;cursor:pointer}
+        .tel-prow input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-radius:50%;background:#5b95ff;cursor:pointer}
         .tel-prow-inline{flex-direction:row;align-items:center;justify-content:space-between}
         .tel-seg{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
         .tel-seg button{background:transparent;border:none;color:#8696b0;font-size:12px;font-weight:600;padding:6px 10px;cursor:pointer}
-        .tel-seg button.active{background:rgba(0,230,118,.14);color:#00e676}
+        .tel-seg button.active{background:rgba(91,149,255,.14);color:#5b95ff}
         .tel-switch{position:relative;display:inline-block;width:38px;height:21px;flex-shrink:0}
         .tel-switch input{display:none}
         .tel-switch span{position:absolute;inset:0;background:#1a2540;border-radius:21px;transition:.15s;cursor:pointer}
         .tel-switch span::before{content:'';position:absolute;left:3px;top:3px;width:15px;height:15px;border-radius:50%;background:#8696b0;transition:.15s}
-        .tel-switch input:checked + span{background:rgba(0,230,118,.4)}
-        .tel-switch input:checked + span::before{transform:translateX(17px);background:#00e676}
+        .tel-switch input:checked + span{background:rgba(91,149,255,.4)}
+        .tel-switch input:checked + span::before{transform:translateX(17px);background:#5b95ff}
         .tel-props-actions{display:flex;gap:8px;flex-wrap:wrap}
         .tel-pbtn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:0;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:#0a0f1a;color:#c7d2e8;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
         .tel-pbtn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -3082,6 +3086,10 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
             <div class="card"><div class="card-title">Confiabilidade do dado</div>
               <div class="guia-row"><span class="cs-src real">Dado real</span><span class="cs-src est">Estimado</span><span class="cs-est-val">72 (estimado)</span></div>
               <div class="cs-metric"><b class="cs-metric-tag">Métrica</b><span>Todo gráfico termina com este chip: o que mede, como é calculado e se o dado é real ou estimado.</span></div></div>
+            <div class="card"><div class="card-title">Logo (I3)</div>
+              <div class="guia-row" style="gap:16px"><svg class="cs-logo lg" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="#2563eb"/><rect x="9" y="15" width="3.4" height="8" rx="1" fill="#fff"/><rect x="14.3" y="10" width="3.4" height="13" rx="1" fill="#fff"/><rect x="19.6" y="13" width="3.4" height="10" rx="1" fill="#f472b6"/></svg><span class="sidebar-logo-name" style="font-size:34px">CapixaStat</span></div>
+              <ul class="guia-ol"><li>Símbolo: bola com barras de dados — azul e rosa da bandeira do ES.</li><li>Nome sempre em Barlow Condensed itálico, azul de marca.</li>
+              <li>Toda imagem/PDF exportado leva o rodapé "CapixaStat" + data.</li><li>Não distorcer, não trocar as cores, manter respiro ao redor.</li></ul></div>
             <div class="card"><div class="card-title">Padrão de página (L2)</div>
               <ol class="guia-ol"><li><b>Cabeçalho</b>: título, subtítulo de contexto e a ação principal (botão azul).</li>
               <li><b>Resumo</b>: o que pede atenção agora (alertas, próximo jogo).</li>
@@ -15470,7 +15478,7 @@ function telInit(){
   telLayer = new Konva.Layer();
   telUI = new Konva.Layer();
   telStage.add(telBg); telStage.add(telLayer); telStage.add(telUI);
-  telTr = new Konva.Transformer({ rotateEnabled:true, borderStroke:'#00e676', borderStrokeWidth:1.5, anchorStroke:'#00e676', anchorFill:'#0A0F1A', anchorSize:9, anchorCornerRadius:3, padding:4 });
+  telTr = new Konva.Transformer({ rotateEnabled:true, borderStroke:'#5b95ff', borderStrokeWidth:1.5, anchorStroke:'#5b95ff', anchorFill:'#0A0F1A', anchorSize:9, anchorCornerRadius:3, padding:4 });
   telUI.add(telTr);
 
   telShowEmpty(true);
@@ -15810,7 +15818,16 @@ function telApplyTextSize(v){ var n = telTr.nodes()[0]; if (!n || n.telType!=='t
 function telApplyDash(v){ var n = telTr.nodes()[0]; if (!n || !n.dash) return; n.dash(v==='dashed' ? [16,11] : undefined); telLayer.batchDraw(); }
 function telApplyFill(on){ var n = telTr.nodes()[0]; if (!n) return; var col = n.telColor || telColor; n.telFillOn = on; if (n.telType==='zone'){ n.fillLinearGradientColorStops(on ? [0, telRgba(col,0.42), 1, telRgba(col,0.08)] : [0,'rgba(0,0,0,0)',1,'rgba(0,0,0,0)']); } else if (n.fill){ n.fill(on ? telRgba(col,0.22) : 'transparent'); } telLayer.batchDraw(); }
 function telPropInput(e){ var id = e.target.id, v = e.target.value; if (id==='tel-p-stroke'){ telSetRange('tel-p-stroke','tel-p-stroke-v',v,''); telApplyStroke(v); } else if (id==='tel-p-opacity'){ telSetRange('tel-p-opacity','tel-p-opacity-v',v,'%'); telApplyOpacity(v); } else if (id==='tel-p-arrow'){ telSetRange('tel-p-arrow','tel-p-arrow-v',v,''); telApplyArrow(v); } else if (id==='tel-p-textsize'){ telSetRange('tel-p-textsize','tel-p-textsize-v',v,''); telApplyTextSize(v); } }
-function telExport(){ if (!telStage) return; telDeselect(); telCancelZone(); try { var url = telStage.toDataURL({ pixelRatio: 1/telScale }); var a = document.createElement('a'); a.href = url; a.download = 'quadro-tatico.png'; document.body.appendChild(a); a.click(); a.remove(); } catch(err){ alert('Não foi possível exportar: ' + err.message); } }
+function telExport(){ if (!telStage) return; telDeselect(); telCancelZone(); try {
+  // I3: imagem exportada ganha rodapé com a marca e a data
+  var src = telStage.toCanvas({ pixelRatio: 1/telScale }), W = src.width, FOOT = Math.max(48, Math.round(W * 0.045));
+  var c = document.createElement('canvas'); c.width = W; c.height = src.height + FOOT; var x = c.getContext('2d');
+  x.fillStyle = '#0a0f18'; x.fillRect(0, 0, W, c.height); x.drawImage(src, 0, 0);
+  x.fillStyle = '#5b95ff'; x.font = 'italic 700 ' + Math.round(FOOT * 0.55) + 'px "Barlow Condensed", sans-serif'; x.fillText('CapixaStat', 18, src.height + FOOT * 0.68);
+  x.fillStyle = '#a9bccb'; x.font = '400 ' + Math.round(FOOT * 0.32) + 'px "DM Sans", sans-serif';
+  x.fillText('Quadro Tático · ' + new Date().toLocaleDateString('pt-BR'), 18 + Math.round(FOOT * 3.1), src.height + FOOT * 0.66);
+  var a = document.createElement('a'); a.download = 'capixastat-quadro-tatico.png'; a.href = c.toDataURL('image/png'); a.click();
+} catch (e) { alert('Não foi possível exportar: ' + e.message); } }
 
 // ── Salvar / retomar análise (localStorage) ──
 function telImageDataURL(){ try { var im = telMedia.el; var c = document.createElement('canvas'); c.width = im.naturalWidth || im.width; c.height = im.naturalHeight || im.height; c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); return c.toDataURL('image/jpeg', 0.85); } catch(e){ return null; } }
