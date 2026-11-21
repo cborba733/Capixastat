@@ -1612,6 +1612,22 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .guia-row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:8px 0 }
 .sidebar-guia-link { display:block; margin:0 0 10px; font-size:11px; color:var(--text-3); cursor:pointer; text-decoration:underline; text-underline-offset:3px }
 .sidebar-guia-link:hover { color:var(--brand) }
+
+/* D1: topo da Visão Geral */
+.dash-top-row { display:grid; grid-template-columns: 1.15fr 1fr 1.25fr; gap:14px; margin-bottom:18px }
+@media (max-width: 1100px) { .dash-top-row { grid-template-columns: 1fr 1fr } .dash-alerts { grid-column: 1 / -1 } }
+.dash-mini-lbl { font-size:11px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; color:var(--text-3); margin-bottom:10px; display:flex; justify-content:space-between; gap:8px }
+.dash-vs { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:8px; text-align:center }
+.dash-vs img { width:38px; height:38px; object-fit:contain; display:block; margin:0 auto 4px }
+.dash-vs .nm { font-size:13px; font-weight:600; color:var(--text-1) }
+.dash-vs .mid { font-family:var(--font-mono); font-size:20px; font-weight:700; color:var(--text-1) }
+.dash-sub { font-size:12px; color:var(--text-2); margin-top:10px; text-align:center }
+.form-dots { display:flex; gap:8px; margin:4px 0 10px }
+.form-dot { width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; color:#fff; cursor:default }
+.form-dot.V { background:var(--ok) } .form-dot.E { background:#64748b } .form-dot.D { background:var(--danger) }
+.light .form-dot.V, .light .form-dot.D { color:#fff }
+.form-list { font-size:12px; color:var(--text-2); display:grid; gap:3px }
+.form-list b { font-family:var(--font-mono); color:var(--text-1) }
 </style>
 </head>
 <body>
@@ -1816,13 +1832,11 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
         </div>
         <div class="content">
 
-          <!-- ODS Alinhamento -->
-          <div class="ods-strip">
-            <div style="font-size:11px;color:var(--text-3);font-weight:600;display:flex;align-items:center;gap:6px;margin-right:8px">🌍 ODS</div>
-            <div class="ods-tag" style="background:rgba(220,53,69,.1);color:#f87171">4 <span>Educação</span></div>
-            <div class="ods-tag" style="background:rgba(160,50,50,.1);color:#fca5a5">8 <span>Trabalho</span></div>
-            <div class="ods-tag" style="background:rgba(245,158,11,.1);color:#fbbf24">9 <span>Inovação</span></div>
-            <div class="ods-tag" style="background:rgba(236,72,153,.1);color:#f9a8d4">10 <span>Igualdade</span></div>
+          <!-- D1: topo da Visão Geral — próximo jogo, forma recente e alertas (D2) -->
+          <div class="dash-top-row" id="dash-top-row">
+            <div class="card dash-next" id="dash-next"></div>
+            <div class="card dash-form" id="dash-form"></div>
+            <div class="card dash-alerts" id="dash-alerts"></div>
           </div>
 
           <!-- Insight de Ciência de Dados -->
@@ -1838,33 +1852,6 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
             </div>
           </div>
 
-
-          <!-- Metodologia de Ciência de Dados -->
-          <div class="ds-method">
-            <div class="ds-method-title">📊 Metodologia — Como calculamos o Score</div>
-            <div class="ds-method-grid">
-              <div class="ds-method-item">
-                <div class="ds-method-item-num">6</div>
-                <div class="ds-method-item-lbl">Indicadores</div>
-                <div class="ds-method-item-desc">KPIs por atleta</div>
-              </div>
-              <div class="ds-method-item">
-                <div class="ds-method-item-num">0–100</div>
-                <div class="ds-method-item-lbl">Escala</div>
-                <div class="ds-method-item-desc">Score normalizado</div>
-              </div>
-              <div class="ds-method-item">
-                <div class="ds-method-item-num">W</div>
-                <div class="ds-method-item-lbl">Pesos</div>
-                <div class="ds-method-item-desc">Por posição</div>
-              </div>
-              <div class="ds-method-item">
-                <div class="ds-method-item-num">Σ</div>
-                <div class="ds-method-item-lbl">Agregação</div>
-                <div class="ds-method-item-desc">Média ponderada</div>
-              </div>
-            </div>
-          </div>
 
           <!-- KPIs -->
           <div class="kpi-grid">
@@ -1918,6 +1905,44 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
               <div id="dash-activities"></div>
             </div>
           </div>
+
+          <!-- D1: blocos explicativos vão para o fim da página -->
+          <!-- Metodologia de Ciência de Dados -->
+          <div class="ds-method">
+            <div class="ds-method-title">📊 Metodologia — Como calculamos o Score</div>
+            <div class="ds-method-grid">
+              <div class="ds-method-item">
+                <div class="ds-method-item-num">6</div>
+                <div class="ds-method-item-lbl">Indicadores</div>
+                <div class="ds-method-item-desc">KPIs por atleta</div>
+              </div>
+              <div class="ds-method-item">
+                <div class="ds-method-item-num">0–100</div>
+                <div class="ds-method-item-lbl">Escala</div>
+                <div class="ds-method-item-desc">Score normalizado</div>
+              </div>
+              <div class="ds-method-item">
+                <div class="ds-method-item-num">W</div>
+                <div class="ds-method-item-lbl">Pesos</div>
+                <div class="ds-method-item-desc">Por posição</div>
+              </div>
+              <div class="ds-method-item">
+                <div class="ds-method-item-num">Σ</div>
+                <div class="ds-method-item-lbl">Agregação</div>
+                <div class="ds-method-item-desc">Média ponderada</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ODS Alinhamento -->
+          <div class="ods-strip">
+            <div style="font-size:11px;color:var(--text-3);font-weight:600;display:flex;align-items:center;gap:6px;margin-right:8px">🌍 ODS</div>
+            <div class="ods-tag" style="background:rgba(220,53,69,.1);color:#f87171">4 <span>Educação</span></div>
+            <div class="ods-tag" style="background:rgba(160,50,50,.1);color:#fca5a5">8 <span>Trabalho</span></div>
+            <div class="ods-tag" style="background:rgba(245,158,11,.1);color:#fbbf24">9 <span>Inovação</span></div>
+            <div class="ods-tag" style="background:rgba(236,72,153,.1);color:#f9a8d4">10 <span>Igualdade</span></div>
+          </div>
+
         </div>
       </div>
 
@@ -2932,9 +2957,65 @@ function enterApp() {
   setTimeout(initCharts, 80);
   updateGlobalStats();
   loadApiPlayers();
+  try { renderDashTopRow(); } catch (e) { console.warn('D1', e); }
 }
 
 // ── Atualizar KPIs com dados reais ───────────
+
+// ── D1: topo da Visão Geral (próximo jogo + forma) ────────────────
+function _dashClubBadge(nome) {
+  return (CLUBS[nome] && CLUBS[nome].escudo) || (typeof EXTRA_BADGES !== 'undefined' && EXTRA_BADGES[nome]) || '';
+}
+function _dashResult(m, clube) {
+  var gf = m.home === clube ? m.gh : m.ga, gc = m.home === clube ? m.ga : m.gh;
+  return gf > gc ? 'V' : (gf < gc ? 'D' : 'E');
+}
+function renderDashTopRow() {
+  var nextEl = document.getElementById('dash-next'), formEl = document.getElementById('dash-form');
+  if (!nextEl || !formEl) return;
+  var user = getCurrentUser();
+  var clube = user ? resolveClube(user.clube) : null;
+  if (!clube) { nextEl.innerHTML = formEl.innerHTML = '<div class="dash-mini-lbl">Faça login</div>'; return; }
+  var all = _getClubAllMatches(clube);
+  var played = all.filter(function (m) { return m.gh !== undefined && m.gh !== null && m._date; }).sort(function (a, b) { return b._date - a._date; });
+  var future = all.filter(function (m) { return (m.gh === undefined || m.gh === null) && m._date; }).sort(function (a, b) { return a._date - b._date; });
+  var esc = function (t) { return String(t).replace(/'/g, "\\'"); };
+  function vs(m, mid) {
+    return '<div class="dash-vs">' +
+      '<div><img src="' + _dashClubBadge(m.home) + '" alt="" onerror="this.style.visibility=\'hidden\'"><span class="nm team-link" onclick="showTeam(\'' + esc(m.home) + '\')">' + m.home + '</span></div>' +
+      '<div class="mid">' + mid + '</div>' +
+      '<div><img src="' + _dashClubBadge(m.away) + '" alt="" onerror="this.style.visibility=\'hidden\'"><span class="nm team-link" onclick="showTeam(\'' + esc(m.away) + '\')">' + m.away + '</span></div></div>';
+  }
+  if (future.length) {
+    var n = future[0];
+    var hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+    var dias = Math.round((n._date - hoje) / 86400000);
+    var quando = dias === 0 ? 'hoje' : (dias === 1 ? 'amanhã' : (dias > 1 ? 'em ' + dias + ' dias' : n.data));
+    nextEl.innerHTML = '<div class="dash-mini-lbl"><span>Próximo jogo</span><span>' + (n._comp.nome || '') + '</span></div>' +
+      vs(n, n.hora || 'x') + '<div class="dash-sub">' + n.data + ' · ' + quando + ' · ' + (n.home === clube ? 'em casa' : 'fora') + '</div>';
+  } else if (played.length) {
+    var u = played[0];
+    nextEl.innerHTML = '<div class="dash-mini-lbl"><span>Último jogo</span><span>' + (u._comp.nome || '') + '</span></div>' +
+      vs(u, u.gh + '–' + u.ga) + '<div class="dash-sub">' + u.data + ' · sem próximos jogos cadastrados (temporada encerrada)</div>';
+  } else {
+    nextEl.innerHTML = '<div class="dash-mini-lbl"><span>Próximo jogo</span></div><div class="dash-sub">Nenhum jogo cadastrado para ' + clube + '.</div>';
+  }
+  var last5 = played.slice(0, 5);
+  if (!last5.length) { formEl.innerHTML = '<div class="dash-mini-lbl"><span>Forma recente</span></div><div class="dash-sub">Sem jogos disputados.</div>'; return; }
+  var pts = 0, lista = '';
+  var dots = last5.slice().reverse().map(function (m) {
+    var r = _dashResult(m, clube); pts += r === 'V' ? 3 : (r === 'E' ? 1 : 0);
+    var adv = m.home === clube ? m.away : m.home;
+    return '<div class="form-dot ' + r + '" title="' + m.data + ' · ' + m.home + ' ' + m.gh + '–' + m.ga + ' ' + m.away + '" aria-label="' + (r === 'V' ? 'Vitória' : r === 'E' ? 'Empate' : 'Derrota') + ' contra ' + adv + '">' + r + '</div>';
+  }).join('');
+  last5.slice(0, 3).forEach(function (m) {
+    lista += '<div>' + m.data + ' · ' + m.home + ' <b>' + m.gh + '–' + m.ga + '</b> ' + m.away + '</div>';
+  });
+  var aprov = Math.round(pts / (last5.length * 3) * 100);
+  formEl.innerHTML = '<div class="dash-mini-lbl"><span>Forma — últimos ' + last5.length + ' jogos (recente à direita)</span><span>' + aprov + '% aprov.</span></div>' +
+    '<div class="form-dots">' + dots + '</div><div class="form-list">' + lista + '</div>';
+}
+
 function updateGlobalStats() {
   const totalJogadores = Object.keys(PLAYERS).length;
   const totalClubes = Object.keys(CLUBS).length;
@@ -10350,6 +10431,7 @@ function goTo(screenId, navEl) {
   if (screenId === 'taticas')      renderTaticasScreen();
   if (screenId === 'telestrador')  setTimeout(telInit, 30);
   if (screenId === 'jogadores')    renderVitrineJogadores();
+  if (screenId === 'dashboard')    { try { renderDashTopRow(); renderDashAlerts && renderDashAlerts(); } catch (e) { console.warn('dash', e); } }
 }
 function switchTab(e, paneId) {
   const nav = e.target.closest('.tab-nav');
