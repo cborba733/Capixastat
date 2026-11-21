@@ -13380,7 +13380,7 @@ function goTo(screenId, navEl) {
     setTimeout(initPerfilCharts, 60);
   }
   if (screenId === 'estatisticas') { setTimeout(initEstatCharts, 60); renderEstatRankings(); }
-  if (screenId === 'ranking')      renderEstatRankings();
+  if (screenId === 'ranking')      { renderEstatRankings(); try { renderRankingScreen(); } catch (e) { console.warn('ranking', e); } } // revisão: v4 só desenhava o ranking após clicar numa aba
   if (screenId === 'comparativo')  setTimeout(renderComparativo, 60);
   if (screenId === 'formacao')     { initEvolucaoDropdown(); setTimeout(initFormCharts, 60); }
   if (screenId === 'partidas')     { showMatchList(); renderMatchList(); try { if (CS_CTX.comp && document.getElementById('ptab-' + CS_CTX.comp)) setPartidaCompFilter(CS_CTX.comp); } catch (e) {} renderFontesExternas(); }
