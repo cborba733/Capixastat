@@ -524,6 +524,13 @@ item, testar sem erro no console, atualizar este arquivo).
   o histórico do GitHub) e enviados **sem force push**. Inclui `backup/`; `.env` não existe nem é rastreado (`.gitignore`).
   Existe um PR #1 antigo aberto no GitHub (não mexido). Daqui em diante: `git push` normal ao fim de cada bloco.
 
+- **R2-3 Sem emojis:** todos os emojis/pictogramas da interface (menu, KPIs, abas da Formação, cadastro, pódio, alertas,
+  Auxiliar Tático, Dossiê, linha do tempo, botões de mídia, tema claro/escuro, menu de celular) trocados por ícones
+  **Lucide** (https://lucide.dev, licença ISC) embutidos: mapa `CS_ICONES` + `ico(nome, classe)` e classe `.cs-ico`
+  (1em, traço 2, `currentColor`) — mesmo estilo e tamanho em todas as telas. Varredura das 17 telas + Dossiê + menu:
+  0 emojis renderizados. Sobraram só ★ em comentários do CSS e ✓ num `console.log` (não aparecem para o usuário).
+  As exportações (PNG, PDF, vídeo) não tinham emojis.
+
 ## Trabalhos futuros
 O que ficou de fora ou só parcialmente feito, em ordem de valor:
 - **Visão computacional em vídeo real:** V1/V2/V3 foram testados com dados sintéticos e um YOLO falso (sem GPU nem

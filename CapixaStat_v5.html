@@ -2089,6 +2089,14 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .lib-modal { width:960px }
 .lib-head { display:flex; align-items:center; justify-content:space-between }
 .lib-head h2 { margin:0 }
+
+/* R2-3: ícones (Lucide) — mesmo traço e tamanho em todo o sistema */
+.cs-ico { width:1.05em; height:1.05em; flex:none; display:inline-block; vertical-align:-0.16em; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round }
+.cs-ico.fill { fill:currentColor }
+.cs-ico.ouro { color:#facc15 } .cs-ico.prata { color:#cbd5e1 } .cs-ico.bronze { color:#d97706 }
+.cs-ico.amarelo { color:#facc15; fill:#facc15 } .cs-ico.vermelho { color:#ef4444; fill:#ef4444 }
+.kpi-icon .cs-ico, .insight-icon .cs-ico { width:22px; height:22px }
+.podium-medal .cs-ico { width:26px; height:26px }
 </style>
 </head>
 <body>
@@ -2293,7 +2301,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
         <div onclick="obStart()" style="margin-top:8px;padding:6px 12px;font-size:12px;color:var(--text-3);cursor:pointer;text-align:center;border-radius:6px;border:1px solid rgba(255,255,255,0.07)" title="Escolher clube e função de novo (L4)">Rever apresentação</div>
         <div onclick="logout()" style="margin-top:8px;padding:6px 12px;font-size:12px;color:var(--text-3);cursor:pointer;text-align:center;border-radius:6px;border:1px solid rgba(255,255,255,0.07)" onmouseover="this.style.color='#f87171'" onmouseout="this.style.color='var(--text-3)'">Sair da conta</div>
         <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="toggleTheme()">
-          <span id="theme-icon">🌙</span><span id="theme-lbl">Tema Claro</span>
+          <span id="theme-icon"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span><span id="theme-lbl">Tema Claro</span>
         </button>
       </div>
     </nav>
@@ -2323,7 +2331,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 
           <!-- Insight de Ciência de Dados -->
           <div class="insight-strip">
-            <div class="insight-icon">🧠</div>
+            <div class="insight-icon"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg></div>
             <div>
               <div class="insight-label"><span class="badge badge-ds">Ciência de Dados</span> Insight Automático</div>
               <div class="insight-text" id="dash-insight-text">Faça login para ver o insight do seu elenco.</div>
@@ -2339,25 +2347,25 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
           <!-- KPIs -->
           <div class="kpi-grid">
             <div class="kpi-card" style="--accent:var(--green)">
-              <div class="kpi-icon">👤</div>
+              <div class="kpi-icon"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
               <div class="kpi-label">Jogadores Cadastrados</div>
               <div class="kpi-value" id="dash-kpi-jogadores">—</div>
               <div class="kpi-delta" id="dash-kpi-jogadores-delta"></div>
             </div>
             <div class="kpi-card" style="--accent:var(--blue)">
-              <div class="kpi-icon">⚽</div>
+              <div class="kpi-icon"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 13V2l8 4-8 4"/><path d="M20.56 10.22a9 9 0 1 1-12.55-5.29"/><path d="M8 10a5 5 0 1 0 8.9 2.02"/></svg></div>
               <div class="kpi-label">Partidas Registradas</div>
               <div class="kpi-value" id="dash-kpi-partidas">—</div>
               <div class="kpi-delta" id="dash-kpi-partidas-delta"></div>
             </div>
             <div class="kpi-card" style="--accent:var(--amber)">
-              <div class="kpi-icon">📊</div>
+              <div class="kpi-icon"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></div>
               <div class="kpi-label">Média Gols / Partida</div>
               <div class="kpi-value" id="dash-kpi-media">—</div>
               <div class="kpi-delta" id="dash-kpi-media-delta"></div>
             </div>
             <div class="kpi-card" style="--accent:var(--purple)">
-              <div class="kpi-icon">🏆</div>
+              <div class="kpi-icon"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg></div>
               <div class="kpi-label">Clubes na Plataforma</div>
               <div class="kpi-value" id="dash-kpi-clubes">—</div>
               <div class="kpi-delta" id="dash-kpi-clubes-delta"></div>
@@ -2394,7 +2402,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
           <!-- D1: blocos explicativos vão para o fim da página -->
           <!-- Metodologia de Ciência de Dados -->
           <div class="ds-method">
-            <div class="ds-method-title">📊 Metodologia — Como calculamos o Score</div>
+            <div class="ds-method-title"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> Metodologia — Como calculamos o Score</div>
             <div class="ds-method-grid">
               <div class="ds-method-item">
                 <div class="ds-method-item-num">6</div>
@@ -2421,7 +2429,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 
           <!-- ODS Alinhamento -->
           <div class="ods-strip">
-            <div style="font-size:12px;color:var(--text-3);font-weight:600;display:flex;align-items:center;gap:6px;margin-right:8px">🌍 ODS</div>
+            <div style="font-size:12px;color:var(--text-3);font-weight:600;display:flex;align-items:center;gap:6px;margin-right:8px"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg> ODS</div>
             <div class="ods-tag" style="background:rgba(220,53,69,.1);color:#f87171">4 <span>Educação</span></div>
             <div class="ods-tag" style="background:rgba(160,50,50,.1);color:#fca5a5">8 <span>Trabalho</span></div>
             <div class="ods-tag" style="background:rgba(245,158,11,.1);color:#fbbf24">9 <span>Inovação</span></div>
@@ -2443,7 +2451,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
             <div class="vf-scope" role="group" aria-label="Escopo da busca">
               <button id="vf-scope-elenco" class="vf-seg active" onclick="vfSetScope('elenco')">Meu elenco</button>
               <button id="vf-scope-base" class="vf-seg" onclick="vfSetScope('base')">Toda a base</button>
-              <button id="vf-scope-obs" class="vf-seg" onclick="vfSetScope('obs')">★ Observados <span id="vf-obs-n"></span></button>
+              <button id="vf-scope-obs" class="vf-seg" onclick="vfSetScope('obs')"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Observados <span id="vf-obs-n"></span></button>
             </div>
             <input id="vitrine-busca" class="search-input" placeholder="Buscar por nome..." oninput="renderVitrineJogadores()" aria-label="Buscar atleta por nome">
             <select id="vitrine-pos" class="form-select" onchange="renderVitrineJogadores()" aria-label="Posição"><option value="">Todas as posições</option><option>Goleiro</option><option>Zagueiro</option><option>Lateral</option><option>Volante</option><option>Meia</option><option>Atacante</option></select>
@@ -2491,9 +2499,9 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
         <div class="content" style="max-width:800px">
           <div class="card mb-20">
             <div class="cadastro-section">
-              <div class="cadastro-section-title">📷 Foto do Atleta</div>
+              <div class="cadastro-section-title"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg> Foto do Atleta</div>
               <label class="photo-upload" id="cad-photo-label" style="cursor:pointer;overflow:hidden">
-                <span id="cad-photo-icon" style="font-size:24px;color:var(--text-3)">📷</span>
+                <span id="cad-photo-icon" style="font-size:24px;color:var(--text-3)"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></span>
                 <small style="font-size:11px;color:var(--text-3);margin-top:4px">Upload foto</small>
                 <input type="file" id="cad-photo-input" accept="image/*" style="display:none" onchange="_onCadPhotoChange(event)">
               </label>
@@ -2502,7 +2510,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 
           <div class="card mb-20">
             <div class="cadastro-section">
-              <div class="cadastro-section-title">👤 Dados Pessoais</div>
+              <div class="cadastro-section-title"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Dados Pessoais</div>
               <div class="form-row">
                 <div class="form-group"><label class="form-label">Nome completo</label><input id="cad-nome" class="form-input" placeholder="Ex: Felipe Gomes da Silva"></div>
                 <div class="form-group"><label class="form-label">Data de nascimento</label><input class="form-input" type="date"></div>
@@ -2517,7 +2525,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 
           <div class="card mb-20">
             <div class="cadastro-section">
-              <div class="cadastro-section-title">⚽ Dados Esportivos</div>
+              <div class="cadastro-section-title"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 13V2l8 4-8 4"/><path d="M20.56 10.22a9 9 0 1 1-12.55-5.29"/><path d="M8 10a5 5 0 1 0 8.9 2.02"/></svg> Dados Esportivos</div>
               <div class="form-row">
                 <div class="form-group"><label class="form-label">Clube atual</label>
                   <select id="cad-clube" class="form-select"><option value="">Selecione o clube</option><option value="Porto Vitória">Porto Vitória</option><option value="Serra FC">Serra FC</option><option value="Vitória ES">Vitória ES</option><option value="Rio Branco ES">Rio Branco ES</option><option value="Vilavelhense">Vilavelhense</option><option value="Desportiva Ferroviária">Desportiva Ferroviária</option><option value="Real Noroeste">Real Noroeste</option><option value="Forte FC">Forte FC</option><option value="Capixaba SC">Capixaba SC</option><option value="Rio Branco-VN">Rio Branco-VN</option><option value="Outro">Outro</option></select>
@@ -2535,7 +2543,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
                   <select class="form-select"><option>Profissional</option><option>Sub-20</option><option>Sub-17</option><option>Sub-15</option></select>
                 </div>
               </div>
-              <div class="cadastro-section-title" style="margin-top:8px">📊 Estatísticas da Temporada</div>
+              <div class="cadastro-section-title" style="margin-top:8px"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> Estatísticas da Temporada</div>
               <div class="form-row">
                 <div class="form-group"><label class="form-label">Jogos na temporada</label><input id="cad-jogos" class="form-input" type="number" min="0" placeholder="0"></div>
                 <div class="form-group"><label class="form-label">Gols</label><input id="cad-gols" class="form-input" type="number" min="0" placeholder="0"></div>
@@ -2724,7 +2732,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
             <!-- ★ BLOCO POC VISÃO COMPUTACIONAL (IA) — DINÂMICO -->
             <div class="ai-poc-card">
               <div class="ai-poc-header">
-                <span style="font-size:18px">🧠</span>
+                <span style="font-size:18px"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.94 15.5A2 2 0 0 0 8.5 14.06l-6.14-1.58a.5.5 0 0 1 0-.96L8.5 9.94A2 2 0 0 0 9.94 8.5l1.58-6.14a.5.5 0 0 1 .96 0L14.06 8.5A2 2 0 0 0 15.5 9.94l6.14 1.58a.5.5 0 0 1 0 .96L15.5 14.06a2 2 0 0 0-1.44 1.44l-1.58 6.14a.5.5 0 0 1-.96 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/></svg></span>
                 <h3>Inteligência Artificial — Visão Computacional (POC)</h3>
                 <span class="badge badge-ds" style="margin-left:auto">YOLOv8 · Deep Learning</span>
               </div>
@@ -2989,12 +2997,12 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
         </div>
         <div class="content">
           <div class="form-tabs">
-            <button class="form-tab active" onclick="switchFormTab('microciclo',this)">📅 Microciclo</button>
-            <button class="form-tab" onclick="switchFormTab('sessoes',this)">📋 Sessões</button>
-            <button class="form-tab" onclick="switchFormTab('carga',this)">📊 Carga &amp; Intensidade</button>
-            <button class="form-tab" onclick="switchFormTab('registro',this)">📝 Registro diário</button>
-            <button class="form-tab" onclick="switchFormTab('fisico',this)">🏃 Evolução Física</button>
-            <button class="form-tab" onclick="switchFormTab('antropometria',this)">🫀 Antropometria</button>
+            <button class="form-tab active" onclick="switchFormTab('microciclo',this)"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg> Microciclo</button>
+            <button class="form-tab" onclick="switchFormTab('sessoes',this)"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg> Sessões</button>
+            <button class="form-tab" onclick="switchFormTab('carga',this)"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> Carga &amp; Intensidade</button>
+            <button class="form-tab" onclick="switchFormTab('registro',this)"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> Registro diário</button>
+            <button class="form-tab" onclick="switchFormTab('fisico',this)"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Evolução Física</button>
+            <button class="form-tab" onclick="switchFormTab('antropometria',this)"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></svg> Antropometria</button>
           </div>
           <div class="form-tab-panel active" id="ftab-microciclo"></div>
           <div class="form-tab-panel" id="ftab-sessoes"></div>
@@ -3206,7 +3214,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
             <label>Atleta<select id="sc-atleta" class="form-select"></select></label>
             <div class="sc-clock">
               <span class="sc-time" id="sc-time" aria-live="off">00:00</span>
-              <button class="btn btn-ghost btn-sm" id="sc-clock-btn" onclick="scClockToggle()">▶ Iniciar 1º tempo</button>
+              <button class="btn btn-ghost btn-sm" id="sc-clock-btn" onclick="scClockToggle()"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg> Iniciar 1º tempo</button>
               <label class="sim-chk">Minuto manual <input id="sc-min" type="number" min="0" max="130" class="form-input" style="width:70px" placeholder="auto"></label>
             </div>
           </div>
@@ -3215,7 +3223,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
               <div class="sc-tipos" role="group" aria-label="Tipo de ação" id="sc-tipos"></div>
               <div class="sc-res" role="group" aria-label="Resultado" id="sc-res"></div>
               <div class="sc-pitch-wrap">
-                <div class="sc-dir">Ataque do seu clube ➜</div>
+                <div class="sc-dir">Ataque do seu clube <svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
                 <svg id="sc-svg" viewBox="-3 -3 111 74" role="img" aria-label="Campo: clique onde a ação aconteceu"></svg>
               </div>
               <div class="cs-metric"><b class="cs-metric-tag">Como usar</b><span>Escolha o atleta, o tipo e o resultado e <b>clique no campo</b> onde a ação aconteceu. O minuto vem do relógio (ou do campo "minuto manual"). <b>Ctrl+Z</b> desfaz a última marcação.</span></div>
@@ -3253,9 +3261,9 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
             </div>
             <div class="sim-bar card">
               <div class="sim-row">
-                <button class="sim-ctl" onclick="simGo(0)" title="Primeiro quadro" aria-label="Primeiro quadro">⏮</button>
-                <button class="sim-ctl play" id="sim-play" onclick="simPlay()" title="Reproduzir" aria-label="Reproduzir">▶</button>
-                <button class="sim-ctl" onclick="simGo(SIM.cur + 1)" title="Próximo quadro" aria-label="Próximo quadro">⏭</button>
+                <button class="sim-ctl" onclick="simGo(0)" title="Primeiro quadro" aria-label="Primeiro quadro"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" x2="5" y1="19" y2="5"/></svg></button>
+                <button class="sim-ctl play" id="sim-play" onclick="simPlay()" title="Reproduzir" aria-label="Reproduzir"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg></button>
+                <button class="sim-ctl" onclick="simGo(SIM.cur + 1)" title="Próximo quadro" aria-label="Próximo quadro"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" x2="19" y1="5" y2="19"/></svg></button>
                 <div class="sim-frames" id="sim-frames" role="tablist" aria-label="Quadros"></div>
                 <button class="btn btn-ghost btn-sm" onclick="simAddFrame()">+ Quadro</button>
                 <span class="sim-spacer"></span>
@@ -3273,7 +3281,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
                 <button class="btn btn-ghost btn-sm" onclick="simDelFrame()">Excluir quadro</button>
               </div>
               <div id="sim-comp-out" class="comp-out" hidden></div>
-              <div class="cs-metric"><b class="cs-metric-tag">Como usar</b><span>Arraste jogadores e bola para montar o Q1. Clique em <b>+ Quadro</b> (copia as posições), mova quem se desloca e escreva a legenda. <b>▶</b> anima de um quadro para o outro. Azul = seu clube, laranja = adversário.</span></div>
+              <div class="cs-metric"><b class="cs-metric-tag">Como usar</b><span>Arraste jogadores e bola para montar o Q1. Clique em <b>+ Quadro</b> (copia as posições), mova quem se desloca e escreva a legenda. <b>Reproduzir</b> anima de um quadro para o outro. Azul = seu clube, laranja = adversário.</span></div>
             </div>
             <div class="card sim-lib" id="sim-lib"></div>
           </div>
@@ -3462,6 +3470,9 @@ async function apiCall(endpoint, options = {}) {
 function setCurrentUser(user) {
   localStorage.setItem('capixastat_current', JSON.stringify(user));
 }
+// ── R2-3: ícones Lucide (https://lucide.dev, licença ISC) — substituem os emojis em todo o sistema ──
+var CS_ICONES = {"moon": "<path d=\"M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z\"/>", "sun": "<circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2\"/><path d=\"M12 20v2\"/><path d=\"m4.93 4.93 1.41 1.41\"/><path d=\"m17.66 17.66 1.41 1.41\"/><path d=\"M2 12h2\"/><path d=\"M20 12h2\"/><path d=\"m6.34 17.66-1.41 1.41\"/><path d=\"m19.07 4.93-1.41 1.41\"/>", "lightbulb": "<path d=\"M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5\"/><path d=\"M9 18h6\"/><path d=\"M10 22h4\"/>", "sparkles": "<path d=\"M9.94 15.5A2 2 0 0 0 8.5 14.06l-6.14-1.58a.5.5 0 0 1 0-.96L8.5 9.94A2 2 0 0 0 9.94 8.5l1.58-6.14a.5.5 0 0 1 .96 0L14.06 8.5A2 2 0 0 0 15.5 9.94l6.14 1.58a.5.5 0 0 1 0 .96L15.5 14.06a2 2 0 0 0-1.44 1.44l-1.58 6.14a.5.5 0 0 1-.96 0z\"/><path d=\"M20 3v4\"/><path d=\"M22 5h-4\"/>", "user": "<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\"/><circle cx=\"12\" cy=\"7\" r=\"4\"/>", "goal": "<path d=\"M12 13V2l8 4-8 4\"/><path d=\"M20.56 10.22a9 9 0 1 1-12.55-5.29\"/><path d=\"M8 10a5 5 0 1 0 8.9 2.02\"/>", "chart": "<path d=\"M3 3v18h18\"/><path d=\"M18 17V9\"/><path d=\"M13 17V5\"/><path d=\"M8 17v-3\"/>", "trophy": "<path d=\"M6 9H4.5a2.5 2.5 0 0 1 0-5H6\"/><path d=\"M18 9h1.5a2.5 2.5 0 0 0 0-5H18\"/><path d=\"M4 22h16\"/><path d=\"M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22\"/><path d=\"M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22\"/><path d=\"M18 2H6v7a6 6 0 0 0 12 0V2Z\"/>", "globe": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20\"/><path d=\"M2 12h20\"/>", "star": "<polygon points=\"12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2\"/>", "camera": "<path d=\"M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z\"/><circle cx=\"12\" cy=\"13\" r=\"3\"/>", "calendar": "<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"/><path d=\"M16 2v4\"/><path d=\"M8 2v4\"/><path d=\"M3 10h18\"/>", "clipboard": "<rect x=\"8\" y=\"2\" width=\"8\" height=\"4\" rx=\"1\"/><path d=\"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2\"/><path d=\"M12 11h4\"/><path d=\"M12 16h4\"/><path d=\"M8 11h.01\"/><path d=\"M8 16h.01\"/>", "pencil": "<path d=\"M12 20h9\"/><path d=\"M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z\"/>", "activity": "<path d=\"M22 12h-4l-3 9L9 3l-3 9H2\"/>", "ruler": "<path d=\"M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z\"/><path d=\"m14.5 12.5 2-2\"/><path d=\"m11.5 9.5 2-2\"/><path d=\"m8.5 6.5 2-2\"/><path d=\"m17.5 15.5 2-2\"/>", "play": "<polygon points=\"6 3 20 12 6 21 6 3\"/>", "pause": "<rect x=\"6\" y=\"4\" width=\"4\" height=\"16\" rx=\"1\"/><rect x=\"14\" y=\"4\" width=\"4\" height=\"16\" rx=\"1\"/>", "skip-back": "<polygon points=\"19 20 9 12 19 4 19 20\"/><line x1=\"5\" x2=\"5\" y1=\"19\" y2=\"5\"/>", "skip-forward": "<polygon points=\"5 4 15 12 5 20 5 4\"/><line x1=\"19\" x2=\"19\" y1=\"5\" y2=\"19\"/>", "arrow-right": "<path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/>", "check-circle": "<path d=\"M22 11.08V12a10 10 0 1 1-5.93-9.14\"/><path d=\"m9 11 3 3L22 4\"/>", "check": "<path d=\"M20 6 9 17l-5-5\"/>", "menu": "<line x1=\"4\" x2=\"20\" y1=\"12\" y2=\"12\"/><line x1=\"4\" x2=\"20\" y1=\"6\" y2=\"6\"/><line x1=\"4\" x2=\"20\" y1=\"18\" y2=\"18\"/>", "x": "<path d=\"M18 6 6 18\"/><path d=\"m6 6 12 12\"/>", "chevron-right": "<path d=\"m9 18 6-6-6-6\"/>", "chevron-down": "<path d=\"m6 9 6 6 6-6\"/>", "award": "<circle cx=\"12\" cy=\"8\" r=\"6\"/><path d=\"M15.48 12.89 17 22l-5-3-5 3 1.52-9.11\"/>", "cross": "<path d=\"M4 9a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h4a1 1 0 0 1 1 1v4a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-4a1 1 0 0 1 1-1h4a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-4a1 1 0 0 1-1-1V4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4a1 1 0 0 1-1 1z\"/>", "save": "<path d=\"M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z\"/><polyline points=\"17 21 17 13 7 13 7 21\"/><polyline points=\"7 3 7 8 15 8\"/>", "trash": "<path d=\"M3 6h18\"/><path d=\"M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6\"/><path d=\"M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2\"/>", "shield": "<path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\"/>", "zap": "<path d=\"M13 2 3 14h9l-1 8 10-12h-9l1-8z\"/>", "alert": "<path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3\"/><path d=\"M12 9v4\"/><path d=\"M12 17h.01\"/>", "settings": "<path d=\"M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/>", "send": "<path d=\"m22 2-7 20-4-9-9-4Z\"/><path d=\"M22 2 11 13\"/>", "download": "<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><polyline points=\"7 10 12 15 17 10\"/><line x1=\"12\" x2=\"12\" y1=\"15\" y2=\"3\"/>", "flame": "<path d=\"M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z\"/>", "briefcase": "<rect width=\"20\" height=\"14\" x=\"2\" y=\"7\" rx=\"2\"/><path d=\"M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16\"/>", "map-pin": "<path d=\"M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/>", "card": "<rect width=\"12\" height=\"18\" x=\"6\" y=\"3\" rx=\"2\"/>"};
+function ico(n, cls) { return '<svg class="cs-ico' + (cls ? ' ' + cls : '') + '" viewBox="0 0 24 24" aria-hidden="true">' + (CS_ICONES[n] || '') + '</svg>'; }
 function getCurrentUser() {
   return JSON.parse(localStorage.getItem('capixastat_current') || 'null');
 }
@@ -3603,7 +3614,7 @@ async function handleRegister() {
       return;
     }
 
-    msgBox.textContent = '✅ Conta criada com sucesso! Redirecionando para o login...';
+    msgBox.textContent = 'Conta criada com sucesso! Redirecionando para o login...';
     msgBox.style.background = 'rgba(34,197,94,.1)';
     msgBox.style.border = '1px solid rgba(34,197,94,.2)';
     msgBox.style.color = '#86efac';
@@ -3823,11 +3834,11 @@ function csClubPlayers() {
   function init() {
     if (document.querySelector('.cs-hamb')) return;
     var b = document.createElement('button');
-    b.className = 'cs-hamb'; b.type = 'button'; b.setAttribute('aria-label', 'Abrir menu'); b.setAttribute('aria-expanded', 'false'); b.textContent = '☰';
+    b.className = 'cs-hamb'; b.type = 'button'; b.setAttribute('aria-label', 'Abrir menu'); b.setAttribute('aria-expanded', 'false'); b.innerHTML = ico('menu');
     var scrim = document.createElement('div'); scrim.className = 'cs-nav-scrim';
     var toggle = function (open) {
       document.body.classList.toggle('nav-open', open);
-      b.setAttribute('aria-expanded', String(open)); b.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu'); b.textContent = open ? '✕' : '☰';
+      b.setAttribute('aria-expanded', String(open)); b.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu'); b.innerHTML = ico(open ? 'x' : 'menu');
     };
     b.addEventListener('click', function () { toggle(!document.body.classList.contains('nav-open')); });
     scrim.addEventListener('click', function () { toggle(false); });
@@ -4274,10 +4285,10 @@ function scClockToggle() {
   var c = SC.clock, b = document.getElementById('sc-clock-btn');
   if (c.run) {
     c.acc += Date.now() - c.t0; c.run = false; clearInterval(c.timer);
-    if (c.tempo === 1) { b.textContent = '▶ Iniciar 2º tempo'; c.tempo = 2; c.acc = 0; } else b.textContent = '▶ Retomar';
+    if (c.tempo === 1) { b.innerHTML = ico('play') + ' Iniciar 2º tempo'; c.tempo = 2; c.acc = 0; } else b.innerHTML = ico('play') + ' Retomar';
   } else {
     c.t0 = Date.now(); c.run = true; c.timer = setInterval(scClockTick, 500);
-    b.textContent = '⏸ Pausar / fim do ' + (c.tempo === 1 ? '1º' : '2º') + ' tempo';
+    b.innerHTML = ico('pause') + ' Pausar / fim do ' + (c.tempo === 1 ? '1º' : '2º') + ' tempo';
   }
   scClockTick();
 }
@@ -4333,7 +4344,7 @@ function scRender() {
   renderShotMap(evs);
   try { renderMomentum(evs); } catch (e) { console.warn('P6', e); }
   document.getElementById('sc-lista').innerHTML = evs.slice().reverse().slice(0, 12).map(function (e) {
-    return '<div class="sc-item"><span class="tl2-min">' + e.minuto + "'</span><i style=\"background:" + (SC_COR[e.resultado] || '#fff') + '"></i><span>' + ((PLAYERS[e.atletaId] || {}).nome || e.atletaId) + ' · ' + SC_TIPOS[e.tipo].l + ' · ' + (SC_RES_L[e.resultado] || '') + '</span><button class="btn btn-ghost btn-sm" onclick="scDel(\'' + e.id + '\')" aria-label="Excluir marcação">✕</button></div>';
+    return '<div class="sc-item"><span class="tl2-min">' + e.minuto + "'</span><i style=\"background:" + (SC_COR[e.resultado] || '#fff') + '"></i><span>' + ((PLAYERS[e.atletaId] || {}).nome || e.atletaId) + ' · ' + SC_TIPOS[e.tipo].l + ' · ' + (SC_RES_L[e.resultado] || '') + '</span><button class="btn btn-ghost btn-sm" onclick="scDel(\'' + e.id + '\')" aria-label="Excluir marcação">' + ico('x') + '</button></div>';
   }).join('') || '<div class="tl2-empty">Clique no campo para marcar a primeira ação.</div>';
 }
 function scDel(id) { if (!csPode('eventos:write')) return; CSStore.remove('eventos', id); scRender(); }
@@ -4503,12 +4514,12 @@ function simDupFrame() { var f = simCopy(SIM.frames[SIM.cur]); f.caption = SIM.f
 function simDelFrame() { if (SIM.frames.length < 2) { csToast('O lance precisa de pelo menos um quadro'); return; } SIM.frames.splice(SIM.cur, 1); SIM.cur = Math.max(0, SIM.cur - 1); simRender(); }
 function simSetCaption(v) { SIM.frames[SIM.cur].caption = v; simCheckEditado(); var cv = document.getElementById('sim-caption-view'); cv.textContent = (SIM.frames.length > 1 ? 'Q' + (SIM.cur + 1) + ' · ' : '') + v; cv.style.display = 'block'; }
 function simSpeed(v) { SIM.speed = v; document.querySelectorAll('[data-sp]').forEach(function (b) { b.classList.toggle('active', +b.getAttribute('data-sp') === v); }); }
-function simStop() { SIM.playing = false; cancelAnimationFrame(SIM.raf); var b = document.getElementById('sim-play'); if (b) { b.textContent = '▶'; b.setAttribute('aria-label', 'Reproduzir'); } }
+function simStop() { SIM.playing = false; cancelAnimationFrame(SIM.raf); var b = document.getElementById('sim-play'); if (b) { b.innerHTML = ico('play'); b.setAttribute('aria-label', 'Reproduzir'); } }
 function simPlay() {
   if (SIM.playing) { simStop(); simRender(); return; }
   if (SIM.frames.length < 2) { csToast('Adicione pelo menos 2 quadros para animar'); return; }
   SIM.playing = true;
-  var b = document.getElementById('sim-play'); b.textContent = '⏸'; b.setAttribute('aria-label', 'Pausar');
+  var b = document.getElementById('sim-play'); b.innerHTML = ico('pause'); b.setAttribute('aria-label', 'Pausar');
   if (SIM.cur >= SIM.frames.length - 1) SIM.cur = 0;
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var from = SIM.cur, t0 = null, dur = 1100 / SIM.speed, hold = 650 / SIM.speed;
@@ -6597,7 +6608,7 @@ function renderProfileAvatar(el, p) {
   var btn = document.createElement('button');
   btn.type = 'button';
   btn.title = 'Enviar ou trocar a foto deste atleta';
-  btn.textContent = '📷';
+  btn.innerHTML = ico('camera');
   btn.style.cssText = 'position:absolute;right:-2px;bottom:-2px;width:28px;height:28px;border-radius:50%;border:2px solid var(--bg-card,#11161d);background:var(--green,#22c55e);color:#06281a;font-size:13px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;box-shadow:0 1px 5px rgba(0,0,0,.55);z-index:3';
   btn.onclick = function (e) { e.stopPropagation(); triggerPhotoUpload(p.id); };
   el.appendChild(btn);
@@ -6711,7 +6722,7 @@ function _resetCadPhoto() {
   var label = document.getElementById('cad-photo-label');
   if (label) label.style.backgroundImage = '';
   var icon = document.getElementById('cad-photo-icon');
-  if (icon) icon.textContent = '📷';
+  if (icon) icon.innerHTML = ico('camera');
   var inp = document.getElementById('cad-photo-input');
   if (inp) inp.value = '';
 }
@@ -12312,7 +12323,7 @@ function openJogoDetail(cacheKey, idx) {
       if (ev.type === 'goal') {
         kind = 'goal';
         var tag = ev.ownGoal ? ' (contra)' : (ev.penalty ? ' (pênalti)' : '');
-        icon = '<span class="tl2-ico goal" aria-hidden="true">⚽</span>';
+        icon = '<span class="tl2-ico goal" aria-hidden="true">' + ico('goal') + '</span>';
         label = '<span class="tl2-name">' + ev.player + tag + '</span><span class="tl2-score">' + ev.scoreH + '–' + ev.scoreA + '</span>';
       } else if (ev.type === 'card') {
         kind = ev.cardType === 'yellow' ? 'yellow' : 'red';
@@ -12332,7 +12343,7 @@ function openJogoDetail(cacheKey, idx) {
         '<span class="tl2-team">' + sig + '</span></div>';
     });
     if (tlHtml) tlHtml += '<div class="tl2-sep end"><span>Fim · ' + j.gh + '–' + j.ga + '</span></div>' +
-      '<div class="tl2-legend"><span><i style="display:inline-block;width:10px;height:10px;background:var(--data-1);border-radius:2px"></i> ' + j.home + '</span><span><i style="display:inline-block;width:10px;height:10px;background:var(--data-2);border-radius:2px"></i> ' + j.away + '</span><span><span class="tl2-ico goal">⚽</span> gol</span><span><span class="tl2-card yellow"></span> amarelo</span><span><span class="tl2-card red"></span> vermelho</span><span><span class="tl2-ico sub">⇄</span> substituição</span><span class="cs-src real">Dado real</span></div>';
+      '<div class="tl2-legend"><span><i style="display:inline-block;width:10px;height:10px;background:var(--data-1);border-radius:2px"></i> ' + j.home + '</span><span><i style="display:inline-block;width:10px;height:10px;background:var(--data-2);border-radius:2px"></i> ' + j.away + '</span><span><span class="tl2-ico goal">' + ico('goal') + '</span> gol</span><span><span class="tl2-card yellow"></span> amarelo</span><span><span class="tl2-card red"></span> vermelho</span><span><span class="tl2-ico sub">⇄</span> substituição</span><span class="cs-src real">Dado real</span></div>';
     if (!tlHtml) tlHtml = '<div class="tl2-empty">Sem eventos registrados</div>';
   } else {
     tlHtml = '<div class="tl2-empty">Eventos não disponíveis para esta partida na fonte de dados.</div>';
@@ -12730,7 +12741,7 @@ function renderRankingScreen() {
     if (playersArr[1]) {
       const p = playersArr[1];
       html += '<div class="podium-card p2">' +
-        '<div class="podium-medal">🥈</div><div class="podium-pos p2">2º lugar</div>' +
+        '<div class="podium-medal">' + ico('award', 'prata') + '</div><div class="podium-pos p2">2º lugar</div>' +
         '<div class="podium-av" style="background:rgba(56,189,248,.1);color:var(--blue);overflow:hidden">' + playerAvatarInner(p, 48) + '</div>' +
         '<div class="podium-name">' + p.nome + '</div><div class="podium-club">' + p.clube + ' · ' + p.pos + '</div>' +
         '<div class="podium-score">' + getPodiumLabel(p) + '</div></div>';
@@ -12739,7 +12750,7 @@ function renderRankingScreen() {
     if (playersArr[0]) {
       const p = playersArr[0];
       html += '<div class="podium-card p1">' +
-        '<div class="podium-medal">🥇</div><div class="podium-pos p1">1º lugar</div>' +
+        '<div class="podium-medal">' + ico('award', 'ouro') + '</div><div class="podium-pos p1">1º lugar</div>' +
         '<div class="podium-av" style="background:rgba(34,197,94,.12);color:var(--green);border:2px solid var(--green);overflow:hidden">' + playerAvatarInner(p, 56) + '</div>' +
         '<div class="podium-name">' + p.nome + '</div><div class="podium-club">' + p.clube + ' · ' + p.pos + '</div>' +
         '<div class="podium-score">' + getPodiumLabel(p) + '</div></div>';
@@ -12748,7 +12759,7 @@ function renderRankingScreen() {
     if (playersArr[2]) {
       const p = playersArr[2];
       html += '<div class="podium-card p3">' +
-        '<div class="podium-medal">🥉</div><div class="podium-pos p3">3º lugar</div>' +
+        '<div class="podium-medal">' + ico('award', 'bronze') + '</div><div class="podium-pos p3">3º lugar</div>' +
         '<div class="podium-av" style="background:rgba(248,113,113,.1);color:var(--red);overflow:hidden">' + playerAvatarInner(p, 48) + '</div>' +
         '<div class="podium-name">' + p.nome + '</div><div class="podium-club">' + p.clube + ' · ' + p.pos + '</div>' +
         '<div class="podium-score">' + getPodiumLabel(p) + '</div></div>';
@@ -12879,7 +12890,7 @@ function playerStatusIcons(p) {
   var out = '';
   var c = (typeof playerCondition === 'function') ? playerCondition(p) : null;
   var origem = c && c.est ? ' (estimado)' : ' (registro real)';
-  if (c && c.status === 'lesion') out += '<span class="st-ico danger" title="Lesionado' + origem + '" aria-label="Lesionado">✚</span>';
+  if (c && c.status === 'lesion') out += '<span class="st-ico danger" title="Lesionado' + origem + '" aria-label="Lesionado">' + ico('cross') + '</span>';
   else if (c && c.status === 'restricao') out += '<span class="st-ico warn" title="Treino restrito' + origem + '" aria-label="Treino restrito">!</span>';
   if ((p.cartoes || 0) >= 3) out += '<span class="st-ico st-yc" title="' + p.cartoes + ' cartões na temporada" aria-label="' + p.cartoes + ' cartões"></span>';
   return out ? '<span class="st-icos">' + out + '</span>' : '';
@@ -13060,7 +13071,7 @@ function obsToggle(id, ev) {
 }
 function obsStar(id, inline) {
   var on = obsHas(id);
-  return '<button class="obs-star' + (on ? ' on' : '') + (inline ? ' inline' : '') + '" onclick="obsToggle(\'' + id + '\', event)" aria-pressed="' + on + '" aria-label="' + (on ? 'Remover da' : 'Adicionar à') + ' lista de observação" title="' + (on ? 'Remover da' : 'Adicionar à') + ' lista de observação">' + (on ? '★' : '☆') + '</button>';
+  return '<button class="obs-star' + (on ? ' on' : '') + (inline ? ' inline' : '') + '" onclick="obsToggle(\'' + id + '\', event)" aria-pressed="' + on + '" aria-label="' + (on ? 'Remover da' : 'Adicionar à') + ' lista de observação" title="' + (on ? 'Remover da' : 'Adicionar à') + ' lista de observação">' + ico('star', on ? 'fill' : '') + '</button>';
 }
 function vfExportCSV() {
   var arr = window._vfLast || [];
@@ -13102,7 +13113,7 @@ function renderRelatorios() {
     '<div class="cs-metric"><b class="cs-metric-tag">Método</b><span>Em vez de "jogou mal", registre <b>situação → comportamento → consequência</b>. Fica claro o que precisa mudar e dá para comparar relatórios de observadores diferentes.</span></div>';
   var rel = relAll().filter(function (r) { return r.atletaId === p.id; }).sort(function (a, b) { return a.data < b.data ? 1 : -1; });
   lista.innerHTML = rel.length ? rel.map(function (r) {
-    return '<div class="rel-item"><div class="rel-h"><b>' + csFmtDate(r.data) + '</b> · ' + (r.jogo || 'treino/vídeo') + ' <span class="rel-nota">' + '★'.repeat(r.nota) + '☆'.repeat(5 - r.nota) + '</span><span class="cs-status info">' + r.recomendacao + '</span></div>' +
+    return '<div class="rel-item"><div class="rel-h"><b>' + csFmtDate(r.data) + '</b> · ' + (r.jogo || 'treino/vídeo') + ' <span class="rel-nota">' + ico('star', 'fill').repeat(r.nota) + ico('star').repeat(5 - r.nota) + '</span><span class="cs-status info">' + r.recomendacao + '</span></div>' +
       (r.situacao ? '<div><small>Situação</small>' + csEsc(r.situacao) + '</div>' : '') + (r.comportamento ? '<div><small>Comportamento</small>' + csEsc(r.comportamento) + '</div>' : '') +
       (r.consequencia ? '<div><small>Consequência</small>' + csEsc(r.consequencia) + '</div>' : '') +
       (r.fortes ? '<div><small>Fortes</small>' + csEsc(r.fortes) + '</div>' : '') + (r.fracos ? '<div><small>A desenvolver</small>' + csEsc(r.fracos) + '</div>' : '') +
@@ -13193,7 +13204,7 @@ function renderVitrineTabela(arr, grid) {
   });
   var f2 = function (v) { return v == null ? '<span class="cs-dash" title="Menos de 270 min — amostra pequena">—</span>' : v.toFixed(2); };
   csTable(grid, [
-    { key: 'obs', label: '★', title: 'Lista de observação', sortable: false, fmt: function (v, r) { return obsStar(r._p.id, true); } },
+    { key: 'obs', label: 'Obs.', title: 'Lista de observação', sortable: false, fmt: function (v, r) { return obsStar(r._p.id, true); } },
     { key: 'nome', label: 'Atleta', sticky: true, fmt: function (v, r) { return csPlayerNameCell(r._p); } },
     { key: 'clube', label: 'Clube' },
     { key: 'pos', label: 'Pos.', title: 'Posição principal' },
@@ -13324,7 +13335,7 @@ function renderMaturacao(p) {
       (regs.length ? '<table class="mat-tab"><thead><tr><th>Data</th><th>Altura</th><th>Sentado</th><th>Peso</th><th>Pico</th>' + (podeEditar ? '<th></th>' : '') + '</tr></thead><tbody>' + regs.slice().reverse().map(function (r) {
         var o = m.nasc ? matOffset(r, m.nasc, m.sexo) : null;
         return '<tr><td>' + csFmtDate(r.data) + '</td><td>' + r.altura + '</td><td>' + (r.sentado || '—') + '</td><td>' + (r.peso || '—') + '</td><td>' + (o ? (o.mo > 0 ? '+' : '') + o.mo.toFixed(1) : '—') + '</td>' +
-          (podeEditar ? '<td><button class="btn btn-ghost btn-sm" onclick="matDel(\'' + p.id + '\',\'' + r.data + '\')" aria-label="Excluir medida de ' + csFmtDate(r.data) + '">✕</button></td>' : '') + '</tr>'; }).join('') + '</tbody></table>' : '') +
+          (podeEditar ? '<td><button class="btn btn-ghost btn-sm" onclick="matDel(\'' + p.id + '\',\'' + r.data + '\')" aria-label="Excluir medida de ' + csFmtDate(r.data) + '">' + ico('x') + '</button></td>' : '') + '</tr>'; }).join('') + '</tbody></table>' : '') +
     '</div></div>' +
     '<div class="cs-metric"><b class="cs-metric-tag">PHV</b><span>Pico de velocidade de crescimento: a fase do estirão. "Distância do pico" é estimada por equação (Mirwald 2002 com altura sentado; Moore 2015 só com idade e altura) e tem erro de cerca de ±1 ano — use para planejar carga e comparar atletas pela idade biológica, não para selecionar. Meça a cada 3 meses, no mesmo horário.</span></div>';
   if (calc.length >= 2) setTimeout(function () {
@@ -13811,7 +13822,7 @@ const MOCK_WEEK = [
   { label:'SÁB', date:'10/05', today:false, sessions:[
     { tipo:'Ativação Pré-Jogo', dur:'45min', ath:18, cls:'ms-baixa', int:'Baixa',  md:'MD-1'}]},
   { label:'DOM', date:'11/05', today:false, sessions:[
-    { tipo:'🏆 Vitória ES × Forte FC', dur:'90min', ath:18, cls:'ms-jogo', int:'Jogo', md:'MD'}]}
+    { tipo:'Jogo · Vitória ES × Forte FC', dur:'90min', ath:18, cls:'ms-jogo', int:'Jogo', md:'MD'}]}
 ];
 
 // ── F4: microciclo editável (semana real), modelos salvos e aplicados em outras semanas ──
@@ -13870,7 +13881,7 @@ function renderMicrociclo(force) {
     h += '<div class="micro-day' + (d.getTime() === hoje.getTime() ? ' today' : '') + '"><div class="micro-day-label">' + MC_DIAS[i] + '</div><div class="micro-day-num">' + f(d) + '</div>';
     sess.forEach(function (x, j) {
       h += '<div class="micro-sess ' + x.cls + '"><div style="font-weight:700;display:flex;justify-content:space-between;gap:4px">' + x.tipo + (x.md ? '<span class="md-tag">' + x.md + '</span>' : '') +
-        '<button class="mc-x" onclick="mcDel(' + i + ',' + j + ')" aria-label="Remover sessão">✕</button></div><div style="font-size:11px;opacity:.75;margin-top:2px">' + (x.dur ? x.dur + ' min · ' : '') + x.int + '</div></div>';
+        '<button class="mc-x" onclick="mcDel(' + i + ',' + j + ')" aria-label="Remover sessão">' + ico('x') + '</button></div><div style="font-size:11px;opacity:.75;margin-top:2px">' + (x.dur ? x.dur + ' min · ' : '') + x.int + '</div></div>';
     });
     h += '<div class="mc-add"><select id="mc-add-' + i + '" class="form-select" aria-label="Tipo de sessão">' + MC_TIPOS.map(function (t, k) { return '<option value="' + k + '">' + t.tipo + '</option>'; }).join('') + '</select><button class="btn btn-ghost btn-sm" onclick="mcAdd(' + i + ')" aria-label="Adicionar sessão">+</button></div></div>';
   });
@@ -14012,7 +14023,7 @@ function toggleSessPhase(header) {
   if (!body) return;
   body.style.display = body.style.display === 'none' ? 'block' : 'none';
   const arrow = header.querySelector('span span');
-  if (arrow) arrow.textContent = body.style.display === 'none' ? '▶' : '▼';
+  if (arrow) arrow.innerHTML = ico(body.style.display === 'none' ? 'chevron-right' : 'chevron-down');
 }
 
 // ── 3. CARGA & INTENSIDADE ────────────────────
@@ -14456,14 +14467,14 @@ function updateAntropometria() {
   <p class="chart-insight" id="insight-flex-cadeia"></p>
   <div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 8px">FLEXIBILIDADE E MOBILIDADE</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">
-    <div class="mobility-card"><span>Flexibilidade de Adutores — EV1</span><span class="mob-check">✓</span></div>
-    <div class="mobility-card"><span>Flexibilidade de Adutores — EV2</span><span class="mob-check">✓</span></div>
+    <div class="mobility-card"><span>Flexibilidade de Adutores — EV1</span><span class="mob-check"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></div>
+    <div class="mobility-card"><span>Flexibilidade de Adutores — EV2</span><span class="mob-check"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></div>
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px">
-    <div class="mobility-card"><span>Elevação Ativa Perna EV1</span><span class="mob-check">✓</span></div>
-    <div class="mobility-card"><span>Elevação Ativa Perna EV2</span><span class="mob-check">✓</span></div>
-    <div class="mobility-card"><span>Agachamento Overhead EV1</span><span class="mob-check">✓</span></div>
-    <div class="mobility-card"><span>Agachamento Overhead EV2</span><span class="mob-check">✓</span></div>
+    <div class="mobility-card"><span>Elevação Ativa Perna EV1</span><span class="mob-check"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></div>
+    <div class="mobility-card"><span>Elevação Ativa Perna EV2</span><span class="mob-check"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></div>
+    <div class="mobility-card"><span>Agachamento Overhead EV1</span><span class="mob-check"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></div>
+    <div class="mobility-card"><span>Agachamento Overhead EV2</span><span class="mob-check"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></div>
   </div>
 </div>`;
 
@@ -14511,7 +14522,7 @@ function toggleTheme() {
   localStorage.setItem('capixastat_theme', isLight ? 'light' : 'dark');
   var icon = document.getElementById('theme-icon');
   var lbl  = document.getElementById('theme-lbl');
-  if (icon) icon.textContent = isLight ? '☀️' : '🌙';
+  if (icon) icon.innerHTML = ico(isLight ? 'sun' : 'moon');
   if (lbl)  lbl.textContent  = isLight ? 'Tema Escuro' : 'Tema Claro';
   // Atualiza defaults e re-inicializa charts visíveis
   _refreshChartDefaults();
@@ -14824,13 +14835,13 @@ function _tacLeftPanel(c, st, formacao) {
   var isCustomSel = sel.indexOf('custom:') === 0;
   var saveArea =
     '<div class="tac-save-row">' +
-      '<button type="button" class="tac-save-btn">💾 Salvar predefinição</button>' +
-      (isCustomSel ? '<button type="button" class="tac-del-btn" title="Excluir esta predefinição">🗑</button>' : '') +
+      '<button type="button" class="tac-save-btn">' + ico('save') + ' Salvar predefinição</button>' +
+      (isCustomSel ? '<button type="button" class="tac-del-btn" title="Excluir esta predefinição" aria-label="Excluir esta predefinição">' + ico('trash') + '</button>' : '') +
     '</div>' +
     '<div class="tac-save-form" style="display:none">' +
       '<input type="text" class="tac-save-input" maxlength="32" placeholder="Nome da predefinição">' +
       '<button type="button" class="tac-save-confirm">Salvar</button>' +
-      '<button type="button" class="tac-save-cancel" title="Cancelar">✕</button>' +
+      '<button type="button" class="tac-save-cancel" title="Cancelar" aria-label="Cancelar">' + ico('x') + '</button>' +
     '</div>';
   var cb = st.comBola, sb = st.semBola, to = st.transOf, td = st.transDef;
   return '' +
@@ -14839,24 +14850,24 @@ function _tacLeftPanel(c, st, formacao) {
     saveArea +
     '<div class="tac-fm-label">Formação</div>' +
     '<select class="tac-fm-select tac-form-sel">' + fmOpts + '</select>' +
-    _tacAccordion('⚽ Com bola',
+    _tacAccordion(ico('goal') + ' Com bola',
       _tacField('Saída de bola', 'saidaDeBola', 'comBola', cb.saidaDeBola) +
       _tacField('Circulação', 'circulacao', 'comBola', cb.circulacao) +
       _tacField('Progressão', 'progressao', 'comBola', cb.progressao) +
       '<div class="tac-field"><div class="tac-field-lbl">Criação de chances' + _tacTip('criacao') + '</div>' + _tacCriacao(cb.criacao) + '</div>'
     ) +
-    _tacAccordion('🛡 Sem bola',
+    _tacAccordion(ico('shield') + ' Sem bola',
       _tacField('Altura do bloco', 'altura', 'semBola', sb.altura) +
       _tacField('Linha defensiva', 'linha', 'semBola', sb.linha) +
       _tacField('Compacidade', 'compacidade', 'semBola', sb.compacidade) +
       _tacField('Marcação', 'marcacao', 'semBola', sb.marcacao) +
       _tacField('Pressão', 'pressao', 'semBola', sb.pressao)
     ) +
-    _tacAccordion('⚡ Transição ofensiva',
+    _tacAccordion(ico('zap') + ' Transição ofensiva',
       _tacField('Primeira intenção', 'intencao', 'transOf', to.intencao) +
       _tacField('Apoio na transição', 'apoio', 'transOf', to.apoio)
     ) +
-    _tacAccordion('⚠ Transição defensiva',
+    _tacAccordion(ico('alert') + ' Transição defensiva',
       _tacField('Reação após perda', 'reacao', 'transDef', td.reacao) +
       _tacField('Prioridade de cobertura', 'cobertura', 'transDef', td.cobertura)
     );
@@ -15074,7 +15085,7 @@ function _openBenchSwap(pid, ev) {
     var occName = m.occ ? m.occ.nome : 'vazio';
     return '<div class="tac-swap-opt" data-idx="' + m.idx + '">' +
       '<span class="tac-swap-nm"><b>' + m.slot.code + '</b> · ' + occName + '</span>' +
-      '<span class="tac-swap-pos">' + (m.match ? '✓' : '') + '</span></div>';
+      '<span class="tac-swap-pos">' + (m.match ? ico('check') : '') + '</span></div>';
   }).join('');
   pop.innerHTML = html;
   document.body.appendChild(pop);
@@ -15530,7 +15541,7 @@ function _tacChatOffline(question) {
   if (cb.saidaDeBola === 'Curta') out.push('• Saida de bola curta pede zagueiros confiantes com a bola (ZCN) e um volante que se oferece para receber.');
   if (to.apoio === 'Baixo') out.push('• Apoio baixo na transicao deixa o atacante isolado. Suba o apoio se quiser segurar mais a bola no ataque.');
   out.push('• Rota principal de criacao: ' + _criacaoLabel(top) + (cr.secundaria ? ' (secundaria: ' + _criacaoLabel(cr.secundaria) + ')' : '') + '.');
-  if (!_geminiKey()) out.push('\n(Modo offline. Para conversa livre, busca na web e analise de adversarios, ative o Gemini gratis na engrenagem ⚙ acima. Voce tambem pode digitar o nome de um time ou jogador cadastrado, ou de uma aba/opcao tatica (ex.: compacidade, marcacao, transicao defensiva) para ver a explicacao.)');
+  if (!_geminiKey()) out.push('\n(Modo offline. Para conversa livre, busca na web e analise de adversarios, ative o Gemini gratis na engrenagem (Configurar IA) acima. Voce tambem pode digitar o nome de um time ou jogador cadastrado, ou de uma aba/opcao tatica (ex.: compacidade, marcacao, transicao defensiva) para ver a explicacao.)');
   return out.join('\n');
 }
 function _tacChatScroll() { var m = document.getElementById('tac-ai-msgs'); if (m) m.scrollTop = m.scrollHeight; }
@@ -15560,7 +15571,7 @@ function _tacChatSend(text) {
   var send = document.getElementById('tac-ai-send'); if (send) send.disabled = true;
   var p = _geminiKey() ? _tacChatGemini(q) : Promise.resolve(_tacChatOffline(q));
   p.then(function(ans) { _tacChatTyping(false); _tacChatAppend('bot', ans); })
-   .catch(function(e) { _tacChatTyping(false); _tacChatAppend('bot', 'Nao consegui falar com o Gemini (' + (e && e.message ? e.message : 'erro') + '). Confira a chave na engrenagem ⚙. Enquanto isso, analise offline:\n\n' + _tacChatOffline(q)); })
+   .catch(function(e) { _tacChatTyping(false); _tacChatAppend('bot', 'Nao consegui falar com o Gemini (' + (e && e.message ? e.message : 'erro') + '). Confira a chave em Configurar IA. Enquanto isso, analise offline:\n\n' + _tacChatOffline(q)); })
    .then(function() { _tacChatBusy = false; var sd = document.getElementById('tac-ai-send'); if (sd) sd.disabled = false; });
 }
 function _toggleTacChat(open) {
@@ -15570,7 +15581,7 @@ function _toggleTacChat(open) {
     if (!_tacChatGreeted) {
       _tacChatGreeted = true;
       _tacChatAppend('bot', 'Ola! Sou seu auxiliar tatico. Conheco sua formacao e configuracao atuais. Posso analisar sua tatica e sugerir ajustes — pergunte a vontade.');
-      if (!_geminiKey()) _tacChatAppend('sys', 'Rodando em modo offline (analise por regras). Para conversa livre com IA gratis, toque na engrenagem ⚙ e cole sua chave do Gemini.');
+      if (!_geminiKey()) _tacChatAppend('sys', 'Rodando em modo offline (analise por regras). Para conversa livre com IA gratis, toque em Configurar IA e cole sua chave do Gemini.');
     }
     var inp = document.getElementById('tac-ai-input'); if (inp) inp.focus();
   } else { dr.classList.remove('open'); }
@@ -15580,17 +15591,17 @@ function _ensureTacChat() {
   if (document.getElementById('tac-ai-fab')) { _tacChatUpdateStatus(); return; }
   var fab = document.createElement('button');
   fab.id = 'tac-ai-fab'; fab.className = 'tac-ai-fab'; fab.type = 'button';
-  fab.innerHTML = '🧠 Auxiliar Tático';
+  fab.innerHTML = ico('sparkles') + ' Auxiliar Tático';
   fab.addEventListener('click', function() { _toggleTacChat(true); });
   screen.appendChild(fab);
   var dr = document.createElement('div');
   dr.id = 'tac-ai-drawer'; dr.className = 'tac-ai-drawer';
   dr.innerHTML =
     '<div class="tac-ai-hdr">' +
-      '<h3>🧠 Auxiliar Tático <span id="tac-ai-status" class="tac-ai-status off">OFFLINE</span></h3>' +
+      '<h3>' + ico('sparkles') + ' Auxiliar Tático <span id="tac-ai-status" class="tac-ai-status off">OFFLINE</span></h3>' +
       '<span class="sp"></span>' +
-      '<button type="button" id="tac-ai-gear" title="Configurar IA">⚙</button>' +
-      '<button type="button" id="tac-ai-close" title="Fechar">✕</button>' +
+      '<button type="button" id="tac-ai-gear" title="Configurar IA" aria-label="Configurar IA">' + ico('settings') + '</button>' +
+      '<button type="button" id="tac-ai-close" title="Fechar" aria-label="Fechar">' + ico('x') + '</button>' +
     '</div>' +
     '<div class="tac-ai-settings" id="tac-ai-settings">' +
       '<label>Chave da API do Gemini (grátis)</label>' +
@@ -15609,7 +15620,7 @@ function _ensureTacChat() {
     '</div>' +
     '<div class="tac-ai-input-row">' +
       '<textarea class="tac-ai-input" id="tac-ai-input" rows="1" placeholder="Pergunte ao auxiliar..."></textarea>' +
-      '<button type="button" class="tac-ai-send" id="tac-ai-send">➤</button>' +
+      '<button type="button" class="tac-ai-send" id="tac-ai-send" aria-label="Enviar">' + ico('send') + '</button>' +
     '</div>';
   screen.appendChild(dr);
   document.getElementById('tac-ai-close').addEventListener('click', function() { _toggleTacChat(false); });
@@ -15928,7 +15939,7 @@ function _dossieExportPDF() {
   }).catch(function(e) {
     alert('Não foi possível gerar o PDF: ' + (e && e.message || e));
   }).then(function() {
-    if (btn) { btn.disabled = false; btn.textContent = '⬇ Exportar PDF'; }
+    if (btn) { btn.disabled = false; btn.innerHTML = ico('download') + ' Exportar PDF'; }
   });
 }
 function _ensureDossie() {
@@ -15936,7 +15947,7 @@ function _ensureDossie() {
   if (document.getElementById('dossie-fab')) return;
   var fab = document.createElement('button');
   fab.id = 'dossie-fab'; fab.className = 'dossie-fab'; fab.type = 'button';
-  fab.innerHTML = '📋 Dossiê do Adversário';
+  fab.innerHTML = ico('clipboard') + ' Dossiê do Adversário';
   fab.addEventListener('click', function() {
     var ov = document.getElementById('dossie-overlay');
     var sel = document.getElementById('dossie-select');
@@ -15954,7 +15965,7 @@ function _ensureDossie() {
   ov.innerHTML =
     '<div class="dossie-modal">' +
       '<div class="dossie-modal-hdr">' +
-        '<span style="font-size:18px">📋</span>' +
+        '<span style="font-size:18px">' + ico('clipboard') + '</span>' +
         '<h3>Dossiê do Adversário</h3>' +
         '<span style="flex:1"></span>' +
         '<button type="button" class="dossie-btn sec" id="dossie-close">Fechar</button>' +
@@ -15963,8 +15974,8 @@ function _ensureDossie() {
         '<div class="dossie-ctrls">' +
           '<select id="dossie-select"><option value="">Selecione o adversário…</option></select>' +
           '<button type="button" class="dossie-btn" id="dossie-gen">Gerar dossiê</button>' +
-          '<button type="button" class="dossie-btn sec" id="dossie-ai" style="display:none">✨ Aprofundar com IA</button>' +
-          '<button type="button" class="dossie-btn sec" id="dossie-export" disabled>⬇ Exportar PDF</button>' +
+          '<button type="button" class="dossie-btn sec" id="dossie-ai" style="display:none">' + ico('sparkles') + ' Aprofundar com IA</button>' +
+          '<button type="button" class="dossie-btn sec" id="dossie-export" disabled>' + ico('download') + ' Exportar PDF</button>' +
         '</div>' +
         '<div id="dossie-report-holder"><div style="text-align:center;padding:40px;color:var(--text-3);font-size:13px">Selecione um adversário e clique em <b>Gerar dossiê</b>.</div></div>' +
       '</div>' +
@@ -16232,7 +16243,7 @@ function _renderTimeTabContent(c, allMatches, tab) {
           '<div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--text-1)">' + p.nome + playerStatusIcons(p) + '</div>' +
             '<span class="badge ' + p.badgeClass + '" style="font-size:11px">' + p.pos + '</span>' +
           '</div>' +
-          (p.gols > 0 ? '<span style="font-size:12px;color:var(--text-3)">⚽ ' + p.gols + '</span>' : '') +
+          (p.gols > 0 ? '<span style="font-size:12px;color:var(--text-3)">' + ico('goal') + ' ' + p.gols + '</span>' : '') +
           '<span class="t2-min" title="Minutos jogados na temporada">' + (playerAgg(p).minutos || 0) + ' min</span>' +
         '</div>';
       });
@@ -16281,7 +16292,7 @@ function _renderTimeTaticas(c) {
   var bLabel = {'Alto':'Pressing Alto','Médio':'Bloco Médio','Baixo':'Bloco Baixo'};
   var coachHtml =
     '<div class="tactics-coach-bar">' +
-      '<div class="tactics-coach-icon">🧑‍💼</div>' +
+      '<div class="tactics-coach-icon">' + ico('briefcase') + '</div>' +
       '<div style="flex:1">' +
         '<div class="tactics-coach-nm">' + (t.tecnico || '—') + '</div>' +
         '<div class="tactics-coach-sub">Técnico Principal · 2026</div>' +
@@ -16293,10 +16304,10 @@ function _renderTimeTaticas(c) {
     '</div>';
   var pillsHtml =
     '<div class="tactics-pills">' +
-      '<span class="tactics-pill blue">⚡ ' + (t.estilo || '—') + '</span>' +
-      '<span class="tactics-pill ' + (mCor[t.mentalidade] || 'blue') + '">🧠 ' + (t.mentalidade || '—') + '</span>' +
-      '<span class="tactics-pill ' + (pCor[t.pressao] || 'blue') + '">🔥 Pressão ' + (t.pressao || '—') + '</span>' +
-      '<span class="tactics-pill ' + (t.blocoDefensivo === 'Alto' ? 'green' : t.blocoDefensivo === 'Baixo' ? 'amber' : 'blue') + '">🛡 ' + (bLabel[t.blocoDefensivo] || '—') + '</span>' +
+      '<span class="tactics-pill blue">' + ico('zap') + ' ' + (t.estilo || '—') + '</span>' +
+      '<span class="tactics-pill ' + (mCor[t.mentalidade] || 'blue') + '">' + ico('lightbulb') + ' ' + (t.mentalidade || '—') + '</span>' +
+      '<span class="tactics-pill ' + (pCor[t.pressao] || 'blue') + '">' + ico('flame') + ' Pressão ' + (t.pressao || '—') + '</span>' +
+      '<span class="tactics-pill ' + (t.blocoDefensivo === 'Alto' ? 'green' : t.blocoDefensivo === 'Baixo' ? 'amber' : 'blue') + '">' + ico('shield') + ' ' + (bLabel[t.blocoDefensivo] || '—') + '</span>' +
     '</div>';
   body.innerHTML = coachHtml + pillsHtml + _buildTacticsPitch(c.nome, formacao);
 }
@@ -16464,7 +16475,7 @@ function renderElencoTime(clubeNome) {
       '<div class="elenco-avatar" style="' + avatarStyle + '">' + avatarInner + '</div>' +
       '<div><div class="elenco-nome">' + p.nome + '</div>' +
         '<div class="elenco-pos"><span class="badge ' + p.badgeClass + '" style="font-size:11px">' + p.pos + '</span>' +
-        (p.gols > 0 ? ' <span style="font-size:11px;color:var(--green)">⚽ ' + p.gols + '</span>' : '') +
+        (p.gols > 0 ? ' <span style="font-size:11px;color:var(--green)">' + ico('goal') + ' ' + p.gols + '</span>' : '') +
         '</div>' +
       '</div>' +
     '</div>';
@@ -16609,7 +16620,7 @@ function _buildExternalTeamModal(nome, d) {
     '<div class="ext-team-backdrop" onclick="closeExternalTeam()"></div>' +
     '<div class="ext-team-panel">' +
       '<div class="ext-team-header">' +
-        '<button class="ext-team-close" onclick="closeExternalTeam()">✕</button>' +
+        '<button class="ext-team-close" onclick="closeExternalTeam()" aria-label="Fechar">' + ico('x') + '</button>' +
         '<div style="display:flex;align-items:center;gap:14px">' +
           badgeHtml +
           '<div>' +
@@ -16618,7 +16629,7 @@ function _buildExternalTeamModal(nome, d) {
             '<div style="margin-top:5px">' + compPills + '</div>' +
           '</div>' +
         '</div>' +
-        (d.stadium ? '<div style="font-size:12px;color:var(--text-3);margin-top:8px">🏟 ' + d.stadium + '</div>' : '') +
+        (d.stadium ? '<div style="font-size:12px;color:var(--text-3);margin-top:8px">' + ico('map-pin') + ' ' + d.stadium + '</div>' : '') +
         (d.manager ? '<div style="font-size:12px;color:var(--text-3);margin-top:2px">Técnico: ' + d.manager + '</div>' : '') +
       '</div>' +
       '<div class="ext-team-body">' +
@@ -16744,7 +16755,7 @@ function showExtMatch(idx) {
     tlHtml = '<div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin:12px 0 6px">Linha do Tempo</div>';
     incidents.forEach(function(ev) {
       var min = ev.time + (ev.addedTime?'+'+ev.addedTime:'');
-      var icon = ev.type==='goal'?(ev.ownGoal?'⚽(OG)':'⚽'):ev.type==='card'?(ev.cardType==='red'?'🟥':'🟨'):ev.type==='substitution'?'↕':'•';
+      var icon = ev.type==='goal'?(ev.ownGoal?ico('goal')+' (contra)':ico('goal')):ev.type==='card'?ico('card', ev.cardType==='red'?'vermelho':'amarelo'):ev.type==='substitution'?'↕':'•';
       var name = ev.type==='goal'?ev.player:ev.type==='card'?ev.player:ev.type==='substitution'?(ev.playerIn+' / '+ev.playerOut):'';
       var align = ev.isHome ? 'left' : 'right';
       tlHtml += '<div style="display:flex;' + (ev.isHome?'':'flex-direction:row-reverse') + ';align-items:center;gap:6px;padding:3px 0;font-size:12px">' +
@@ -16800,7 +16811,7 @@ function telRgba(hex, a){ hex = (hex || '#ffffff').replace('#',''); if (hex.leng
 
 function telInit(){
   var cont = document.getElementById('tel-konva'); if (!cont) return;
-  if (typeof Konva === 'undefined'){ var h = document.getElementById('tel-tiphelp'); if (h) h.textContent = '⚠ Biblioteca Konva não carregou (verifique konva.min.js).'; return; }
+  if (typeof Konva === 'undefined'){ var h = document.getElementById('tel-tiphelp'); if (h) h.textContent = 'Aviso: biblioteca Konva não carregou (verifique konva.min.js).'; return; }
   if (telInited){ telFit(); return; }
   telInited = true;
 
@@ -17248,7 +17259,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (document.documentElement.classList.contains('light')) {
     var icon = document.getElementById('theme-icon');
     var lbl  = document.getElementById('theme-lbl');
-    if (icon) icon.textContent = '☀️';
+    if (icon) icon.innerHTML = ico('sun');
     if (lbl)  lbl.textContent  = 'Tema Escuro';
   }
 });
