@@ -1807,6 +1807,10 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 @media (max-width: 420px) {
   .player-grid { grid-template-columns:1fr }
 }
+
+/* L2 */
+.cs-section-head:first-child { margin-top:0 }
+.guia-ol { margin:0; padding-left:18px; font-size:13px; color:var(--text-2); display:grid; gap:4px }
 </style>
 </head>
 <body>
@@ -2019,6 +2023,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
         </div>
         <div class="content">
 
+          <div class="cs-section-head"><div><h2>Resumo do momento</h2><p>O que precisa de atenção agora: próximo jogo, forma e alertas do elenco</p></div></div>
           <!-- D1: topo da Visão Geral — próximo jogo, forma recente e alertas (D2) -->
           <div class="dash-top-row" id="dash-top-row">
             <div class="card dash-next" id="dash-next"></div>
@@ -2040,6 +2045,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
           </div>
 
 
+          <div class="cs-section-head"><div><h2>Indicadores da temporada</h2><p>Números gerais do clube em 2026</p></div></div>
           <!-- KPIs -->
           <div class="kpi-grid">
             <div class="kpi-card" style="--accent:var(--green)">
@@ -2068,6 +2074,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
             </div>
           </div>
 
+          <div class="cs-section-head"><div><h2>Desempenho</h2><p>Gráficos e destaques — clique para ver o detalhe</p></div></div>
           <!-- Charts row -->
           <div class="grid-2">
             <div class="card">
@@ -2093,6 +2100,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
             </div>
           </div>
 
+          <div class="cs-section-head"><div><h2>Sobre os dados</h2><p>Como o score é calculado e com quais objetivos o projeto se alinha</p></div></div>
           <!-- D1: blocos explicativos vão para o fim da página -->
           <!-- Metodologia de Ciência de Dados -->
           <div class="ds-method">
@@ -2701,8 +2709,10 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
           <div id="time-hero-section"></div>
           <!-- Anterior / Próxima partida -->
           <div id="time-last-next" class="team-last-next"></div>
+          <div class="cs-section-head"><div><h2>Destaques</h2><p>Forma recente e quem mais decide no elenco</p></div></div>
           <!-- T1: forma + destaques do elenco (padrão "vitrine do clube") -->
           <div id="time-destaques" class="time-destaques"></div>
+          <div class="cs-section-head"><div><h2>Calendário e competições</h2><p>Jogos do mês, classificação, elenco e forma por competição</p></div></div>
           <!-- Layout principal: calendário + tabs -->
           <div class="time-layout">
             <div id="time-cal-wrap"></div>
@@ -2861,6 +2871,14 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
             <div class="card"><div class="card-title">Confiabilidade do dado</div>
               <div class="guia-row"><span class="cs-src real">Dado real</span><span class="cs-src est">Estimado</span><span class="cs-est-val">72 (estimado)</span></div>
               <div class="cs-metric"><b class="cs-metric-tag">Métrica</b><span>Todo gráfico termina com este chip: o que mede, como é calculado e se o dado é real ou estimado.</span></div></div>
+            <div class="card"><div class="card-title">Padrão de página (L2)</div>
+              <ol class="guia-ol"><li><b>Cabeçalho</b>: título, subtítulo de contexto e a ação principal (botão azul).</li>
+              <li><b>Resumo</b>: o que pede atenção agora (alertas, próximo jogo).</li>
+              <li><b>Indicadores</b>: KPIs em cards.</li>
+              <li><b>Visualizações</b>: gráficos com chip "Métrica".</li>
+              <li><b>Detalhes</b>: tabelas e listas — o detalhe abre ao clicar.</li>
+              <li><b>Sobre os dados</b>: metodologia no fim.</li></ol>
+              <div class="cs-section-head" style="margin:10px 0 0"><div><h2>Título de seção</h2><p>Subtítulo curto dizendo para que serve</p></div></div></div>
             <div class="card"><div class="card-title">KPI</div>
               <div class="kpi-label">Partidas registradas</div><div class="kpi-value" style="font-size:28px">39</div><div class="kpi-delta up">&#9650; 3 na última rodada</div></div>
           </div>
