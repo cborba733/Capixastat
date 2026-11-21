@@ -1890,6 +1890,9 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .mc-x { background:none; border:none; color:inherit; opacity:.55; cursor:pointer; font-size:11px; padding:0 2px }
 .mc-x:hover { opacity:1 }
 .mc-add { display:flex; gap:4px; margin-top:6px } .mc-add .form-select { font-size:11px; padding:4px 6px; min-width:0; flex:1 }
+
+/* T2 */
+.t2-min { font-size:12px; color:var(--text-2); font-family:var(--font-mono); margin-left:8px; min-width:62px; text-align:right }
 </style>
 </head>
 <body>
@@ -14772,17 +14775,23 @@ function _renderTimeTabContent(c, allMatches, tab) {
     if (jogadores.length === 0) { body.innerHTML = '<div style="font-size:12px;color:var(--text-3);padding:8px 0">Nenhum atleta cadastrado.</div>'; return; }
     var byPos = {};
     jogadores.forEach(function(p){ if (!byPos[p.pos]) byPos[p.pos] = []; byPos[p.pos].push(p); });
-    var html = '';
+    // T2: resumo de disponibilidade do elenco
+    var disp = { ok: 0, lesion: 0, restricao: 0, est: false };
+    jogadores.forEach(function (p) { var c = playerCondition(p); disp[c.status]++; if (c.est) disp.est = true; });
+    var cart3 = jogadores.filter(function (p) { return (p.cartoes || 0) >= 3; }).length;
+    var html = '<div class="guia-row" style="margin:4px 0 8px"><span class="cs-status ok">' + disp.ok + ' disponíveis</span><span class="cs-status danger">' + disp.lesion + ' lesionados</span>' +
+      '<span class="cs-status warn">' + disp.restricao + ' restritos</span><span class="cs-status info">' + cart3 + ' com 3+ cartões</span>' + (disp.est ? '<span class="cs-src est" title="Sem registro de bem-estar recente para parte do elenco">status estimado</span>' : '') + '</div>';
     Object.keys(byPos).forEach(function(pos) {
       html += '<div style="font-size:11px;font-weight:700;color:var(--text-3);margin:10px 0 5px;text-transform:uppercase;letter-spacing:.6px">' + pos + 's</div>';
       byPos[pos].forEach(function(p) {
         var av = p.color ? 'background:' + p.color + ',.12);color:' + p.pointColor : 'background:rgba(34,197,94,.12);color:var(--green)';
         html += '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="goTo(\'perfil\',document.querySelector(\'[data-screen=perfil]\'));showPlayer(\'' + p.id + '\')">' +
           '<div style="width:28px;height:28px;border-radius:50%;' + av + ';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;overflow:hidden">' + playerAvatarInner(p, 28) + '</div>' +
-          '<div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--text-1)">' + p.nome + '</div>' +
+          '<div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--text-1)">' + p.nome + playerStatusIcons(p) + '</div>' +
             '<span class="badge ' + p.badgeClass + '" style="font-size:11px">' + p.pos + '</span>' +
           '</div>' +
           (p.gols > 0 ? '<span style="font-size:12px;color:var(--text-3)">⚽ ' + p.gols + '</span>' : '') +
+          '<span class="t2-min" title="Minutos jogados na temporada">' + (playerAgg(p).minutos || 0) + ' min</span>' +
         '</div>';
       });
     });
