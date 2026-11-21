@@ -145,7 +145,7 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 **Dados externos:** ✅ pesquisa de fontes · ✅ integração TheSportsDB (rotina + banco + fonte/data na tela)
 **Média:** ✅ A5 · ✅ A7 · ✅ A8 · ✅ P4 · ✅ P5 · ✅ F3 · ✅ F4 · ✅ T2 · ✅ T3 · ✅ X2 · ✅ Q2 · ✅ B6 · ✅ V5 ·
 ✅ I2 · ✅ I3 · ✅ M2 · ✅ M4 · ✅ R5 · ✅ D4 · ✅ A6 · ✅ A9 · ✅ P3 · ✅ F5 · ✅ T4 · ✅ X3 · ✅ Q1 · ✅ B5 ·
-✅ V2 · ⬜ V4 · ⬜ L3 · ⬜ M1 · ⬜ R4 · ⬜ Q3 · ⬜ V3
+✅ V2 · ✅ V4 · ⬜ L3 · ⬜ M1 · ⬜ R4 · ⬜ Q3 · ⬜ V3
 **Baixa:** ⬜ A10 · ⬜ X4 · ⬜ Q4 · ⬜ V6 · ⬜ M3 · ⬜ P6 · ⬜ F6 · ✅ B7 · ⬜ L4
 
 ### Notas por item
@@ -408,6 +408,12 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
   `example_tracking.py --times` aprende as cores nos 25 primeiros quadros (guardados e processados depois), pinta as caixas
   por time e grava a coluna `time` no `posicoes.csv`. Testes: `test_times.py` (6) + `test_tracking_mock.py` (laço completo
   com cv2/YOLO falsos) → 14 testes no poc-cv. Não foi rodado em vídeo real (sem GPU/ultralytics nesta máquina).
+
+- **V4:** tela **Análise de Vídeo** (`screen-video`, menu Clube): abre o `anotado.mp4` (fica local, `createObjectURL`) e o
+  `posicoes.csv` do poc-cv (`vaParseCsv` valida colunas, `vaCarregar`); **visão de cima** sincronizada com o vídeo
+  (`vaSync` por tempo×fps, `vaIrQuadro` pelo controle deslizante), IDs coloridos pelo time mais votado; resumo (quadros,
+  duração, FPS, IDs por time, % de quadros com bola). Sem CSV mostra estado vazio — nenhum dado inventado.
+  Testado com CSV sintético gerado só no console (não salvo). Sincronia com vídeo real não testada (sem vídeo de jogo aqui).
 
 ### ONDE PAROU (21/11, madrugada — limite de uso)
 Próximos itens Média (dif. média): D4, A6,

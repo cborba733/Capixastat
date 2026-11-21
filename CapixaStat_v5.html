@@ -1985,6 +1985,15 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .sim-lib-tab td { padding:6px 8px; border-bottom:1px solid var(--border); color:var(--text-2); vertical-align:middle }
 .sim-lib-tab td.num { font-family:var(--font-mono) } .sim-lib-tab td.act { white-space:nowrap; text-align:right }
 .sim-lib-tab .form-input, .sim-lib-tab .form-select { width:100%; min-width:150px; padding:5px 8px; font-size:12.5px }
+
+/* V4 */
+.va-grid { display:grid; grid-template-columns:1.2fr 1fr; gap:14px; margin-bottom:14px }
+.va-video { width:100%; max-height:420px; background:#000; border-radius:8px; display:block }
+.va-pitch { width:100%; display:block; border-radius:8px }
+.va-slider { width:100%; margin-top:8px }
+.va-kpis { display:grid; grid-template-columns:repeat(8, 1fr); gap:10px }
+.va-kpi { background:var(--bg-raised); border-radius:8px; padding:8px 10px } .va-kpi small { display:block; font-size:11px; color:var(--text-3) } .va-kpi b { font-family:var(--font-mono); font-size:16px; color:var(--text-1) }
+#va-resumo, #va-analise { margin-bottom:14px }
 </style>
 </head>
 <body>
@@ -2140,6 +2149,10 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
       <div class="nav-item" data-screen="scout" onclick="goTo('scout',this)">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg>
         Scout ao Vivo
+      </div>
+      <div class="nav-item" data-screen="video" onclick="goTo('video',this)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="13" height="14" rx="2"/><path d="M16 10l5-3v10l-5-3z"/></svg>
+        Análise de Vídeo
       </div>
 
       <div class="nav-group-label">Jogadores</div>
@@ -3064,6 +3077,32 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
         <div class="content at-wrap" id="at-body"></div>
       </div>
 
+      <!-- ══ V4: ANÁLISE DE VÍDEO (resultado do poc-cv: vídeo anotado + posicoes.csv) ══ -->
+      <div id="screen-video" class="screen">
+        <div class="topbar">
+          <div class="topbar-left"><h1>Análise de Vídeo</h1><p>Abra o vídeo anotado e o <code>posicoes.csv</code> gerados pela visão computacional (pasta <code>poc-cv</code>)</p></div>
+          <div class="topbar-right">
+            <label class="btn btn-ghost btn-sm" for="va-video-in">Abrir vídeo</label><input type="file" id="va-video-in" accept="video/*" hidden onchange="vaAbrirVideo(this.files[0])">
+            <label class="btn btn-primary btn-sm" for="va-csv-in">Abrir posicoes.csv</label><input type="file" id="va-csv-in" accept=".csv,text/csv" hidden onchange="vaAbrirCsv(this.files[0])">
+          </div>
+        </div>
+        <div class="content">
+          <div id="va-status"></div>
+          <div class="va-grid">
+            <div class="card"><div class="card-title">Vídeo <span id="va-video-nome">nenhum arquivo</span></div>
+              <video id="va-video" controls preload="metadata" class="va-video" ontimeupdate="vaSync()" onseeked="vaSync()"></video>
+              <div class="tl2-empty" id="va-video-vazio">O vídeo fica só no seu computador (não é enviado). Use o <code>saida/anotado.mp4</code>.</div></div>
+            <div class="card"><div class="card-title">Visão de cima <span id="va-quadro">—</span></div>
+              <svg id="va-pitch" viewBox="-3 -3 111 74" class="va-pitch" role="img" aria-label="Posições no campo no quadro atual"></svg>
+              <div class="tl2-legend"><span><i class="leg-dot" style="background:#fb923c"></i> time A</span><span><i class="leg-dot" style="background:#5b95ff"></i> time B</span><span><i class="leg-dot" style="background:#cbd5e1"></i> outro / sem time</span><span><i class="leg-dot" style="background:#fff;border:1px solid #111"></i> bola</span></div>
+              <input type="range" id="va-slider" min="0" max="0" value="0" class="va-slider" oninput="vaIrQuadro(+this.value)" aria-label="Quadro"></div>
+          </div>
+          <div id="va-resumo"></div>
+          <div id="va-analise"></div>
+          <div class="cs-metric"><b class="cs-metric-tag">De onde vem</b><span>Rode <code>python example_tracking.py --video clip.mp4 --calib calib.json --times --out saida/</code> (ver <code>poc-cv/README.md</code>). O CSV tem uma linha por pessoa/bola por quadro, com a posição em metros (campo 105 × 68 m). Posições só valem enquanto a câmera não muda de enquadramento (calibração por homografia).</span></div>
+        </div>
+      </div>
+
       <!-- ══ P2: SCOUT AO VIVO (registro manual de eventos no campo) ══ -->
       <div id="screen-scout" class="screen">
         <div class="topbar">
@@ -3798,6 +3837,108 @@ function atSaveRpe() {
   CSStore.add('srpe', { atletaId: id, data: csToday(), tipo: 'Treino', minutos: m, rpe: AT_STATE.rpe, carga: AT_STATE.rpe * m });
   csToast('Esforço registrado'); renderAtleta();
 }
+
+
+// ══════════════════════════════════════════════════════════════════
+// V4: Análise de Vídeo — lê o posicoes.csv do poc-cv e sincroniza com o vídeo anotado
+// ══════════════════════════════════════════════════════════════════
+var VA = { linhas: [], quadros: {}, lista: [], ids: {}, fps: 25, nome: '', cur: 0, videoUrl: null };
+var VA_COR = { A: '#fb923c', B: '#5b95ff', outro: '#cbd5e1', '': '#cbd5e1' };
+function vaParseCsv(txt) {
+  var L = txt.replace(/\r/g, '').split('\n').filter(function (l) { return l.trim(); });
+  if (L.length < 2) throw new Error('CSV vazio');
+  var cab = L[0].split(',').map(function (c) { return c.trim().toLowerCase(); });
+  var ix = function (n) { return cab.indexOf(n); };
+  ['quadro', 'id', 'x_m', 'y_m'].forEach(function (c) { if (ix(c) < 0) throw new Error('coluna "' + c + '" não encontrada — use o posicoes.csv do example_tracking.py --calib'); });
+  var out = [];
+  for (var i = 1; i < L.length; i++) {
+    var c = L[i].split(',');
+    var r = { q: +c[ix('quadro')], t: ix('tempo_s') >= 0 ? +c[ix('tempo_s')] : null, id: c[ix('id')].trim(), classe: ix('classe') >= 0 ? (c[ix('classe')] || '').trim() : 'pessoa',
+      time: ix('time') >= 0 ? (c[ix('time')] || '').trim() : '', x: +c[ix('x_m')], y: +c[ix('y_m')] };
+    if (isFinite(r.q) && isFinite(r.x) && isFinite(r.y)) out.push(r);
+  }
+  if (!out.length) throw new Error('nenhuma linha válida');
+  return out;
+}
+function vaCarregar(linhas, nome) {
+  VA.linhas = linhas; VA.nome = nome || 'posicoes.csv'; VA.quadros = {}; VA.ids = {};
+  linhas.forEach(function (r) {
+    (VA.quadros[r.q] = VA.quadros[r.q] || []).push(r);
+    if (r.classe === 'bola') return;
+    var o = VA.ids[r.id] = VA.ids[r.id] || { id: r.id, votos: {}, n: 0 };
+    o.n++; o.votos[r.time] = (o.votos[r.time] || 0) + 1;
+  });
+  Object.values(VA.ids).forEach(function (o) { o.time = Object.keys(o.votos).sort(function (a, b) { return o.votos[b] - o.votos[a]; })[0] || ''; });
+  VA.lista = Object.keys(VA.quadros).map(Number).sort(function (a, b) { return a - b; });
+  // fps a partir de tempo_s (quadro / tempo)
+  var comT = linhas.filter(function (r) { return r.t > 0; });
+  VA.fps = comT.length ? Math.round(comT[comT.length - 1].q / comT[comT.length - 1].t) || 25 : 25;
+  VA.cur = 0;
+  vaRender();
+}
+function vaAbrirCsv(f) {
+  if (!f) return;
+  var rd = new FileReader();
+  rd.onload = function () {
+    try { vaCarregar(vaParseCsv(String(rd.result)), f.name); csToast('CSV carregado: ' + VA.linhas.length + ' linhas'); }
+    catch (e) { csToast('Não consegui ler o CSV: ' + e.message); }
+  };
+  rd.readAsText(f);
+}
+function vaAbrirVideo(f) {
+  if (!f) return;
+  if (VA.videoUrl) URL.revokeObjectURL(VA.videoUrl);
+  VA.videoUrl = URL.createObjectURL(f);
+  var v = document.getElementById('va-video'); v.src = VA.videoUrl;
+  document.getElementById('va-video-nome').textContent = f.name;
+  document.getElementById('va-video-vazio').style.display = 'none';
+}
+function vaSync() {
+  var v = document.getElementById('va-video'); if (!v || !VA.lista.length) return;
+  var q = Math.round(v.currentTime * VA.fps) + 1;
+  var k = 0; while (k < VA.lista.length - 1 && VA.lista[k + 1] <= q) k++;
+  if (k !== VA.cur) { VA.cur = k; vaDesenhar(); }
+}
+function vaIrQuadro(k) {
+  VA.cur = Math.max(0, Math.min(VA.lista.length - 1, k)); vaDesenhar();
+  var v = document.getElementById('va-video');
+  if (v && v.src && v.readyState > 0) { v.pause(); v.currentTime = (VA.lista[VA.cur] - 1) / VA.fps; }
+}
+function vaDesenhar() {
+  var svg = document.getElementById('va-pitch'); if (!svg) return;
+  var h = simPitchSvg();
+  var q = VA.lista[VA.cur], linhas = VA.quadros[q] || [];
+  try { h += vaExtraSvg(linhas); } catch (e) {}
+  linhas.forEach(function (r) {
+    if (r.classe === 'bola') { h += '<circle cx="' + r.x + '" cy="' + r.y + '" r="1" fill="#fff" stroke="#111" stroke-width=".3"><title>Bola</title></circle>'; return; }
+    var t = (VA.ids[r.id] || {}).time || r.time;
+    h += '<g transform="translate(' + r.x + ' ' + r.y + ')"><circle r="1.8" fill="' + VA_COR[t] + '" stroke="#0a0f18" stroke-width=".3"/><text y=".65" text-anchor="middle" font-size="1.7" font-weight="800" fill="#0a0f18" font-family="DM Sans, sans-serif">' + r.id + '</text><title>ID ' + r.id + (t ? ' · time ' + t : '') + '</title></g>';
+  });
+  svg.innerHTML = h;
+  var sl = document.getElementById('va-slider'); if (sl) { sl.max = Math.max(0, VA.lista.length - 1); sl.value = VA.cur; }
+  var lab = document.getElementById('va-quadro'); if (lab) lab.textContent = VA.lista.length ? 'quadro ' + q + ' · ' + ((q - 1) / VA.fps).toFixed(1) + ' s · ' + linhas.filter(function (r) { return r.classe !== 'bola'; }).length + ' pessoas' : '—';
+}
+function vaRender() {
+  var st = document.getElementById('va-status'); if (!st) return;
+  if (!VA.lista.length) {
+    st.innerHTML = '<div class="cs-est-banner"><span class="cs-status info">Sem dados</span><span>Abra o <b>posicoes.csv</b> gerado pela visão computacional para ver posições, mapa de calor e compactação. Nenhum dado de exemplo é inventado aqui.</span></div>';
+    document.getElementById('va-resumo').innerHTML = ''; document.getElementById('va-analise').innerHTML = '';
+    vaDesenhar(); return;
+  }
+  st.innerHTML = '';
+  var ids = Object.values(VA.ids), porTime = { A: 0, B: 0, outro: 0, '': 0 };
+  ids.forEach(function (o) { porTime[o.time] = (porTime[o.time] || 0) + 1; });
+  var bola = VA.linhas.filter(function (r) { return r.classe === 'bola'; }).length;
+  var dur = (VA.lista[VA.lista.length - 1] - VA.lista[0]) / VA.fps;
+  document.getElementById('va-resumo').innerHTML = '<div class="card"><div class="card-title">Resumo do arquivo <span>' + VA.nome + '</span></div><div class="va-kpis">' +
+    [['Quadros', VA.lista.length], ['Duração', dur.toFixed(1) + ' s'], ['FPS', VA.fps], ['IDs rastreados', ids.length], ['Time A', porTime.A || 0], ['Time B', porTime.B || 0], ['Outros / sem time', (porTime.outro || 0) + (porTime[''] || 0)], ['Bola visível', Math.round(bola / VA.lista.length * 100) + '% dos quadros']]
+      .map(function (k) { return '<div class="va-kpi"><small>' + k[0] + '</small><b>' + k[1] + '</b></div>'; }).join('') + '</div>' +
+    (porTime.A || porTime.B ? '' : '<div class="dash-sub" style="text-align:left">Sem coluna de time: rode o example_tracking.py com <code>--times</code> para separar os times.</div>') + '</div>';
+  try { vaRenderAnalise(); } catch (e) { console.warn('V3', e); }
+  vaDesenhar();
+}
+function vaExtraSvg() { return ''; }
+function vaRenderAnalise() {}
 
 // ══════════════════════════════════════════════════════════════════
 // P2: SCOUT AO VIVO — eventos {partida, atletaId, tipo, resultado, minuto, x, y} (formato do B3)
@@ -12711,6 +12852,7 @@ function goTo(screenId, navEl) {
   if (screenId === 'telestrador')  setTimeout(telInit, 30);
   if (screenId === 'simulador')    simInit();
   if (screenId === 'scout')        scInit();
+  if (screenId === 'video')        vaRender();
   if (screenId === 'atleta')       renderAtleta();
   if (screenId === 'jogadores')    renderVitrineJogadores();
   setTimeout(function () { try { applyMetricChips(); } catch (e) {} }, 250);
