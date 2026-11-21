@@ -586,3 +586,11 @@ O que ficou de fora ou só parcialmente feito, em ordem de valor:
   Tático.
 - **Layout para celular:** fora do escopo — o CapixaStat é um site para PC (decisão de 21/11).
 - **React (`web-react/`):** parado; a v5 em HTML é a versão de entrega.
+- **Rodada 2 (21/11) — ficou para depois:**
+  - Táticas: TA7 dossiê em slides para a preleção, TA8 IA como redatora do dossiê (texto a partir dos números), TA9
+    escalação provável e duelos-chave (fontes abertas não têm escalações), TA10 bolas paradas com dados. O Auxiliar com
+    IA não foi testado com chave real do Gemini.
+  - Formação: FM3 testes físicos com protocolo (CMJ, sprint 10/30 m, Yo-Yo IR1), FM4 monotonia e strain (Foster),
+    FM5 perfil físico único do atleta, FM6 relatório semanal de carga em PDF, FM7 corpo **3D** (Three.js + modelo
+    anatômico de licença livre e regiões separadas). Ainda há conteúdo de exemplo na Formação: sessões/microciclo de
+    exemplo, lista de mobilidade fixa e a aba Carga & Intensidade estimada (com aviso).

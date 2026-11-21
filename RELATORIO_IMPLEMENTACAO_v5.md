@@ -130,3 +130,14 @@
   adversário; dados físicos reais (abas Físico/Antropometria e alguns eixos do radar seguem estimados); mais fontes de
   dados (só TheSportsDB está na rotina); a plataforma ainda não chama a API do serviço Python; selo "editado" ainda
   não existe no Quadro Tático; React parado.
+
+## 9. Rodada 2 (21/11/2026)
+1. **Navegação:** "Estúdio Tático" com abas Campo / Lance animado / Sobre vídeo; Scout ao Vivo dentro de Partidas;
+   Análise de Vídeo com selo Experimental; biblioteca de lances em janela nas abas que salvam lances.
+2. **GitHub:** publicado em https://github.com/cborba733/Capixastat (histórico unido sem force push; sem `.env`).
+3. **Sem emojis:** todos trocados por ícones Lucide (SVG, licença ISC) com o mesmo estilo.
+4. **Táticas:** avaliação e pesquisa em `docs/PROPOSTA_TATICAS.md`; Dossiê com "Resumo para a preleção" (3 chaves do
+   jogo, números reais, confronto direto, lances ligados), perfil tático marcado como não verificado/informado pela
+   comissão, anotações por fases do jogo + SWOT, Auxiliar Tático ancorado nos dados. Corrigido o PDF do dossiê.
+5. **Formação:** avaliação em `docs/PROPOSTA_FORMACAO.md`; Antropometria e Evolução Física **inventavam números** —
+   substituídas por medidas reais (ISAK) com corpo em SVG clicável (frente/costas). O 3D ficou para depois.
