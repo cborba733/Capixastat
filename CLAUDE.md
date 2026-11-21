@@ -142,7 +142,7 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 ✅ A1 · ✅ A2 · ✅ A3 · ✅ B1 · ✅ B2 · ✅ B3 · ✅ L2 · ✅ R2 · ✅ R3 · ✅ V1 · ✅ X1 · ✅ P2
 **Dados externos:** ✅ pesquisa de fontes · ✅ integração TheSportsDB (rotina + banco + fonte/data na tela)
 **Média:** ✅ A5 · ✅ A7 · ✅ A8 · ✅ P4 · ✅ P5 · ✅ F3 · ✅ F4 · ✅ T2 · ✅ T3 · ✅ X2 · ✅ Q2 · ✅ B6 · ✅ V5 ·
-✅ I2 · ✅ I3 · ✅ M2 · ⬜ M4 · ⬜ R5 · ⬜ D4 · ⬜ A6 · ⬜ A9 · ⬜ P3 · ⬜ F5 · ⬜ T4 · ⬜ X3 · ⬜ Q1 · ⬜ B5 ·
+✅ I2 · ✅ I3 · ✅ M2 · ✅ M4 · ⬜ R5 · ⬜ D4 · ⬜ A6 · ⬜ A9 · ⬜ P3 · ⬜ F5 · ⬜ T4 · ⬜ X3 · ⬜ Q1 · ⬜ B5 ·
 ⬜ V2 · ⬜ V4 · ⬜ L3 · ⬜ M1 · ⬜ R4 · ⬜ Q3 · ⬜ V3
 **Baixa:** ⬜ A10 · ⬜ X4 · ⬜ Q4 · ⬜ V6 · ⬜ M3 · ⬜ P6 · ⬜ F6 · ✅ B7 · ⬜ L4
 
@@ -349,6 +349,9 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 
 - **M2:** `csCountUp(el, alvo, casas)` nos KPIs da Visão Geral (com `setTimeout` de garantia — rAF pausa em aba oculta),
   `csSkeleton(n)` (shimmer) no carregamento dos dados externos, fade-up nas trocas de aba, transições em botões/cards.
+
+- **M4:** `@media (prefers-reduced-motion: reduce)` zera animações/transições; Chart.js sem animação; rolagem sem
+  "smooth"; contador e simulador respeitam `csReduceMotion()`. Teste geral: 15 telas + 6 abas da Formação sem erro.
 
 ### ONDE PAROU (21/11, madrugada — limite de uso)
 Próximos itens Média, nesta ordem: P5, F3, F4, T2, T3, X2, Q2, B6, V5, I2, I3, M2, M4, R5 (dif. baixa); depois D4, A6,

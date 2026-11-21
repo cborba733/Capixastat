@@ -1930,6 +1930,12 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 @keyframes csShimmer { from { background-position:200% 0 } to { background-position:-200% 0 } }
 .btn, .vf-seg, .nav-item, .card, .player-card { transition: background-color .18s ease, color .18s ease, border-color .18s ease, transform .18s ease, box-shadow .18s ease }
 .btn:active, .vf-seg:active { transform: scale(.97) }
+
+/* ═══ M4: respeita "reduzir movimento" do sistema operacional ═══ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important }
+  .cs-skel { animation:none !important }
+}
 </style>
 </head>
 <body>
@@ -4389,6 +4395,8 @@ function renderTimeDestaques(c, allMatches) {
 
 
 // ── M2: microinterações ──
+// M4: com "reduzir movimento" ligado, os gráficos do Chart.js também deixam de animar
+(function () { try { if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches && window.Chart) Chart.defaults.animation = false; } catch (e) {} })();
 function csReduceMotion() { return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
 function csCountUp(el, alvo, casas) {
   if (!el) return;
@@ -12242,7 +12250,7 @@ function goTo(screenId, navEl) {
   const NAV_PARENT = { 'cadastro-jogador': 'jogadores' };
   if (!navEl || !navEl.classList || !navEl.classList.contains('nav-item')) navEl = document.querySelector('.nav-item[data-screen="' + (NAV_PARENT[screenId] || screenId) + '"]');
   if (navEl) navEl.classList.add('active');
-  document.querySelector('.main').scrollTo({top:0, behavior:'smooth'});
+  document.querySelector('.main').scrollTo({top:0, behavior: csReduceMotion() ? 'auto' : 'smooth'}); // M4
   // Lembra a tela atual (restaurada ao recarregar a página)
   try {
     localStorage.setItem('capixastat_screen', screenId);
