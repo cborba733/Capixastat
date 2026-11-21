@@ -2022,6 +2022,19 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .cs-chart-alt-tab caption { text-align:left; padding:6px 8px; color:var(--text-2); font-weight:600 }
 .cs-chart-alt-tab th, .cs-chart-alt-tab td { padding:4px 8px; border-bottom:1px solid var(--border); text-align:left; color:var(--text-2) }
 .cs-chart-alt-tab td { font-family:var(--font-mono) }
+
+/* A10 */
+.cmp-tab { width:100%; border-collapse:collapse; font-size:13px }
+.cmp-tab th, .cmp-tab td { padding:7px 10px; border-bottom:1px solid var(--border); text-align:left; color:var(--text-2) }
+.cmp-tab thead th { font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--text-3) }
+.cmp-tab thead th.p1, .cmp-tab tfoot .p1 { color:var(--brand) } .cmp-tab thead th.p2, .cmp-tab tfoot .p2 { color:var(--accent) }
+.cmp-tab td { font-family:var(--font-mono); width:16% }
+.cmp-tab td.cmp-win { color:var(--ok); font-weight:700 }
+.cmp-tab .cmp-dif { width:30%; position:relative }
+.cmp-dif-bar { display:inline-block; vertical-align:middle; height:6px; width:calc(var(--w) * .6); max-width:60%; border-radius:3px; background:var(--border-md); margin-right:8px }
+.cmp-dif-bar.p1 { background:var(--brand) } .cmp-dif-bar.p2 { background:var(--accent) }
+.cmp-dif b.p1 { color:var(--brand) } .cmp-dif b.p2 { color:var(--accent) }
+.cmp-tab tfoot th, .cmp-tab tfoot td { font-weight:700; border-bottom:0 }
 </style>
 </head>
 <body>
@@ -2919,6 +2932,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
               </div>
             </div>
           </div>
+          <!-- A10: tabela lado a lado com diferença colorida -->
+          <div class="card" id="cmp-tabela" style="margin-top:14px"></div>
         </div>
       </div>
 
@@ -13370,8 +13385,42 @@ function renderComparativo() {
     
   const metricsEl = document.getElementById('cmp-metrics-container');
   if (metricsEl) metricsEl.innerHTML = metricsHtml;
+  try { renderCmpTabela(p1, p2); } catch (e) { console.warn('A10', e); }
   
   initCmpCharts(p1, p2);
+}
+
+
+// ── A10: tabela lado a lado — valor de cada atleta, diferença e quem leva vantagem ──
+function renderCmpTabela(p1, p2) {
+  var el = document.getElementById('cmp-tabela'); if (!el) return;
+  var a1 = playerAgg(p1), a2 = playerAgg(p2), n1 = per90(a1), n2 = per90(a2);
+  var gk1 = p1.pos === 'Goleiro', gk2 = p2.pos === 'Goleiro';
+  var eixos = ['Gols/Ações', 'Passes', 'Dribles/Reflexos', 'Físico', 'Disciplina', 'Consistência'];
+  var estEixo = { 2: 1, 3: 1, 5: 1 }; // eixos que são aproximação (ver README: proxies/baseline)
+  var linhas = [
+    ['Jogos', a1.jogos, a2.jogos, 1, 0], ['Minutos', a1.minutos || null, a2.minutos || null, 1, 0],
+    ['Gols', gk1 ? null : a1.gols, gk2 ? null : a2.gols, 1, 0], ['Assistências', gk1 ? null : a1.assists, gk2 ? null : a2.assists, 1, 0],
+    ['Gols por 90 min', gk1 ? null : n1.gols, gk2 ? null : n2.gols, 1, 2], ['Assistências por 90 min', gk1 ? null : n1.ast, gk2 ? null : n2.ast, 1, 2],
+    ['G+A por 90 min', gk1 ? null : n1.ga, gk2 ? null : n2.ga, 1, 2],
+    ['Cartões', (a1.amarelos || 0) + (a1.vermelhos || 0), (a2.amarelos || 0) + (a2.vermelhos || 0), -1, 0], ['Cartões por 90 min', n1.cart, n2.cart, -1, 2],
+    ['Score Geral', p1.score, p2.score, 1, 0]
+  ].concat(eixos.map(function (e, i) { return ['Radar · ' + e + (estEixo[i] ? ' <span class="cs-src est" title="Aproximação: não há dado público direto desta métrica">est.</span>' : ''), (p1.radar || [])[i], (p2.radar || [])[i], 1, 0]; }));
+  var v1 = 0, v2 = 0;
+  var fmt = function (v, d) { return v == null || !isFinite(v) ? '—' : (+v).toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d }); };
+  var corpo = linhas.map(function (l) {
+    var x = l[1], y = l[2], melhor = l[3], d = l[4], tem = x != null && y != null && isFinite(x) && isFinite(y);
+    var dif = tem ? x - y : null, lado = !tem || Math.abs(dif) < 1e-9 ? 0 : (dif * melhor > 0 ? 1 : 2);
+    if (lado === 1) v1++; else if (lado === 2) v2++;
+    var max = Math.max(Math.abs(x || 0), Math.abs(y || 0)) || 1, larg = tem ? Math.min(100, Math.abs(dif) / max * 100) : 0;
+    return '<tr><th scope="row">' + l[0] + '</th>' +
+      '<td class="' + (lado === 1 ? 'cmp-win' : '') + '">' + fmt(x, d) + '</td><td class="' + (lado === 2 ? 'cmp-win' : '') + '">' + fmt(y, d) + '</td>' +
+      '<td class="cmp-dif">' + (tem ? '<span class="cmp-dif-bar ' + (lado === 1 ? 'p1' : lado === 2 ? 'p2' : '') + '" style="--w:' + larg.toFixed(0) + '%"></span><b class="' + (lado === 1 ? 'p1' : lado === 2 ? 'p2' : '') + '">' + (dif > 0 ? '+' : '') + fmt(dif, d) + '</b>' : '<span class="tl2-empty" style="padding:0">sem dado</span>') + '</td></tr>';
+  }).join('');
+  el.innerHTML = '<div class="card-title">Lado a lado <span>diferença = ' + p1.nome + ' − ' + p2.nome + '; verde = quem leva vantagem (em cartões, menos é melhor)</span></div>' +
+    '<table class="cmp-tab"><thead><tr><th scope="col">Métrica</th><th scope="col" class="p1">' + p1.nome + '</th><th scope="col" class="p2">' + p2.nome + '</th><th scope="col">Diferença</th></tr></thead><tbody>' + corpo + '</tbody>' +
+    '<tfoot><tr><th scope="row">Vantagens</th><td class="p1">' + v1 + '</td><td class="p2">' + v2 + '</td><td></td></tr></tfoot></table>' +
+    '<div class="dash-sub" style="text-align:left">Números por 90 min só aparecem com pelo menos ' + MIN_MINUTOS_90 + ' minutos jogados. Gols e assistências de goleiro não entram na comparação.</div>';
 }
 
 function initCmpCharts(p1, p2) {
