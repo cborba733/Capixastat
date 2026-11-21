@@ -1860,6 +1860,13 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
   color:var(--text-3); font-size:16px; cursor:pointer; line-height:1; z-index:1 }
 .obs-star.inline { position:static; width:26px; height:26px; font-size:14px }
 .obs-star.on { color:#facc15; border-color:#facc15 }
+
+/* A7 */
+.rel-item { border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin-bottom:10px; font-size:13px; color:var(--text-1); display:grid; gap:5px }
+.rel-item small { display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--text-3) }
+.rel-h { display:flex; flex-wrap:wrap; gap:8px; align-items:center }
+.rel-nota { color:#facc15; letter-spacing:1px }
+.rel-f { display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--text-3) }
 </style>
 </head>
 <body>
@@ -2378,6 +2385,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
             <button class="tab-btn" onclick="switchTab(event,'pane-stats')">Estatísticas</button>
             <button class="tab-btn" onclick="switchTab(event,'pane-evolucao')">Evolução</button>
             <button class="tab-btn" onclick="switchTab(event,'pane-historico')">Histórico</button>
+            <button class="tab-btn" onclick="switchTab(event,'pane-observacao');renderRelatorios()">Observação</button>
           </div>
 
           <style>
@@ -2528,6 +2536,13 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
             <div class="card"><div class="card-title">Evolução do Score — Temporada 2026 <span class="badge badge-ds">DS</span></div><canvas id="chartEvolucao" height="80"></canvas><p class="chart-insight" id="insight-evolucao"></p></div>
           </div>
 
+          <!-- A7: relatório de observação estruturado -->
+          <div id="pane-observacao" class="tab-pane">
+            <div class="grid-2-eq">
+              <div class="card" id="obs-form-card"></div>
+              <div class="card"><div class="card-title">Relatórios deste atleta</div><div id="obs-lista"></div></div>
+            </div>
+          </div>
           <div id="pane-historico" class="tab-pane">
             <div class="card">
               <div class="card-title">Linha do tempo — Histórico de clubes</div>
@@ -3851,7 +3866,7 @@ function regAtletaToggle() {
 // Qualquer gravação no localStorage destas chaves agenda o envio (1,5 s depois da última mudança).
 // Ao entrar, baixa o que estiver mais novo no servidor. Sem login real, tudo continua só local.
 // ══════════════════════════════════════════════════════════════════
-var CS_CLOUD_KEYS = { capixastat_taticas: 'taticas', capixastat_taticas_presets: 'taticas_presets', capixastat_tel: 'telestracao', capixastat_userphotos: 'fotos', capixastat_v5_filtros: 'filtros', capixastat_v5_lances: 'lances', capixastat_v5_obs: 'observacao' };
+var CS_CLOUD_KEYS = { capixastat_taticas: 'taticas', capixastat_taticas_presets: 'taticas_presets', capixastat_tel: 'telestracao', capixastat_userphotos: 'fotos', capixastat_v5_filtros: 'filtros', capixastat_v5_lances: 'lances', capixastat_v5_obs: 'observacao', capixastat_v5_relatorios: 'relatorios' };
 var _csCloudTimers = {}, _csCloudPulling = false;
 function csCloudStamps() { try { return JSON.parse(localStorage.getItem('capixastat_v5_stamps') || '{}'); } catch (e) { return {}; } }
 function csCloudSetStamp(chave, t) { var s = csCloudStamps(); s[chave] = t; try { Storage.prototype._csOrigSet.call(localStorage, 'capixastat_v5_stamps', JSON.stringify(s)); } catch (e) {} }
@@ -11782,6 +11797,52 @@ function vfExportCSV() {
   var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' }));
   a.download = 'capixastat-atletas-' + (VF_STATE.scope === 'obs' ? 'observacao' : VF_STATE.scope) + '.csv'; a.click();
 }
+
+
+// ── A7: relatório de observação (situação → comportamento → consequência + fortes/fracos) ──
+var REL_RECOM = ['Acompanhar', 'Observar ao vivo', 'Recomendar contratação', 'Promover ao profissional', 'Descartar por ora'];
+function relAll() { try { return JSON.parse(localStorage.getItem('capixastat_v5_relatorios') || '[]'); } catch (e) { return []; } }
+function relSave(arr) { try { localStorage.setItem('capixastat_v5_relatorios', JSON.stringify(arr)); } catch (e) { csToast('Armazenamento cheio'); } }
+function renderRelatorios() {
+  var p = window.currentProfileId && PLAYERS[window.currentProfileId];
+  var form = document.getElementById('obs-form-card'), lista = document.getElementById('obs-lista');
+  if (!p || !form || !lista) return;
+  var u = getCurrentUser() || {};
+  var jogos = (_getClubAllMatches(p.clube) || []).filter(function (j) { return j.gh != null; }).sort(function (a, b) { return (b._date || 0) - (a._date || 0); }).slice(0, 15);
+  form.innerHTML = '<div class="card-title">Novo relatório — ' + p.nome + '</div>' +
+    '<div class="rg-form">' +
+      '<label>Data<input type="date" id="rel-data" class="form-input" value="' + csToday() + '"></label>' +
+      '<label>Jogo / contexto<select id="rel-jogo" class="form-select"><option value="">Treino ou vídeo</option>' + jogos.map(function (j) { return '<option>' + j.data + ' · ' + j.home + ' ' + j.gh + '–' + j.ga + ' ' + j.away + '</option>'; }).join('') + '</select></label>' +
+      '<label class="rg-wide">Situação (o que estava acontecendo)<textarea id="rel-sit" class="form-textarea" rows="2" maxlength="400" placeholder="Ex.: saída de bola sob pressão alta, lado direito"></textarea></label>' +
+      '<label class="rg-wide">Comportamento observado<textarea id="rel-comp" class="form-textarea" rows="2" maxlength="400" placeholder="Ex.: recebeu de costas e devolveu de primeira ao zagueiro"></textarea></label>' +
+      '<label class="rg-wide">Consequência<textarea id="rel-cons" class="form-textarea" rows="2" maxlength="400" placeholder="Ex.: o time perdeu a chance de progredir pelo corredor livre"></textarea></label>' +
+      '<label>Pontos fortes<textarea id="rel-fortes" class="form-textarea" rows="2" maxlength="300"></textarea></label>' +
+      '<label>A desenvolver<textarea id="rel-fracos" class="form-textarea" rows="2" maxlength="300"></textarea></label>' +
+      '<label>Nota (1–5)<select id="rel-nota" class="form-select"><option>3</option><option>1</option><option>2</option><option>4</option><option>5</option></select></label>' +
+      '<label>Recomendação<select id="rel-rec" class="form-select">' + REL_RECOM.map(function (r) { return '<option>' + r + '</option>'; }).join('') + '</select></label>' +
+    '</div><button class="btn btn-primary btn-sm" onclick="relAdd()">Salvar relatório</button>' +
+    '<div class="cs-metric"><b class="cs-metric-tag">Método</b><span>Em vez de "jogou mal", registre <b>situação → comportamento → consequência</b>. Fica claro o que precisa mudar e dá para comparar relatórios de observadores diferentes.</span></div>';
+  var rel = relAll().filter(function (r) { return r.atletaId === p.id; }).sort(function (a, b) { return a.data < b.data ? 1 : -1; });
+  lista.innerHTML = rel.length ? rel.map(function (r) {
+    return '<div class="rel-item"><div class="rel-h"><b>' + csFmtDate(r.data) + '</b> · ' + (r.jogo || 'treino/vídeo') + ' <span class="rel-nota">' + '★'.repeat(r.nota) + '☆'.repeat(5 - r.nota) + '</span><span class="cs-status info">' + r.recomendacao + '</span></div>' +
+      (r.situacao ? '<div><small>Situação</small>' + csEsc(r.situacao) + '</div>' : '') + (r.comportamento ? '<div><small>Comportamento</small>' + csEsc(r.comportamento) + '</div>' : '') +
+      (r.consequencia ? '<div><small>Consequência</small>' + csEsc(r.consequencia) + '</div>' : '') +
+      (r.fortes ? '<div><small>Fortes</small>' + csEsc(r.fortes) + '</div>' : '') + (r.fracos ? '<div><small>A desenvolver</small>' + csEsc(r.fracos) + '</div>' : '') +
+      '<div class="rel-f">por ' + csEsc(r.autor || '—') + ' <button class="btn btn-ghost btn-sm" onclick="relDel(\'' + r.id + '\')">Excluir</button></div></div>';
+  }).join('') : '<div class="tl2-empty">Nenhum relatório ainda.</div>';
+}
+function csEsc(t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+function relAdd() {
+  var p = PLAYERS[window.currentProfileId]; if (!p) return;
+  var v = function (id) { return (document.getElementById(id).value || '').trim(); };
+  if (!v('rel-sit') && !v('rel-comp') && !v('rel-fortes')) { csToast('Preencha pelo menos a situação ou o comportamento'); return; }
+  var u = getCurrentUser() || {};
+  var arr = relAll();
+  arr.push({ id: Date.now().toString(36), atletaId: p.id, data: v('rel-data') || csToday(), jogo: v('rel-jogo'), situacao: v('rel-sit'), comportamento: v('rel-comp'),
+    consequencia: v('rel-cons'), fortes: v('rel-fortes'), fracos: v('rel-fracos'), nota: +v('rel-nota') || 3, recomendacao: v('rel-rec'), autor: u.nome || '', criadoEm: new Date().toISOString() });
+  relSave(arr); csToast('Relatório salvo'); renderRelatorios();
+}
+function relDel(id) { if (!confirm('Excluir este relatório?')) return; relSave(relAll().filter(function (r) { return r.id !== id; })); renderRelatorios(); }
 
 var VF_VIEW = 'cards';
 function vfSetView(v) {
