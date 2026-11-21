@@ -51,7 +51,7 @@
   --seq-0: rgba(91,149,255,.08); --seq-1: #5b95ff;            /* sequencial (heatmap/intensidade) */
   --div-neg: #f87171; --div-mid: #8299aa; --div-pos: #22c55e;  /* divergente (abaixo/acima da média) */
   --sidebar-w:   240px;
-  --topbar-h:    58px;
+  --topbar-h:    66px; /* L3: +1 linha para a barra de contexto */
   --radius:      10px;
   --radius-lg:   14px;
   --font-ui:     'DM Sans', sans-serif;
@@ -580,7 +580,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
   flex-direction: column;
 }
 .topbar {
-  height: var(--topbar-h);
+  min-height: var(--topbar-h); /* L3: cresce se o subtítulo quebrar linha */
   background: rgba(10,15,24,.85);
   backdrop-filter: blur(20px) saturate(1.4);
   -webkit-backdrop-filter: blur(20px) saturate(1.4);
@@ -588,7 +588,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 28px;
+  padding: 6px 28px;
   position: sticky;
   top: 0;
   z-index: 5;
@@ -1997,6 +1997,15 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 
 /* V3 */
 .va-an { display:grid; grid-template-columns:1fr 1fr; gap:14px }
+
+/* L3: barra de contexto */
+.ctx-bar { display:flex; align-items:center; gap:6px; white-space:nowrap; font-size:11.5px; color:var(--text-3); margin-bottom:2px; line-height:1.2 }
+.ctx-clube { display:inline-flex; align-items:center; gap:5px; color:var(--text-2); font-weight:600 }
+.ctx-clube img { width:14px; height:14px; object-fit:contain }
+.ctx-sel { background:transparent; border:1px solid var(--border-md); color:var(--brand); border-radius:6px; font-size:11.5px; padding:1px 4px; cursor:pointer; font-family:inherit }
+.ctx-sel option { background:var(--bg-raised); color:var(--text-1) }
+.ctx-off { font-style:italic }
+.ctx-x { background:none; border:0; color:var(--text-3); cursor:pointer; font-size:14px; line-height:1; padding:0 2px } .ctx-x:hover { color:var(--danger) }
 </style>
 </head>
 <body>
@@ -5017,11 +5026,30 @@ function ctxInit() {
 }
 function ctxSet(comp) {
   CS_CTX.comp = comp; try { localStorage.setItem('capixastat_v5_ctx_comp', comp); } catch (e) {}
+  var lat = document.getElementById('ctx-comp'); if (lat) lat.value = comp; // L3: barra do topo e menu lateral sempre iguais
   var vfc = document.getElementById('vf-comp'); if (vfc) vfc.value = CTX_STATS_KEY[comp] || '';
   var ativa = document.querySelector('.screen.active'); var id = ativa ? ativa.id.replace('screen-', '') : 'dashboard';
   updateGlobalStats(); goTo(id);
   csToast(comp ? 'Filtrando por ' + COMPETITIONS[comp].nome : 'Mostrando todas as competições');
 }
+
+// ── L3: barra de contexto em todas as telas (clube · competição · temporada) ──
+var CTX_TELAS = { dashboard: 1, time: 1, jogadores: 1, perfil: 1 }; // telas cujos números mudam com a competição
+function ctxBarRender(screenId) {
+  var tela = document.getElementById('screen-' + screenId); if (!tela) return;
+  var tb = tela.querySelector('.topbar'); if (!tb) return;
+  var bar = tb.querySelector('.ctx-bar');
+  if (!bar) { bar = document.createElement('div'); bar.className = 'ctx-bar'; var h1 = tb.querySelector('h1'), left = h1 ? h1.parentElement : (tb.querySelector('.topbar-left') || tb); left.insertBefore(bar, left.firstChild); }
+  var u = getCurrentUser(), clube = u ? resolveClube(u.clube) : null, esc = clube ? _dashClubBadge(clube) : '';
+  var usa = !!CTX_TELAS[screenId];
+  var opts = '<option value="">Todas as competições</option>' + Object.keys(COMPETITIONS).map(function (k) { return '<option value="' + k + '"' + (CS_CTX.comp === k ? ' selected' : '') + '>' + COMPETITIONS[k].nome + '</option>'; }).join('');
+  bar.innerHTML = (clube ? '<span class="ctx-clube">' + (esc ? '<img src="' + esc + '" alt="" onerror="this.remove()">' : '') + clube + '</span><span class="ctx-sep">·</span>' : '') +
+    (usa ? '<select class="ctx-sel" onchange="ctxSet(this.value)" aria-label="Competição">' + opts + '</select>'
+         : '<span class="ctx-off" title="Esta tela não depende da competição">' + ctxLabel() + '</span>') +
+    '<span class="ctx-sep">·</span><span>Temporada ' + CS_CTX.temporada + '</span>' +
+    (usa && CS_CTX.comp ? '<button class="ctx-x" onclick="ctxSet(\'\')" title="Limpar filtro de competição" aria-label="Limpar filtro de competição">×</button>' : '');
+}
+
 function ctxFilter(jogos) { return CS_CTX.comp ? jogos.filter(function (j) { return j._compId === CS_CTX.comp; }) : jogos; }
 function ctxLabel() { return CS_CTX.comp ? COMPETITIONS[CS_CTX.comp].nome : 'Todas as competições'; }
 
@@ -12899,6 +12927,7 @@ function goTo(screenId, navEl) {
   if (!navEl || !navEl.classList || !navEl.classList.contains('nav-item')) navEl = document.querySelector('.nav-item[data-screen="' + (NAV_PARENT[screenId] || screenId) + '"]');
   if (navEl) navEl.classList.add('active');
   document.querySelector('.main').scrollTo({top:0, behavior: csReduceMotion() ? 'auto' : 'smooth'}); // M4
+  try { ctxBarRender(screenId); } catch (e) { console.warn('L3', e); }
   // Lembra a tela atual (restaurada ao recarregar a página)
   try {
     localStorage.setItem('capixastat_screen', screenId);
