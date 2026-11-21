@@ -3111,6 +3111,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
               <button class="tel-tool" data-tool="ellipse" data-tip="Círculo / destaque"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9" ry="6.5"/></svg></button>
               <button class="tel-tool" data-tool="cone" data-tip="Campo de visão"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
               <button class="tel-tool" data-tool="zone" data-tip="Zona (perspectiva)"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></button>
+              <button class="tel-tool" data-tool="spot" data-tip="Spotlight (foco no jogador)"><svg viewBox="0 0 24 24"><path d="M9 3h6l3 14H6z" opacity=".5"/><ellipse cx="12" cy="19" rx="7" ry="2.5"/></svg></button>
+              <button class="tel-tool" data-tool="link" data-tip="Ligação entre jogadores (clique nos pontos, duplo clique termina)"><svg viewBox="0 0 24 24"><circle cx="5" cy="17" r="2.5"/><circle cx="12" cy="7" r="2.5"/><circle cx="19" cy="17" r="2.5"/><path d="M6.5 15 10.5 9M13.5 9l4 6"/></svg></button>
               <button class="tel-tool" data-tool="draw" data-tip="Desenho livre"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
               <button class="tel-tool" data-tool="text" data-tip="Texto"><svg viewBox="0 0 24 24"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg></button>
               <div class="tel-rdiv"></div>
@@ -15622,7 +15624,8 @@ function telDown(e){
       telPending = null; telClearPreview();
     }
   }
-  else if (telTool === 'zone'){ if (!telZonePts) telZonePts = []; telZonePts.push(p); telDrawZonePrev(); }
+  else if (telTool === 'zone' || telTool === 'link'){ if (!telZonePts) telZonePts = []; telZonePts.push(p); telDrawZonePrev(); }
+  else if (telTool === 'spot') telAddSpot(p.x, p.y);
 }
 function telMove(){
   var p = telPos();
@@ -15637,6 +15640,7 @@ function telMove(){
 function telUp(){ if (telDrawing){ telDrawing = false; telClearPreview(); telAddFree(telFreePts); telFreePts = null; } }
 function telDbl(e){
   if (telTool === 'zone' && telZonePts && telZonePts.length >= 3){ telAddZone(telZonePts.slice()); telCancelZone(); return; }
+  if (telTool === 'link' && telZonePts && telZonePts.length >= 2){ var lp = telZonePts.slice(); if (lp.length > 2) lp.pop(); telAddLink(lp); telCancelZone(); return; }
   var top = e && e.target;
   while (top && top !== telStage && top.getParent && top.getParent() !== telLayer) top = top.getParent();
   if (top && top.telType === 'text'){ var nv = prompt('Editar texto:', top.getText().text()); if (nv !== null){ top.getText().text(nv); telLayer.batchDraw(); } return; }
@@ -15709,6 +15713,25 @@ function telAddEllipse(x1, y1, x2, y2){
   var el = new Konva.Ellipse({ x:cx, y:cy, radiusX:rx, radiusY:ry, stroke:telColor, strokeWidth:4, fill:'transparent', draggable:telTool === 'select', shadowColor:'#000', shadowBlur:5, shadowOpacity:0.3 });
   el.telType = 'ellipse'; el.telColor = telColor; el.telFillOn = false; telLayer.add(el); telPushAdd(el); telLayer.batchDraw();
 }
+
+// ── Q2: novas marcações do Quadro Tático ──
+// Spotlight: feixe de luz sobre o jogador (destaque de quem deve ser observado)
+function telAddSpot(x, y){
+  var g = new Konva.Group({ x:x, y:y, draggable:telTool === 'select' });
+  g.add(new Konva.Rect({ x:-42, y:-230, width:84, height:230, fillLinearGradientStartPoint:{ x:0, y:0 }, fillLinearGradientEndPoint:{ x:0, y:230 },
+    fillLinearGradientColorStops:[0, telRgba(telColor, 0), 1, telRgba(telColor, 0.38)], cornerRadius:4 }));
+  g.add(new Konva.Ellipse({ x:0, y:0, radiusX:46, radiusY:14, fill:telRgba(telColor, 0.30), stroke:telColor, strokeWidth:4, shadowColor:telColor, shadowBlur:18, shadowOpacity:.8 }));
+  g.telType = 'spot'; g.telColor = telColor; telLayer.add(g); telPushAdd(g); telLayer.batchDraw();
+}
+// Ligação: linha que une vários jogadores (ex.: "saída de 3"), com nós nas pontas
+function telAddLink(pts){
+  if (!pts || pts.length < 2) return;
+  var flat = []; pts.forEach(function (q) { flat.push(q.x, q.y); });
+  var g = new Konva.Group({ x:0, y:0, draggable:telTool === 'select' });
+  g.add(new Konva.Line({ points:flat, stroke:telColor, strokeWidth:5, lineCap:'round', lineJoin:'round', shadowColor:'#000', shadowBlur:4, shadowOpacity:.5 }));
+  pts.forEach(function (q) { g.add(new Konva.Circle({ x:q.x, y:q.y, radius:9, fill:'#0b1220', stroke:telColor, strokeWidth:4 })); });
+  g.telType = 'link'; g.telColor = telColor; g.telPts = flat; telLayer.add(g); telPushAdd(g); telLayer.batchDraw();
+}
 function telAddLine(x1, y1, x2, y2){
   var l = new Konva.Line({ points:[x1,y1,x2,y2], stroke:telColor, strokeWidth:5, lineCap:'round', draggable:telTool === 'select', shadowColor:'#000', shadowBlur:4, shadowOpacity:0.3 });
   l.telType = 'line'; l.telColor = telColor; telLayer.add(l); telPushAdd(l); telLayer.batchDraw();
@@ -15728,6 +15751,7 @@ function telRecolorSel(){
     else if (n.telType === 'player'){ telRecolorPlayer(n, telColor); }
     else if (n.telType === 'line' || n.telType === 'free'){ n.stroke(telColor); n.telColor = telColor; }
     else if (n.telType === 'rect' || n.telType === 'ellipse'){ n.stroke(telColor); n.telColor = telColor; if (n.telFillOn) n.fill(telRgba(telColor, 0.22)); }
+    else if (n.telType === 'spot' || n.telType === 'link'){ var b = telSerializeNode(n); b.col = telColor; var idx = n.zIndex(); n.destroy(); telRebuild(b); }
   });
   telLayer.batchDraw();
 }
@@ -15792,6 +15816,7 @@ function telSerializeNode(n){
   else if (t === 'zone'){ b.points = n.points(); b.sw = n.strokeWidth(); b.fillOn = (n.telFillOn !== false); }
   else if (t === 'cone'){ b.len = n.getAttr('len'); }
   else if (t === 'text'){ b.text = n.getText().text(); b.fs = n.getText().fontSize(); }
+  else if (t === 'link'){ b.pts = n.telPts; }
   return b;
 }
 function telRebuild(b){
@@ -15808,6 +15833,8 @@ function telRebuild(b){
   else if (t === 'zone'){ var pts = []; for (var i = 0; i < b.points.length; i += 2) pts.push({ x:b.points[i], y:b.points[i+1] }); telAddZone(pts); n = last(); if (b.sw) n.strokeWidth(b.sw); if (b.fillOn === false){ n.telFillOn = false; n.fillLinearGradientColorStops([0,'rgba(0,0,0,0)',1,'rgba(0,0,0,0)']); } }
   else if (t === 'cone'){ telAddCone(b.x, b.y, b.x + 10, b.y); n = last(); n.setAttr('len', b.len); }
   else if (t === 'text'){ telAddText(b.x, b.y, b.text); n = last(); if (b.fs) n.getText().fontSize(b.fs); }
+  else if (t === 'spot'){ telAddSpot(0, 0); n = last(); }
+  else if (t === 'link'){ var lp = []; for (var k = 0; k < (b.pts || []).length; k += 2) lp.push({ x:b.pts[k], y:b.pts[k+1] }); telAddLink(lp); n = last(); }
   if (n){ n.x(b.x); n.y(b.y); n.rotation(b.rot || 0); n.scaleX(b.sx || 1); n.scaleY(b.sy || 1); n.opacity(b.op == null ? 1 : b.op); if (b.ts != null) n.telTStart = b.ts; if (b.te != null) n.telTEnd = b.te; }
   telColor = prevColor; telTool = prevTool;
 }
