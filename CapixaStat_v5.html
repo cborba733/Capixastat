@@ -2342,7 +2342,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
           </div>
           <div class="topbar-right">
             <button class="btn btn-ghost btn-sm">Editar</button>
-            <button class="btn btn-ghost btn-sm">Exportar PDF</button>
+            <button class="btn btn-ghost btn-sm" onclick="cardAtletaBaixar('png')" title="Imagem para compartilhar (redes sociais, WhatsApp)">Card PNG</button>
+            <button class="btn btn-ghost btn-sm" onclick="cardAtletaBaixar('pdf')">Exportar PDF</button>
             <button class="btn btn-primary btn-sm" onclick="goTo('comparativo',document.querySelector('[data-screen=comparativo]'))">Comparar Atletas</button>
           </div>
         </div>
@@ -11843,6 +11844,60 @@ function relAdd() {
   relSave(arr); csToast('Relatório salvo'); renderRelatorios();
 }
 function relDel(id) { if (!confirm('Excluir este relatório?')) return; relSave(relAll().filter(function (r) { return r.id !== id; })); renderRelatorios(); }
+
+
+// ── A8: card do atleta compartilhável (canvas próprio: sem depender de fotos externas) ──
+function cardAtletaCanvas(p) {
+  var W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H;
+  var x = c.getContext('2d');
+  var g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#0d1b2e'); g.addColorStop(1, '#0a0f18');
+  x.fillStyle = g; x.fillRect(0, 0, W, H);
+  x.fillStyle = '#2563eb'; x.fillRect(0, 0, W, 10); x.fillStyle = '#f472b6'; x.fillRect(W - 220, 0, 220, 10);
+  var a = playerAgg(p), q = per90(a);
+  // cabeçalho
+  x.fillStyle = (p.pointColor || '#5b95ff'); x.beginPath(); x.arc(150, 190, 92, 0, Math.PI * 2); x.fill();
+  x.fillStyle = '#0a0f18'; x.font = '800 70px Space Grotesk, sans-serif'; x.textAlign = 'center'; x.fillText(p.iniciais || '', 150, 214);
+  x.textAlign = 'left'; x.fillStyle = '#eaf0f6'; x.font = '700 64px Space Grotesk, sans-serif'; x.fillText(p.nome, 275, 170);
+  x.fillStyle = '#a9bccb'; x.font = '500 34px DM Sans, sans-serif';
+  x.fillText(p.pos + ' · ' + p.clube + (p.idade ? ' · ' + p.idade + ' anos' : ''), 275, 222);
+  x.fillStyle = '#5b95ff'; x.font = '800 120px Space Grotesk, sans-serif'; x.textAlign = 'right'; x.fillText(Math.round(p.score), W - 70, 230);
+  x.fillStyle = '#8299aa'; x.font = '600 26px DM Sans, sans-serif'; x.fillText('SCORE CAPIXASTAT', W - 70, 270); x.textAlign = 'left';
+  // números
+  var nums = [['Jogos', a.jogos], ['Minutos', a.minutos || '—'], ['Gols', a.gols], ['Assist.', a.assists], ['G+A/90', q.ga == null ? '—' : q.ga.toFixed(2)], ['Cartões', (a.amarelos || 0) + (a.vermelhos || 0)]];
+  nums.forEach(function (n, i) {
+    var cx = 70 + (i % 3) * 320, cy = 350 + Math.floor(i / 3) * 150;
+    x.fillStyle = '#142030'; x.beginPath(); if (x.roundRect) x.roundRect(cx, cy, 300, 130, 18); else x.rect(cx, cy, 300, 130); x.fill();
+    x.fillStyle = '#eaf0f6'; x.font = '800 60px JetBrains Mono, monospace'; x.fillText(String(n[1]), cx + 24, cy + 76);
+    x.fillStyle = '#8299aa'; x.font = '600 26px DM Sans, sans-serif'; x.fillText(n[0].toUpperCase(), cx + 24, cy + 112);
+  });
+  // radar
+  var eixos = ['Finalização', 'Passes', 'Dribles', 'Físico', 'Disciplina', 'Consistência'], r = (p.radar || [50, 50, 50, 50, 50, 50]);
+  var RX = W / 2, RY = 905, RR = 205;
+  x.strokeStyle = 'rgba(255,255,255,.12)'; x.lineWidth = 2;
+  [0.25, 0.5, 0.75, 1].forEach(function (k) { x.beginPath(); for (var i = 0; i <= 6; i++) { var t = -Math.PI / 2 + i * Math.PI / 3; var px = RX + Math.cos(t) * RR * k, py = RY + Math.sin(t) * RR * k; if (i) x.lineTo(px, py); else x.moveTo(px, py); } x.stroke(); });
+  x.beginPath(); r.forEach(function (v, i) { var t = -Math.PI / 2 + i * Math.PI / 3; var px = RX + Math.cos(t) * RR * v / 100, py = RY + Math.sin(t) * RR * v / 100; if (i) x.lineTo(px, py); else x.moveTo(px, py); });
+  x.closePath(); x.fillStyle = 'rgba(91,149,255,.28)'; x.fill(); x.strokeStyle = '#5b95ff'; x.lineWidth = 5; x.stroke();
+  x.font = '600 28px DM Sans, sans-serif'; x.fillStyle = '#d3e0ea'; x.textAlign = 'center';
+  eixos.forEach(function (e, i) { var t = -Math.PI / 2 + i * Math.PI / 3; x.fillText(e + ' ' + r[i], RX + Math.cos(t) * (RR + 60), RY + Math.sin(t) * (RR + 50) + 10); });
+  x.textAlign = 'left';
+  // rodapé
+  x.fillStyle = '#0f1923'; x.fillRect(0, H - 110, W, 110);
+  x.fillStyle = '#5b95ff'; x.font = '700 44px Space Grotesk, sans-serif'; x.fillText('CapixaStat', 60, H - 45);
+  x.fillStyle = '#8299aa'; x.font = '400 24px DM Sans, sans-serif';
+  x.fillText('Futebol capixaba em dados · temporada 2026 · ' + (a.real ? 'estatísticas reais' : 'valores estimados') + ' · ' + new Date().toLocaleDateString('pt-BR'), 330, H - 50);
+  return c;
+}
+function cardAtletaBaixar(tipo) {
+  var p = PLAYERS[window.currentProfileId]; if (!p) { csToast('Abra o perfil de um atleta'); return; }
+  var c = cardAtletaCanvas(p), nome = 'capixastat-' + p.id;
+  if (tipo === 'pdf' && window.jspdf) {
+    var pdf = new window.jspdf.jsPDF({ orientation: 'portrait', unit: 'pt', format: [540, 675] });
+    pdf.addImage(c.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, 540, 675); pdf.save(nome + '.pdf');
+  } else {
+    var a = document.createElement('a'); a.download = nome + '.png'; a.href = c.toDataURL('image/png'); a.click();
+  }
+  csToast('Card de ' + p.nome + ' gerado');
+}
 
 var VF_VIEW = 'cards';
 function vfSetView(v) {
