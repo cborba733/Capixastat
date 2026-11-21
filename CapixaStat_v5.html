@@ -2121,6 +2121,27 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .dz-est { font-weight:600 !important }
 .ds-perfil { margin:8px 0 10px; font-size:12.5px; color:var(--text-2) } .ds-perfil small { color:var(--text-3) }
 .ds-perfil-row { display:grid; grid-template-columns:repeat(5, 1fr); gap:8px; margin-top:6px } .ds-perfil-row label { display:grid; gap:3px; font-size:11.5px; color:var(--text-3) }
+
+/* R2-5: antropometria */
+.ab-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; gap:12px }
+.ab-tit { font-size:13px; font-weight:700; color:var(--text-1) } .ab-top .form-select { width:auto }
+.ab-grid { display:grid; grid-template-columns:300px 1fr; gap:18px; align-items:start }
+.ab-esq { display:flex; flex-direction:column; align-items:center; gap:10px; position:sticky; top:80px }
+.ab-corpo { width:260px; height:auto }
+.ab-base { fill:#1e293b; stroke:#0f1623; stroke-width:2 }
+.ab-reg { fill:#273449; stroke:#0f1623; stroke-width:2; stroke-linejoin:round; cursor:pointer; transition:fill .15s }
+.ab-reg.tem { fill:rgba(91,149,255,.38); stroke:#5b95ff }
+.ab-reg:hover, .ab-reg:focus-visible { fill:rgba(91,149,255,.6); outline:none }
+.ab-reg.on { fill:#5b95ff; stroke:#dbe7ff; stroke-width:2 }
+.light .ab-base { fill:#e2e8f0; stroke:#fff } .light .ab-reg { fill:#d5deea; stroke:#fff } .light .ab-reg.tem { fill:rgba(37,99,235,.3); stroke:#2563eb } .light .ab-reg.on { fill:#2563eb; stroke:#1e3a8a }
+.ab-lado { font-size:12px; font-weight:700; fill:var(--text-3); text-anchor:middle }
+.ab-dir { display:grid; gap:14px }
+.ab-card { margin:0 }
+.ab-tab td:nth-child(2) { font-family:var(--font-mono); color:var(--text-1) }
+.ab-d { font-family:var(--font-mono); font-size:12px; color:var(--text-3) } .ab-d.bom { color:var(--ok) } .ab-d.ruim { color:var(--danger) }
+.ab-linha { display:grid; grid-template-columns:auto 1fr; gap:2px 12px; margin-top:10px; font-size:12.5px; color:var(--text-2) }
+.ab-linha b { font-family:var(--font-mono); color:var(--text-1); text-align:right } .ab-linha small { grid-column:1 / -1; color:var(--text-3); font-size:11.5px }
+.ab-form { display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin:10px 0 } .ab-form label { display:grid; gap:3px; font-size:11.5px; color:var(--text-3) }
 </style>
 </head>
 <body>
@@ -3769,7 +3790,7 @@ function enterApp() {
 var FORM_EST_TABS = {
   carga: 'Cargas e status são estimados (modelo) até a comissão registrar sRPE e bem-estar nesta tela.',
   fisico: 'Peso e flexibilidade são simulados — aguardando aferição real do clube.',
-  antropometria: 'Medidas antropométricas simuladas — aguardando avaliação real do clube.'
+  antropometria: ''
 };
 function applyFormEstBanner(name) {
   var panel = document.getElementById('ftab-' + name);
@@ -14275,254 +14296,151 @@ function updateFisicoMetrics() {
       : `Ganho de ${pesoTrend.toFixed(1)}kg nas últimas 8 semanas. Pode refletir ganho de massa muscular ou necessidade de ajuste nutricional.`;
 }
 
-// ── 5. ANTROPOMETRIA ──────────────────────────
+// ── 5. ANTROPOMETRIA (R2-5) — só medidas registradas, padrão ISAK; corpo em SVG com regiões clicáveis ──
+// Medidas ficam em capixastat_v5_medidas[atletaId].antropo = [{ data, campos... }] (mesmo documento do F6, já vai para a nuvem).
+var ANTRO_CAMPOS = {
+  massa: ['Massa corporal', 'kg'], estatura: ['Estatura', 'cm'],
+  per_braco_rel_d: ['Perímetro do braço relaxado (D)', 'cm'], per_braco_rel_e: ['Perímetro do braço relaxado (E)', 'cm'],
+  per_braco_con_d: ['Perímetro do braço contraído (D)', 'cm'], per_antebraco_d: ['Perímetro do antebraço (D)', 'cm'],
+  per_torax: ['Perímetro do tórax (mesoesternal)', 'cm'], per_cintura: ['Perímetro da cintura', 'cm'], per_quadril: ['Perímetro do quadril (glúteo)', 'cm'],
+  per_coxa_d: ['Perímetro da coxa medial (D)', 'cm'], per_coxa_e: ['Perímetro da coxa medial (E)', 'cm'],
+  per_pant_d: ['Perímetro da panturrilha (D)', 'cm'], per_pant_e: ['Perímetro da panturrilha (E)', 'cm'],
+  dc_triceps: ['Dobra do tríceps', 'mm'], dc_biceps: ['Dobra do bíceps', 'mm'], dc_subescapular: ['Dobra subescapular', 'mm'],
+  dc_peitoral: ['Dobra peitoral', 'mm'], dc_abdominal: ['Dobra abdominal', 'mm'], dc_suprailiaca: ['Dobra suprailíaca (crista ilíaca)', 'mm'],
+  dc_coxa: ['Dobra da coxa', 'mm'], dc_panturrilha: ['Dobra da panturrilha medial', 'mm']
+};
+var ANTRO_DOBRAS = ['dc_triceps', 'dc_biceps', 'dc_subescapular', 'dc_peitoral', 'dc_abdominal', 'dc_suprailiaca', 'dc_coxa', 'dc_panturrilha'];
+// regiões do corpo → medidas daquela região (frente e costas)
+var ANTRO_REGIOES = {
+  braco_d: ['Braço direito', ['per_braco_rel_d', 'per_braco_con_d', 'dc_biceps', 'dc_triceps']], braco_e: ['Braço esquerdo', ['per_braco_rel_e']],
+  antebraco_d: ['Antebraço direito', ['per_antebraco_d']], antebraco_e: ['Antebraço esquerdo', []],
+  torax: ['Tórax', ['per_torax', 'dc_peitoral']], abdomen: ['Abdômen e cintura', ['per_cintura', 'dc_abdominal', 'dc_suprailiaca']],
+  quadril: ['Quadril', ['per_quadril']], costas: ['Costas (escápula)', ['dc_subescapular']], lombar: ['Lombar', ['dc_suprailiaca']], gluteo: ['Glúteos', ['per_quadril']],
+  coxa_d: ['Coxa direita', ['per_coxa_d', 'dc_coxa']], coxa_e: ['Coxa esquerda', ['per_coxa_e']],
+  pant_d: ['Perna direita (panturrilha)', ['per_pant_d', 'dc_panturrilha']], pant_e: ['Perna esquerda (panturrilha)', ['per_pant_e']],
+  post_coxa_d: ['Posterior da coxa direita', ['per_coxa_d']], post_coxa_e: ['Posterior da coxa esquerda', ['per_coxa_e']],
+  triceps_d: ['Tríceps direito', ['dc_triceps', 'per_braco_rel_d']], triceps_e: ['Tríceps esquerdo', ['per_braco_rel_e']]
+};
+var ANTRO = { vista: 'frente', regiao: 'coxa_d' };
+function antroLista(id) { var m = matAll()[id] || {}; return (m.antropo || []).slice().sort(function (a, b) { return a.data < b.data ? -1 : 1; }); }
+function antroIdade(p, data) { var m = matAll()[p.id] || {}; return m.nasc ? matIdade(m.nasc, data) : (p.idade || null); }
+function antroGordura(r, idade, sexo) { // Jackson & Pollock 3 dobras + Siri — estimativa
+  if (!idade) return null;
+  var S, dc;
+  if (sexo === 'F') { if (!(r.dc_triceps && r.dc_suprailiaca && r.dc_coxa)) return null; S = +r.dc_triceps + +r.dc_suprailiaca + +r.dc_coxa; dc = 1.0994921 - 0.0009929 * S + 0.0000023 * S * S - 0.0001392 * idade; }
+  else { if (!(r.dc_peitoral && r.dc_abdominal && r.dc_coxa)) return null; S = +r.dc_peitoral + +r.dc_abdominal + +r.dc_coxa; dc = 1.10938 - 0.0008267 * S + 0.0000016 * S * S - 0.0002574 * idade; }
+  return 495 / dc - 450;
+}
+function antroCorpoSvg(vista, comDado) {
+  // silhueta estilizada 200 × 440; lado esquerdo do desenho = lado direito do atleta (vista de frente)
+  var R = function (id, d) { var tem = comDado[id], on = ANTRO.regiao === id;
+    return '<path d="' + d + '" class="ab-reg' + (tem ? ' tem' : '') + (on ? ' on' : '') + '" data-reg="' + id + '" tabindex="0" role="button" aria-label="' + ANTRO_REGIOES[id][0] + (tem ? ', com medidas' : ', sem medidas') + '" onclick="antroRegiao(\'' + id + '\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();antroRegiao(\'' + id + '\')}"><title>' + ANTRO_REGIOES[id][0] + '</title></path>'; };
+  var frente = vista === 'frente';
+  var L = function (f) { return frente ? f + '_d' : f + '_e'; }, Rt = function (f) { return frente ? f + '_e' : f + '_d'; };
+  var h = '<ellipse cx="100" cy="29" rx="17" ry="21" class="ab-base"/><path d="M92 46 C92 52 91 56 88 60 L112 60 C109 56 108 52 108 46 Z" class="ab-base"/>' +
+    '<ellipse cx="38" cy="220" rx="6.5" ry="10" class="ab-base"/><ellipse cx="162" cy="220" rx="6.5" ry="10" class="ab-base"/>' +
+    '<path d="M68 410 C64 418 66 426 80 426 C88 426 88 418 86 410 Z" class="ab-base"/><path d="M132 410 C136 418 134 426 120 426 C112 426 112 418 114 410 Z" class="ab-base"/>';
+  // braços (esquerda do desenho)
+  var bracoE = 'M56 70 C46 72 40 82 40 96 L37 146 C42 152 50 152 54 146 L60 100 C61 88 60 78 56 70 Z', anteE = 'M37 150 C35 168 33 188 33 206 C37 212 45 212 47 206 C49 188 52 168 54 150 C50 155 41 155 37 150 Z';
+  var coxaE = 'M67 218 C63 250 62 286 65 316 C72 324 86 324 92 316 C95 286 98 250 99 224 C90 226 76 224 67 218 Z', pantE = 'M66 321 C62 346 63 378 69 408 C74 414 83 414 86 408 C88 378 92 346 91 321 C84 327 72 327 66 321 Z';
+  var tronco = 'M60 68 C68 60 84 57 100 57 C116 57 132 60 140 68 L135 124 C114 132 86 132 65 124 Z', meio = 'M65 127 C88 135 112 135 135 127 L130 180 C112 188 88 188 70 180 Z',
+    pelve = 'M70 183 C88 191 112 191 130 183 C134 194 136 204 135 214 C116 224 84 224 65 214 C64 204 66 194 70 183 Z';
+  var espelho = function (d) { return d.replace(/(-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)/g, function (m, x, y) { return (200 - +x) + ' ' + y; }); };
+  if (frente) {
+    h += R('torax', tronco) + R('abdomen', meio) + R('quadril', pelve);
+    h += R(L('braco'), bracoE) + R(Rt('braco'), espelho(bracoE));
+    h += R(L('antebraco'), anteE) + R(Rt('antebraco'), espelho(anteE));
+    h += R(L('coxa'), coxaE) + R(Rt('coxa'), espelho(coxaE));
+    h += R(L('pant'), pantE) + R(Rt('pant'), espelho(pantE));
+  } else {
+    h += R('costas', tronco) + R('lombar', meio) + R('gluteo', pelve);
+    h += R(L('triceps'), bracoE) + R(Rt('triceps'), espelho(bracoE));
+    h += '<path d="' + anteE + '" class="ab-base"/><path d="' + espelho(anteE) + '" class="ab-base"/>';
+    h += R(L('post_coxa'), coxaE) + R(Rt('post_coxa'), espelho(coxaE));
+    h += R(L('pant'), pantE) + R(Rt('pant'), espelho(pantE));
+  }
+  h += '<text x="' + (frente ? 22 : 178) + '" y="436" class="ab-lado">' + (frente ? 'D' : 'D') + '</text><text x="' + (frente ? 178 : 22) + '" y="436" class="ab-lado">E</text>';
+  return '<svg viewBox="0 0 200 440" class="ab-corpo" role="group" aria-label="Corpo, vista de ' + (frente ? 'frente' : 'costas') + ' — clique numa região">' + h + '</svg>';
+}
 function renderAntropometria() {
-  const panel = document.getElementById('ftab-antropometria');
-  if (!panel) return;
+  var panel = document.getElementById('ftab-antropometria'); if (!panel) return;
   if (!panel.dataset.initialized) {
     panel.dataset.initialized = '1';
-    const _antroUser = getCurrentUser();
-    const _antroClub = _antroUser ? resolveClube(_antroUser.clube) : null;
-    const _antroPlayers = _antroClub ? Object.values(PLAYERS).filter(p => p.clube === _antroClub) : Object.values(PLAYERS);
-    let opts = '';
-    _antroPlayers.forEach(p => { opts += `<option value="${p.id}">${p.nome} — ${p.pos}</option>`; });
-    panel.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <div style="font-size:12px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.5px">Avaliação Antropométrica do Atleta</div>
-        <select class="form-select" id="antro-player-sel" onchange="updateAntropometria()" style="width:auto;padding:4px 28px 4px 8px;font-size:12px;height:28px">${opts}</select>
-      </div>
-      <div id="antro-content"></div>`;
+    var u = getCurrentUser(), clube = u ? resolveClube(u.clube) : null;
+    var lista = clube ? Object.values(PLAYERS).filter(function (p) { return p.clube === clube; }) : Object.values(PLAYERS);
+    panel.innerHTML = '<div class="ab-top"><div class="ab-tit">Avaliação antropométrica <span class="dz-sub">padrão ISAK · só medidas registradas pela comissão</span></div>' +
+      '<select class="form-select" id="antro-player-sel" onchange="updateAntropometria()" aria-label="Atleta">' + lista.map(function (p) { return '<option value="' + p.id + '">' + p.nome + ' — ' + p.pos + '</option>'; }).join('') + '</select></div><div id="antro-content"></div>';
   }
   updateAntropometria();
 }
-
+function antroRegiao(id) { ANTRO.regiao = id; updateAntropometria(); }
+function antroVista(v) { ANTRO.vista = v; var frente = ['braco_d', 'braco_e', 'antebraco_d', 'antebraco_e', 'torax', 'abdomen', 'quadril', 'coxa_d', 'coxa_e', 'pant_d', 'pant_e'];
+  if (v === 'frente' && frente.indexOf(ANTRO.regiao) < 0) ANTRO.regiao = 'torax';
+  if (v === 'costas' && frente.indexOf(ANTRO.regiao) >= 0 && ['pant_d', 'pant_e'].indexOf(ANTRO.regiao) < 0) ANTRO.regiao = 'costas';
+  updateAntropometria(); }
 function updateAntropometria() {
-  const id = document.getElementById('antro-player-sel')?.value;
-  if (!id) return;
-  const p = PLAYERS[id]; if (!p) return;
-  const s = p.nome.length * 3 + p.idade * 7;
-  const isAtk = p.pos==='Atacante'||p.pos==='Lateral';
-  const isGk  = p.pos==='Goleiro';
-  const d = {
-    bic:  (27 + (s%8)  + (isGk?3:0)).toFixed(2),
-    tor:  (70 + (s%12) + (isGk||!isAtk?3:0)).toFixed(2),
-    qL:   (52 + (s%10) + (isAtk?2:0)).toFixed(2),
-    qR:   (52 + ((s+1)%10) + (isAtk?2:0)).toFixed(2),
-    gL:   (36 + (s%7)).toFixed(2),
-    gR:   (36 + ((s+2)%7)).toFixed(2),
-    fat:  (8  + (s%8)  + (isGk?2:0)).toFixed(2),
-    dBic: (s%5)-2, dTor:(s%7)-2, dQL:(s%3)-1, dQR:((s+1)%3)-1,
-    dGL: (s%4)-2,  dGR:((s+2)%4)-2, dFat:(s%5)-3,
-    flexEv1: 30+(s%14), flexEv2: 30+((s+3)%14), flexAvg: 10+(s%10)
-  };
-  const heightCm = p.altura || 178;
-  const heightM  = (heightCm/100).toFixed(2);
-  const hPct     = Math.max(5, Math.min(88, ((2.0 - heightCm/100)/0.5)*83 + 5));
-
-  const ds = (val, positiveBad=false) => {
-    const n = parseFloat(val);
-    const good = positiveBad ? n<0 : n>0;
-    const c = n===0?'var(--text-3)':good?'var(--green)':'var(--red)';
-    return `<span class="am-delta" style="color:${c}">${n>0?'+':''}${n===0?'+0':n}</span>`;
-  };
-
-  // Anatomical image with measurement overlay lines
-  const H = 480;
-  // Y positions calibrated to running anatomy figure (% of H)
-  const yBic = Math.round(0.22 * H);  // ~106px — upper arm / bíceps
-  const yTor = Math.round(0.33 * H);  // ~158px — chest / tórax
-  const yQ   = Math.round(0.47 * H);  // ~226px — thigh / quadríceps
-  const yG   = Math.round(0.62 * H);  // ~298px — calf / panturrilha
-
-  // ── Score Físico (0-100) — derivado do perfil antropométrico do atleta ──
-  const clp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-  const _fat  = parseFloat(d.fat);
-  const _qAvg = (parseFloat(d.qL) + parseFloat(d.qR)) / 2;
-  const _gAvg = (parseFloat(d.gL) + parseFloat(d.gR)) / 2;
-  const _bic  = parseFloat(d.bic);
-  const _tor  = parseFloat(d.tor);
-  const _flex = parseFloat(d.flexAvg);
-  const _symm = Math.abs(parseFloat(d.qL) - parseFloat(d.qR)) + Math.abs(parseFloat(d.gL) - parseFloat(d.gR));
-  const compScore   = clp(100 - (_fat - 7) * 5.5, 30, 100);                 // % de gordura (menor = melhor)
-  const quadScore   = clp((_qAvg - 50) * 7.5, 0, 100);
-  const calfScore   = clp((_gAvg - 35) * 9, 0, 100);
-  const upperScore  = clp((_bic - 27) * 6 + (_tor - 70) * 2.2, 0, 100);
-  const muscleScore = quadScore * 0.45 + calfScore * 0.30 + upperScore * 0.25;
-  const flexScore   = clp(_flex * 4 + 24, 30, 100);
-  const symScore    = clp(100 - _symm * 9, 40, 100);
-  let imcScore = 72;
-  if (p.peso && p.altura) { const _imc = p.peso / ((p.altura / 100) ** 2); imcScore = clp(100 - Math.abs(_imc - 22.5) * 7, 30, 100); }
-  let _fScore = compScore * 0.30 + muscleScore * 0.26 + imcScore * 0.18 + flexScore * 0.14 + symScore * 0.12;
-  if (isAtk) _fScore += 2;     // atacantes/laterais: exigência física maior
-  if (isGk)  _fScore -= 1.5;   // goleiros: menor peso de explosão muscular
-  const fScore = Math.round(clp(_fScore, 0, 100) * 10) / 10;
-  const fClass = fScore >= 85 ? 'Pico físico' : fScore >= 75 ? 'Muito bom' : fScore >= 65 ? 'Bom' : fScore >= 55 ? 'Regular' : 'Requer atenção';
-  const fColor = fScore >= 75 ? 'var(--green)' : fScore >= 60 ? '#fbbf24' : 'var(--red)';
-  const _fbar = (label, val) => `<div><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-3);margin-bottom:3px"><span>${label}</span><span style="color:var(--text-1);font-weight:700">${Math.round(val)}</span></div><div style="height:5px;background:var(--bg-overlay);border-radius:3px;overflow:hidden"><div style="height:100%;width:${Math.round(val)}%;background:linear-gradient(90deg,var(--green),var(--cyan));border-radius:3px"></div></div></div>`;
-
-  const content = document.getElementById('antro-content');
-  if (!content) return;
-
-  content.innerHTML = `
-<div style="display:flex;align-items:center;gap:22px;background:var(--bg-raised);border:1px solid var(--border);border-radius:12px;padding:16px 22px;margin-bottom:18px">
-  <div style="text-align:center;min-width:108px;border-right:1px solid var(--border);padding-right:20px">
-    <div style="font-family:var(--font-display);font-size:48px;font-weight:800;color:${fColor};line-height:1">${fScore}</div>
-    <div style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-top:4px">Score Físico</div>
-    <div style="font-size:12px;font-weight:700;color:${fColor};margin-top:3px">${fClass}</div>
-  </div>
-  <div style="flex:1;display:flex;flex-direction:column;gap:9px">
-    ${_fbar('Composição corporal', compScore)}
-    ${_fbar('Massa muscular', muscleScore)}
-    ${_fbar('Flexibilidade', flexScore)}
-    ${_fbar('Simetria', symScore)}
-  </div>
-</div>
-<div style="display:flex;gap:0;align-items:flex-start">
-
-  <!-- Left labels -->
-  <div style="flex:1;position:relative;height:${H}px;min-width:160px">
-    <div class="am-item" style="top:${yBic-10}px">
-      <div style="text-align:right;flex-shrink:0">
-        <div class="am-lbl">BÍCEPS</div>
-        <div style="display:flex;gap:4px;justify-content:flex-end;align-items:center">
-          <span class="am-num">${d.bic}CM</span>${ds(d.dBic)}
-        </div>
-      </div>
-      <div style="width:45px;height:3px;border-radius:2px;flex-shrink:0;background:rgba(251,191,36,.9)"></div>
-    </div>
-    <div class="am-item" style="top:${yTor+6}px">
-      <div style="text-align:right;flex-shrink:0">
-        <div class="am-lbl">% GORDURA</div>
-        <div style="display:flex;gap:4px;justify-content:flex-end;align-items:center">
-          <span class="am-num">${d.fat}%</span>${ds(d.dFat,true)}
-        </div>
-      </div>
-      <div style="width:45px;height:3px;border-radius:2px;flex-shrink:0;background:rgba(248,113,113,.9)"></div>
-    </div>
-    <div class="am-item" style="top:${yQ-8}px">
-      <div style="text-align:right;flex-shrink:0">
-        <div class="am-lbl">QUADRÍCEPS (E)</div>
-        <div style="display:flex;gap:4px;justify-content:flex-end;align-items:center">
-          <span class="am-num">${d.qL}CM</span>${ds(d.dQL)}
-        </div>
-      </div>
-      <div style="width:45px;height:3px;border-radius:2px;flex-shrink:0;background:rgba(34,197,94,.9)"></div>
-    </div>
-    <div class="am-item" style="top:${yG-8}px">
-      <div style="text-align:right;flex-shrink:0">
-        <div class="am-lbl">PANTURRILHA (E)</div>
-        <div style="display:flex;gap:4px;justify-content:flex-end;align-items:center">
-          <span class="am-num">${d.gL}CM</span>${ds(d.dGL)}
-        </div>
-      </div>
-      <div style="width:45px;height:3px;border-radius:2px;flex-shrink:0;background:rgba(56,189,248,.9)"></div>
-    </div>
-  </div>
-
-  <!-- Figure -->
-  <div style="flex:0 0 380px;height:${H}px;position:relative">
-    <img src="corpo_anatomico.png.png" style="width:100%;height:100%;object-fit:contain;object-position:center;display:block;filter:drop-shadow(0 4px 18px rgba(0,0,0,0.5))"/>
-  </div>
-
-  <!-- Right labels -->
-  <div style="flex:1;position:relative;height:${H}px;min-width:160px">
-    <div class="am-item-right" style="top:${yTor-8}px">
-      <div style="width:45px;height:3px;border-radius:2px;flex-shrink:0;background:rgba(248,113,113,.9)"></div>
-      <div style="flex-shrink:0">
-        <div class="am-lbl-r">TÓRAX</div>
-        <div style="display:flex;gap:4px;align-items:center">
-          <span class="am-num">${d.tor}CM</span>${ds(d.dTor)}
-        </div>
-      </div>
-    </div>
-    <div class="am-item-right" style="top:${yQ-8}px">
-      <div style="width:45px;height:3px;border-radius:2px;flex-shrink:0;background:rgba(34,197,94,.9)"></div>
-      <div style="flex-shrink:0">
-        <div class="am-lbl-r">QUADRÍCEPS (D)</div>
-        <div style="display:flex;gap:4px;align-items:center">
-          <span class="am-num">${d.qR}CM</span>${ds(d.dQR)}
-        </div>
-      </div>
-    </div>
-    <div class="am-item-right" style="top:${yG-8}px">
-      <div style="width:45px;height:3px;border-radius:2px;flex-shrink:0;background:rgba(56,189,248,.9)"></div>
-      <div style="flex-shrink:0">
-        <div class="am-lbl-r">PANTURRILHA (D)</div>
-        <div style="display:flex;gap:4px;align-items:center">
-          <span class="am-num">${d.gR}CM</span>${ds(d.dGR)}
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Height ruler -->
-  <div style="flex:0 0 58px;position:relative;height:${H}px;padding-left:8px">
-    <div style="position:absolute;left:16px;top:5%;bottom:5%;width:2px;background:var(--border);border-radius:1px"></div>
-    <div style="position:absolute;left:10px;top:5%;display:flex;align-items:center;gap:4px">
-      <div style="width:8px;height:1.5px;background:var(--border-md)"></div>
-      <span style="font-size:11px;color:var(--text-3);font-weight:600">2m</span>
-    </div>
-    <div style="position:absolute;left:8px;top:${hPct.toFixed(1)}%;display:flex;align-items:center;gap:4px">
-      <div style="width:12px;height:2px;background:#38bdf8"></div>
-      <span style="font-size:11px;font-weight:700;color:#38bdf8;background:rgba(56,189,248,.15);padding:1px 5px;border-radius:3px;white-space:nowrap">${heightM}m</span>
-    </div>
-    <div style="position:absolute;left:10px;top:52%;display:flex;align-items:center;gap:4px">
-      <div style="width:8px;height:1.5px;background:var(--border-md)"></div>
-      <span style="font-size:11px;color:var(--text-3);font-weight:600">1.6m</span>
-    </div>
-    <div style="position:absolute;left:10px;top:77%;display:flex;align-items:center;gap:4px">
-      <div style="width:8px;height:1.5px;background:var(--border-md)"></div>
-      <span style="font-size:11px;color:var(--text-3);font-weight:600">1.1m</span>
-    </div>
-  </div>
-</div>
-
-<!-- Weight -->
-<div style="text-align:center;padding:10px 0 8px;border-top:1px solid var(--border);margin-top:6px">
-  <span style="font-size:30px;font-weight:800;color:var(--text-1)">${p.peso != null ? p.peso : '—'}</span>
-  <span style="font-size:14px;color:var(--text-3);margin-left:4px">${p.peso != null ? 'kg · Peso registrado' : 'Peso não cadastrado'}</span>
-</div>
-<p class="chart-insight">${(()=>{const imc=(p.peso/((p.altura/100)**2)).toFixed(1);const cat=imc<18.5?'abaixo do peso':imc<25?'peso ideal':imc<30?'sobrepeso':'acima do ideal';return `IMC estimado: ${imc} (${cat}). Perímetro torácico de ${d.tor}cm e bíceps de ${d.bic}cm. Acompanhe a evolução dessas medidas ao longo da temporada para monitorar composição corporal.`;})()}</p>
-
-<!-- Flexibility -->
-<div style="margin-top:18px">
-  <div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">CADEIA POSTERIOR — FLEXIBILIDADE (CM)</div>
-  <canvas id="chartFlexCadeia" height="70"></canvas>
-  <p class="chart-insight" id="insight-flex-cadeia"></p>
-  <div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 8px">FLEXIBILIDADE E MOBILIDADE</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">
-    <div class="mobility-card"><span>Flexibilidade de Adutores — EV1</span><span class="mob-check"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></div>
-    <div class="mobility-card"><span>Flexibilidade de Adutores — EV2</span><span class="mob-check"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></div>
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px">
-    <div class="mobility-card"><span>Elevação Ativa Perna EV1</span><span class="mob-check"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></div>
-    <div class="mobility-card"><span>Elevação Ativa Perna EV2</span><span class="mob-check"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></div>
-    <div class="mobility-card"><span>Agachamento Overhead EV1</span><span class="mob-check"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></div>
-    <div class="mobility-card"><span>Agachamento Overhead EV2</span><span class="mob-check"><svg class="cs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span></div>
-  </div>
-</div>`;
-
-  setTimeout(() => {
-    mkChart('chartFlexCadeia', {
-      type:'bar',
-      data:{ labels:['EV1','EV2','AVG2'],
-        datasets:[{ data:[d.flexEv1, d.flexEv2, d.flexAvg],
-          backgroundColor:['rgba(251,191,36,.75)','rgba(34,197,94,.75)','rgba(56,189,248,.75)'],
-          borderRadius:4, borderSkipped:false }] },
-      options:{ indexAxis:'y', plugins:{legend:{display:false}},
-        scales:{ x:{grid,ticks,beginAtZero:true,max:60}, y:{grid:{display:false},ticks} } }
-    });
-    const flexTrend = d.flexEv2 - d.flexEv1;
-    const flexEl = document.getElementById('insight-flex-cadeia');
-    if (flexEl) flexEl.textContent = flexTrend > 2
-      ? `Melhora de ${flexTrend.toFixed(1)}cm na flexibilidade da cadeia posterior entre EV1 e EV2. Evolução positiva, indicando eficácia do trabalho de mobilidade.`
-      : flexTrend < -2
-        ? `Redução de ${Math.abs(flexTrend).toFixed(1)}cm na flexibilidade entre as avaliações. Recomenda-se intensificar o trabalho de alongamento e mobilidade.`
-        : `Flexibilidade estável entre as avaliações (EV1: ${d.flexEv1}cm · EV2: ${d.flexEv2}cm). Média do grupo: ${d.flexAvg}cm.`;
-  }, 80);
+  var id = document.getElementById('antro-player-sel') && document.getElementById('antro-player-sel').value; if (!id) return;
+  var p = PLAYERS[id], el = document.getElementById('antro-content'); if (!p || !el) return;
+  var regs = antroLista(id), ult = regs[regs.length - 1] || null, ant = regs[regs.length - 2] || null, m = matAll()[id] || {};
+  var comDado = {}; Object.keys(ANTRO_REGIOES).forEach(function (rg) { comDado[rg] = !!ult && ANTRO_REGIOES[rg][1].some(function (c) { return ult[c] != null; }); });
+  var fmt = function (v, d) { return v == null ? '—' : (+v).toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d }); };
+  var delta = function (c) { if (!ult || !ant || ult[c] == null || ant[c] == null) return ''; var d = ult[c] - ant[c]; if (Math.abs(d) < 0.05) return '<span class="ab-d">=</span>'; var ruim = c.indexOf('dc_') === 0 ? d > 0 : false; return '<span class="ab-d ' + (ruim ? 'ruim' : 'bom') + '">' + (d > 0 ? '+' : '') + fmt(d, 1) + '</span>'; };
+  var regiao = ANTRO_REGIOES[ANTRO.regiao];
+  var linhas = regiao[1].length ? regiao[1].map(function (c) { var v = ult ? ult[c] : null;
+    return '<tr><th scope="row">' + ANTRO_CAMPOS[c][0] + '</th><td>' + fmt(v, 1) + (v != null ? ' ' + ANTRO_CAMPOS[c][1] : '') + '</td><td>' + delta(c) + '</td></tr>'; }).join('')
+    : '<tr><td colspan="3" class="dz-vazio">O protocolo ISAK mede este segmento só do lado direito.</td></tr>';
+  // resumo do corpo todo
+  var idade = ult ? antroIdade(p, ult.data) : null, sexo = m.sexo || 'M';
+  var imc = ult && ult.massa && ult.estatura ? ult.massa / Math.pow(ult.estatura / 100, 2) : null;
+  var dobras = ult ? ANTRO_DOBRAS.filter(function (c) { return ult[c] != null; }) : [];
+  var soma = dobras.reduce(function (t, c) { return t + +ult[c]; }, 0);
+  var gord = ult ? antroGordura(ult, idade, sexo) : null;
+  var assim = function (a, b) { return ult && ult[a] != null && ult[b] != null ? Math.abs(ult[a] - ult[b]) / Math.max(ult[a], ult[b]) * 100 : null; };
+  var asCoxa = assim('per_coxa_d', 'per_coxa_e'), asPant = assim('per_pant_d', 'per_pant_e'), asBraco = assim('per_braco_rel_d', 'per_braco_rel_e');
+  var podeEditar = csPode('players:write') || ['preparador', 'medico'].indexOf(csPapel()) >= 0;
+  var hist = regs.slice().reverse();
+  el.innerHTML = '<div class="ab-grid">' +
+    '<div class="ab-esq"><div class="vf-scope ab-vistas" role="group" aria-label="Vista do corpo"><button class="vf-seg' + (ANTRO.vista === 'frente' ? ' active' : '') + '" onclick="antroVista(\'frente\')">Frente</button><button class="vf-seg' + (ANTRO.vista === 'costas' ? ' active' : '') + '" onclick="antroVista(\'costas\')">Costas</button></div>' +
+      antroCorpoSvg(ANTRO.vista, comDado) + '<div class="tl2-legend"><span><i class="leg-dot" style="background:var(--brand)"></i> região com medidas</span><span><i class="leg-dot" style="background:#334155"></i> sem medidas</span></div></div>' +
+    '<div class="ab-dir">' +
+      '<div class="card ab-card"><div class="card-title">' + regiao[0] + ' <span>' + (ult ? 'avaliação de ' + csFmtDate(ult.data) + (ant ? ' · variação desde ' + csFmtDate(ant.data) : '') + ' <span class="cs-src real">Medido</span>' : 'sem avaliação registrada') + '</span></div>' +
+        '<table class="mat-tab ab-tab"><thead><tr><th>Medida</th><th>Valor</th><th>Variação</th></tr></thead><tbody>' + linhas + '</tbody></table></div>' +
+      '<div class="card ab-card"><div class="card-title">Corpo todo</div><div class="mat-kpis">' +
+        '<div><small>Massa</small><b>' + fmt(ult && ult.massa, 1) + (ult && ult.massa ? ' kg' : '') + '</b></div>' +
+        '<div><small>Estatura</small><b>' + fmt(ult && ult.estatura, 1) + (ult && ult.estatura ? ' cm' : '') + '</b></div>' +
+        '<div><small>IMC</small><b>' + fmt(imc, 1) + '</b></div>' +
+        '<div><small>Σ ' + dobras.length + ' dobras</small><b>' + (dobras.length ? fmt(soma, 1) + ' mm' : '—') + '</b></div></div>' +
+        '<div class="ab-linha"><span>% de gordura <span class="cs-src est">estimativa</span></span><b>' + (gord == null ? '—' : fmt(gord, 1) + '%') + '</b><small>' + (sexo === 'F' ? 'Jackson, Pollock & Ward 1980 (tríceps, suprailíaca, coxa)' : 'Jackson & Pollock 1978 (peitoral, abdominal, coxa)') + ' + Siri. Para acompanhar o atleta, a soma das dobras é mais confiável que o %.</small></div>' +
+        '<div class="ab-linha"><span>Diferença entre lados</span><b>' + [['coxa', asCoxa], ['panturrilha', asPant], ['braço', asBraco]].filter(function (x) { return x[1] != null; }).map(function (x) { return x[0] + ' ' + fmt(x[1], 1) + '%'; }).join(' · ') + ([asCoxa, asPant, asBraco].every(function (x) { return x == null; }) ? '—' : '') + '</b><small>Acima de ~5% merece atenção (possível desequilíbrio ou sequela de lesão).</small></div></div>' +
+      (podeEditar ? '<details class="card ab-card"' + (regs.length ? '' : ' open') + '><summary class="card-title" style="cursor:pointer">Registrar avaliação <span>preencha só o que mediu · ISAK: lado direito, média de 2 medidas</span></summary><div class="ab-form">' +
+        '<label>Data <input type="date" id="ab-data" class="form-input" value="' + csToday() + '"></label>' +
+        Object.keys(ANTRO_CAMPOS).map(function (c) { return '<label>' + ANTRO_CAMPOS[c][0] + ' (' + ANTRO_CAMPOS[c][1] + ')<input type="number" step="0.1" min="0" id="ab-' + c + '" class="form-input"></label>'; }).join('') +
+        '</div><button class="btn btn-primary btn-sm" onclick="antroSalvar(\'' + id + '\')">Salvar avaliação</button></details>' : '') +
+      (hist.length ? '<div class="card ab-card"><div class="card-title">Histórico <span>' + hist.length + ' avaliação(ões)</span></div><table class="mat-tab"><thead><tr><th>Data</th><th>Massa</th><th>Σ dobras</th><th>% gord. (est.)</th>' + (podeEditar ? '<th></th>' : '') + '</tr></thead><tbody>' +
+        hist.map(function (r) { var dd = ANTRO_DOBRAS.filter(function (c) { return r[c] != null; }), g = antroGordura(r, antroIdade(p, r.data), sexo);
+          return '<tr><td>' + csFmtDate(r.data) + '</td><td>' + fmt(r.massa, 1) + '</td><td>' + (dd.length ? fmt(dd.reduce(function (t, c) { return t + +r[c]; }, 0), 1) + ' (' + dd.length + ')' : '—') + '</td><td>' + (g == null ? '—' : fmt(g, 1)) + '</td>' +
+            (podeEditar ? '<td><button class="btn btn-ghost btn-sm" onclick="antroExcluir(\'' + id + '\',\'' + r.data + '\')" aria-label="Excluir avaliação de ' + csFmtDate(r.data) + '">' + ico('x') + '</button></td>' : '') + '</tr>'; }).join('') + '</tbody></table></div>' : '') +
+    '</div></div>';
+}
+function antroSalvar(id) {
+  var data = document.getElementById('ab-data').value; if (!data) { csToast('Informe a data'); return; }
+  var r = { data: data }, n = 0, erro = '';
+  Object.keys(ANTRO_CAMPOS).forEach(function (c) { var v = document.getElementById('ab-' + c).value; if (v === '') return; v = +v;
+    var lim = ANTRO_CAMPOS[c][1] === 'mm' ? [2, 60] : c === 'massa' ? [25, 150] : c === 'estatura' ? [120, 215] : [15, 140];
+    if (!(v >= lim[0] && v <= lim[1])) erro = erro || ANTRO_CAMPOS[c][0] + ' fora da faixa (' + lim[0] + '–' + lim[1] + ' ' + ANTRO_CAMPOS[c][1] + ')';
+    r[c] = v; n++; });
+  if (erro) { csToast(erro); return; }
+  if (!n) { csToast('Preencha pelo menos uma medida'); return; }
+  var all = matAll(), m = all[id] = all[id] || { registros: [] };
+  m.antropo = (m.antropo || []).filter(function (x) { return x.data !== data; }); m.antropo.push(r);
+  matSaveAll(all); updateAntropometria(); csToast('Avaliação salva (' + n + ' medida' + (n > 1 ? 's' : '') + ')');
+}
+function antroExcluir(id, data) {
+  if (!confirm('Excluir a avaliação de ' + csFmtDate(data) + '?')) return;
+  var all = matAll(); if (!all[id]) return; all[id].antropo = (all[id].antropo || []).filter(function (x) { return x.data !== data; });
+  matSaveAll(all); updateAntropometria();
 }
 
-// Inicialização ao entrar na aba Formação
 function initFormCharts() { renderMicrociclo(); }
 function toggleTrainingDesc(el) {
   const desc = el.querySelector('.training-desc');

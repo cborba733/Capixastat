@@ -549,6 +549,16 @@ item, testar sem erro no console, atualizar este arquivo).
   Ficaram para Trabalhos futuros: TA7 (dossiê em slides), TA8 (IA redatora), TA9 (escalação provável), TA10 (bolas
   paradas com dados). O Auxiliar com IA **não foi testado com chave real do Gemini** (sem chave aqui).
 
+- **R2-5 Formação / Antropometria (FM1):** avaliação e proposta em **`docs/PROPOSTA_FORMACAO.md`** (FM1–FM7). A aba
+  antiga **inventava todas as medidas a partir do nome do atleta** (e um "Score Físico" em cima) — removida. Nova aba:
+  corpo em **SVG** (frente/costas, `antroCorpoSvg`) com 11 + 9 regiões clicáveis (mouse e teclado), regiões com medida
+  destacadas; ao lado, as medidas **ISAK** daquela região (perímetros e dobras, lados D/E onde existe), variação desde a
+  avaliação anterior, selo "Medido"; corpo todo: massa, estatura, IMC, Σ dobras, **% de gordura só como estimativa**
+  (Jackson & Pollock 1978 / Jackson, Pollock & Ward 1980 + Siri, citados na tela) e diferença entre lados (alerta > 5%).
+  Formulário de avaliação (só o que foi medido, faixas validadas) e histórico. Dados em `capixastat_v5_medidas[id].antropo`
+  (mesmo documento do F6, já sincronizado com a nuvem). **3D não feito**: inviável com licença e qualidade até terça
+  (justificativa no doc) — vai para Trabalhos futuros. `corpo_anatomico.png.png` deixou de ser usado.
+
 ## Trabalhos futuros
 O que ficou de fora ou só parcialmente feito, em ordem de valor:
 - **Visão computacional em vídeo real:** V1/V2/V3 foram testados com dados sintéticos e um YOLO falso (sem GPU nem
