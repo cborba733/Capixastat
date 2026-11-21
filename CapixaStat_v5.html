@@ -4494,6 +4494,43 @@ var CS_PONTOS = ['circle', 'rect', 'triangle', 'rectRot', 'crossRot', 'star'];
   } });
 })();
 
+// ── M1: foco no hover — ao passar o mouse, a série apontada fica em destaque, as outras
+// esmaecem e a grade/eixo de fundo some (sobra o valor). Desligar num gráfico: plugins: { csFocus: false }
+(function () {
+  if (!window.Chart) return;
+  var fundo = function (chart) {
+    var el = chart.canvas, bg = '';
+    while (el && el !== document.body) { bg = getComputedStyle(el).backgroundColor; if (bg && bg !== 'transparent' && !/rgba\(.*,\s*0\)$/.test(bg)) break; el = el.parentElement; }
+    return bg || 'rgb(15,21,32)';
+  };
+  Chart.register({ id: 'csFocus',
+    afterEvent: function (chart, args, opts) {
+      if (opts === false) return;
+      var act = chart.getActiveElements(), ds = act.map(function (a) { return a.datasetIndex; });
+      var novo = !act.length ? null : (ds.every(function (d) { return d === ds[0]; }) && chart.data.datasets.length > 1 ? ds[0] : -1);
+      if (args.event.type === 'mouseout') novo = null;
+      if (novo !== chart.$csFocus) { chart.$csFocus = novo; args.changed = true; }
+    },
+    beforeDatasetsDraw: function (chart, a, opts) {
+      if (opts === false || chart.$csFocus == null || !Object.keys(chart.scales).length) return;
+      var ca = chart.chartArea, ctx = chart.ctx;
+      ctx.save(); ctx.globalAlpha = .72; ctx.fillStyle = fundo(chart);
+      ctx.fillRect(ca.left, ca.top, ca.right - ca.left, ca.bottom - ca.top); ctx.restore();
+    },
+    beforeDatasetDraw: function (chart, args, opts) {
+      if (opts === false || chart.$csFocus == null || chart.$csFocus < 0) return;
+      chart.ctx.save();
+      if (args.index !== chart.$csFocus) chart.ctx.globalAlpha = .18;
+    },
+    afterDatasetDraw: function (chart, args, opts) {
+      if (opts === false || chart.$csFocus == null || chart.$csFocus < 0) return;
+      chart.ctx.restore();
+    }
+  });
+  Chart.defaults.elements.point.hoverRadius = 6;
+  Chart.defaults.elements.point.hoverBorderWidth = 2;
+})();
+
 // ══════════════════════════════════════════════════════════════════
 // B1: nuvem — o que antes ficava só no navegador vai para o banco (/api/dados/:chave)
 // Qualquer gravação no localStorage destas chaves agenda o envio (1,5 s depois da última mudança).
