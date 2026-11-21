@@ -1893,6 +1893,15 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 
 /* T2 */
 .t2-min { font-size:12px; color:var(--text-2); font-family:var(--font-mono); margin-left:8px; min-width:62px; text-align:right }
+
+/* T3 */
+.elo-list { display:grid; gap:2px; max-height:340px; overflow:auto }
+.elo-row { display:flex; align-items:center; gap:8px; padding:5px 6px; border-radius:8px }
+.elo-row.me { background:var(--brand-dim) }
+.elo-var { font-size:11px; font-family:var(--font-mono); min-width:44px; text-align:right } .elo-var.up { color:var(--ok) } .elo-var.down { color:var(--danger) }
+
+/* R3 (ajuste tablet): topo do Meu Time quebra em linhas */
+@media (max-width: 1024px) { .team-hero { flex-wrap:wrap; gap:16px } .team-hero-stats { flex-wrap:wrap; gap:14px 22px } }
 </style>
 </head>
 <body>
@@ -2817,6 +2826,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
           <div id="time-destaques" class="time-destaques"></div>
           <!-- P4: quando o time marca e sofre (faixas de 15 min, 1º x 2º tempo) -->
           <div class="card" id="time-timing" style="margin-bottom:14px"></div>
+          <!-- T3: ranking Elo dos clubes capixabas -->
+          <div class="card" id="time-elo" style="margin-bottom:14px"></div>
           <div class="cs-section-head"><div><h2>Calendário e competições</h2><p>Jogos do mês, classificação, elenco e forma por competição</p></div></div>
           <!-- Layout principal: calendário + tabs -->
           <div class="time-layout">
@@ -3428,6 +3439,7 @@ var METRIC_NOTES = {
   chartCargaIntensidade: { real: false,   txt: 'Intensidade física, de recuperação e semanal (0–10) por atleta. Estimada até a comissão registrar sRPE em Formação.' },
   chartFisicoEvolucao:   { real: false,   txt: 'Peso corporal nas últimas 8 avaliações. Simulado até haver aferição real do clube.' },
   chartFlexCadeia:       { real: false,   txt: 'Banco de Wells (cm) por avaliação. Simulado até haver aferição real do clube.' },
+  chartElo:              { real: true,    txt: 'Elo: todos começam em 1500; a cada jogo o vencedor ganha pontos do perdedor, mais quando vence alguém mais forte, fora de casa ou por goleada (K=20, mando +60). Calculado pelo CapixaStat a partir dos placares reais.' },
   chartTiming:           { real: true,    txt: 'Gols marcados (acima) e sofridos (abaixo) por faixa de 15 minutos, a partir dos incidentes oficiais das partidas. Só entram os jogos com eventos minuto a minuto.' }
 };
 function metricChipHtml(note) {
@@ -4266,6 +4278,51 @@ function renderTimeTiming(c) {
                   y: { stacked: true, ticks: { color: cc.tick, callback: function (v) { return Math.abs(v); } }, grid: { color: cc.grid } } } } });
     try { applyMetricChips(); } catch (e) {}
   }, 60);
+}
+
+
+// ── T3: Elo dos clubes (padrão "World Football Elo": K=20, mando +60, peso pelo saldo de gols) ──
+var ELO_K = 20, ELO_MANDO = 60, ELO_BASE = 1500;
+function computeElo() {
+  var jogos = [];
+  Object.keys(COMPETITIONS).forEach(function (cid) { (COMPETITIONS[cid].jogos || []).forEach(function (j) { if (j.gh != null && j.ga != null) jogos.push({ j: j, d: _parseJogoDate(j.data) || new Date(2026, 0, 1), comp: COMPETITIONS[cid].sigla || cid }); }); });
+  jogos.sort(function (a, b) { return a.d - b.d; });
+  var R = {}, hist = {};
+  var r = function (t) { if (R[t] == null) { R[t] = ELO_BASE; hist[t] = [{ d: null, v: ELO_BASE }]; } return R[t]; };
+  jogos.forEach(function (x) {
+    var j = x.j, rh = r(j.home), ra = r(j.away);
+    var dr = rh + ELO_MANDO - ra, We = 1 / (1 + Math.pow(10, -dr / 400));
+    var W = j.gh > j.ga ? 1 : j.gh < j.ga ? 0 : 0.5, n = Math.abs(j.gh - j.ga);
+    var G = n <= 1 ? 1 : n === 2 ? 1.5 : (11 + n) / 8;
+    var delta = ELO_K * G * (W - We);
+    R[j.home] = rh + delta; R[j.away] = ra - delta;
+    hist[j.home].push({ d: x.d, v: R[j.home] }); hist[j.away].push({ d: x.d, v: R[j.away] });
+  });
+  return { R: R, hist: hist, n: jogos.length };
+}
+function renderTimeElo(c) {
+  var el = document.getElementById('time-elo'); if (!el) return;
+  var e = computeElo();
+  var es = Object.keys(CLUBS).filter(function (t) { return e.R[t] != null; }).sort(function (a, b) { return e.R[b] - e.R[a]; });
+  var lista = es.map(function (t, i) {
+    var h = e.hist[t], var30 = h.length > 6 ? e.R[t] - h[h.length - 6].v : 0;
+    return '<div class="elo-row' + (t === c.nome ? ' me' : '') + '"><span class="dest-pos">' + (i + 1) + '</span><span class="dest-nm">' + t + '<small>' + (h.length - 1) + ' jogos</small></span>' +
+      '<b class="dest-val">' + Math.round(e.R[t]) + '</b><span class="elo-var ' + (var30 >= 0 ? 'up' : 'down') + '" title="Variação nos últimos 5 jogos">' + (var30 >= 0 ? '▲' : '▼') + ' ' + Math.abs(Math.round(var30)) + '</span></div>';
+  }).join('');
+  el.innerHTML = '<div class="card-title">Ranking de força — Elo <span>' + e.n + ' jogos reais de 2026, em ordem cronológica</span></div>' +
+    '<div class="timing-grid"><div class="elo-list">' + lista + '</div><div><canvas id="chartElo" height="150"></canvas></div></div>';
+  setTimeout(function () {
+    var cc = _chartColors();
+    var top = [c.nome].concat(es.filter(function (t) { return t !== c.nome; }).slice(0, 3));
+    mkChart('chartElo', { type: 'line',
+      data: { datasets: top.map(function (t, i) {
+        return { label: t, data: e.hist[t].slice(1).map(function (h, k) { return { x: k + 1, y: Math.round(h.v) }; }), borderColor: csData(i), backgroundColor: csData(i), borderWidth: t === c.nome ? 3 : 1.5, pointRadius: 0, tension: .25 };
+      }) },
+      options: { responsive: true, plugins: { legend: { labels: { color: cc.legend, boxWidth: 12 } } },
+        scales: { x: { type: 'linear', title: { display: true, text: 'Jogo nº', color: cc.tick }, ticks: { color: cc.tick }, grid: { color: cc.grid } },
+                  y: { ticks: { color: cc.tick }, grid: { color: cc.grid } } } } });
+    try { applyMetricChips(); } catch (x) {}
+  }, 80);
 }
 
 function renderTimeDestaques(c, allMatches) {
@@ -14566,6 +14623,7 @@ function renderTeamScreen() {
   _renderTimeLastNext(c, allMatches);
   try { renderTimeDestaques(c, allMatches); } catch (e) { console.warn('T1', e); }
   try { renderTimeTiming(c); } catch (e) { console.warn('P4', e); }
+  try { renderTimeElo(c); } catch (e) { console.warn('T3', e); }
   _renderTimeCalendar(c, allMatches);
 
   _timeActiveComp = (c.competicoes || [])[0] || null;
