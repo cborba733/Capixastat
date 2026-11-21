@@ -3637,6 +3637,25 @@ async function extAtualizar() {
   } catch (e) { csToast('API offline'); }
 }
 
+
+// ── A9: Nota CapixaStat do jogo — fórmula pública, calculada só com ações marcadas no Scout ao Vivo ──
+var NOTA_PESOS = { base: 6.0, gol: 1.0, no_alvo: 0.2, fora: -0.05, bloqueado: 0.0, passe_chave: 0.3, drible: 0.15, desarme: 0.25, interceptacao: 0.2,
+  errado: -0.15, falta: -0.1, amarelo: -0.5, vermelho: -1.5 };
+function notaDoJogo(evs) {
+  var n = NOTA_PESOS.base;
+  evs.forEach(function (e) {
+    if (e.tipo === 'finalizacao') n += e.resultado === 'gol' ? NOTA_PESOS.gol + NOTA_PESOS.no_alvo : (NOTA_PESOS[e.resultado] || 0);
+    else if (e.tipo === 'cartao') n += NOTA_PESOS[e.resultado] || 0;
+    else if (e.tipo === 'falta') n += NOTA_PESOS.falta;
+    else if (e.resultado === 'errado') n += NOTA_PESOS.errado;
+    else n += NOTA_PESOS[e.tipo] || 0;
+  });
+  return Math.max(3, Math.min(10, Math.round(n * 10) / 10));
+}
+function notaFormulaTxt() {
+  return 'Nota = 6,0 + gol 1,0 + finalização no alvo 0,2 + passe-chave 0,3 + drible 0,15 + desarme 0,25 + interceptação 0,2 − ação errada 0,15 − falta 0,1 − amarelo 0,5 − vermelho 1,5 (entre 3 e 10). Só considera ações marcadas no Scout ao Vivo.';
+}
+
 // ══════════════════════════════════════════════════════════════════
 // P2: SCOUT AO VIVO — eventos {partida, atletaId, tipo, resultado, minuto, x, y} (formato do B3)
 // x, y de 0 a 100 (x = comprimento, 100 = gol atacado pelo seu clube).
@@ -3735,14 +3754,17 @@ function scRender() {
     if (e.resultado === 'errado') a.err++;
   });
   document.getElementById('sc-count').textContent = evs.length + ' marcação(ões)';
-  var rows = Object.keys(porAt).map(function (id) { var a = porAt[id]; return { _p: PLAYERS[id] || { nome: id }, nome: (PLAYERS[id] || {}).nome || id, fin: a.fin, alvo: a.alvo, gol: a.gol, pc: a.pc, dr: a.dr, des: a.des, err: a.err }; });
+  var rows = Object.keys(porAt).map(function (id) { var a = porAt[id]; return { _p: PLAYERS[id] || { nome: id }, nome: (PLAYERS[id] || {}).nome || id, fin: a.fin, alvo: a.alvo, gol: a.gol, pc: a.pc, dr: a.dr, des: a.des, err: a.err,
+    nota: notaDoJogo(evs.filter(function (e) { return e.atletaId === id; })) }; }); // A9
   csTable(document.getElementById('sc-resumo'), [
     { key: 'nome', label: 'Atleta', sticky: true },
     { key: 'fin', label: 'Fin', title: 'Finalizações', num: true }, { key: 'alvo', label: 'Alvo', title: 'Finalizações no alvo (inclui gols)', num: true },
     { key: 'gol', label: 'Gols', num: true }, { key: 'pc', label: 'PC', title: 'Passes-chave certos', num: true },
     { key: 'dr', label: 'Dr', title: 'Dribles certos', num: true }, { key: 'des', label: 'Rec', title: 'Desarmes + interceptações', num: true },
-    { key: 'err', label: 'Err', title: 'Ações erradas', num: true }
-  ], rows, { id: 'scout', sortKey: 'fin', label: 'Resumo do scout', empty: 'Nenhuma marcação nesta partida ainda.' });
+    { key: 'err', label: 'Err', title: 'Ações erradas', num: true },
+    { key: 'nota', label: 'Nota', title: 'Nota CapixaStat do jogo (fórmula abaixo)', num: true, range: [5, 8], fmt: function (v) { return v.toFixed(1); } }
+  ], rows, { id: 'scout', sortKey: 'nota', label: 'Resumo do scout', empty: 'Nenhuma marcação nesta partida ainda.' });
+  document.getElementById('sc-resumo').insertAdjacentHTML('beforeend', '<div class="cs-metric"><b class="cs-metric-tag">Nota</b><span>' + notaFormulaTxt() + '</span></div>');
   document.getElementById('sc-lista').innerHTML = evs.slice().reverse().slice(0, 12).map(function (e) {
     return '<div class="sc-item"><span class="tl2-min">' + e.minuto + "'</span><i style=\"background:" + (SC_COR[e.resultado] || '#fff') + '"></i><span>' + ((PLAYERS[e.atletaId] || {}).nome || e.atletaId) + ' · ' + SC_TIPOS[e.tipo].l + ' · ' + (SC_RES_L[e.resultado] || '') + '</span><button class="btn btn-ghost btn-sm" onclick="scDel(\'' + e.id + '\')" aria-label="Excluir marcação">✕</button></div>';
   }).join('') || '<div class="tl2-empty">Clique no campo para marcar a primeira ação.</div>';
