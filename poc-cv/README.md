@@ -62,6 +62,13 @@ python -m pytest -q                                   # 14 testes (homografia, t
 - **Banco e torcida:** se quase não há grama logo abaixo dos pés, a pessoa é descartada.
 - Vídeo anotado com caixas laranja (A), azuis (B) e cinza (outro); coluna `time` no `posicoes.csv`.
 
+## V6 — Limites e câmera fixa
+Texto completo para o relatório em [`docs/relatorio_secao_visao_computacional.md`](../docs/relatorio_secao_visao_computacional.md).
+Resumo: com **transmissão de TV** (câmera móvel, campo parcial, cortes) a homografia só vale em trechos com a
+câmera parada e nenhuma métrica física é apresentada como real. Com **câmera fixa e alta** (celular em tripé
+alto, duas câmeras fixas ou câmera panorâmica automática como Veo/Pixellot/Trace) calibra-se uma vez por estádio
+e os 22 jogadores ficam no quadro o jogo todo.
+
 ## Para onde evolui
 - ~~**Separar por time**~~ — feito (V2, acima).
 - ~~**Homografia**~~ — feito (V1, acima). Próximo: mapa de calor e posições médias a partir do CSV.
