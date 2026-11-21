@@ -2964,10 +2964,46 @@ function enterApp() {
   updateGlobalStats();
   loadApiPlayers();
   try { renderDashTopRow(); renderDashAlerts(); } catch (e) { console.warn('D1/D2', e); }
+  setTimeout(function () { try { applyMetricChips(); } catch (e) {} }, 300);
 }
 
 // ── Atualizar KPIs com dados reais ───────────
 
+
+
+// ── D3: chip "Métrica" — explica cada gráfico e diz se o dado é real ou estimado ──
+// real: true = dado real da temporada; false = estimado/simulado; 'misto' = parte real, parte estimada
+var METRIC_NOTES = {
+  chartGols:             { real: true,    txt: 'Soma dos gols marcados em cada rodada do Campeonato Capixaba 2026, a partir dos placares oficiais.' },
+  chartPosicao:          { real: true,    txt: 'Gols do elenco agrupados pela posição de quem marcou (atacante, meia, zagueiro, goleiro). Fonte: súmulas/incidentes das partidas.' },
+  chartMiniRadar:        { real: 'misto', txt: 'Atributos 0–100. Gols, Passes e Disciplina vêm das estatísticas reais; Físico e Consistência são aproximados por jogos disputados; Dribles é referência por posição.' },
+  chartDevMini:          { real: false,   txt: 'Tendência de desenvolvimento modelada a partir do score atual — ilustrativa, não é série histórica medida.' },
+  chartRadar:            { real: 'misto', txt: 'Mesmo radar de competências (0–100). Eixos reais: Gols, Passes, Disciplina. Aproximados: Físico, Consistência. Referência por posição: Dribles.' },
+  chartPizza:            { real: true,    txt: 'Percentil do atleta em cada atributo comparado só com jogadores da mesma posição que têm estatísticas reais. Fatia maior = melhor posição no ranking.' },
+  chartEvolucao:         { real: false,   txt: 'Evolução semanal do score modelada a partir do score atual — ilustrativa até existir registro jogo a jogo.' },
+  chartArtilheiros:      { real: true,    txt: 'Os 8 maiores goleadores da base, somando todas as competições de 2026 (Capixabão, Copa ES, Série D, Copa Verde).' },
+  chartDonut:            { real: true,    txt: 'Participação de cada posição no total de gols marcados pelos atletas cadastrados.' },
+  chartRadarCmp:         { real: 'misto', txt: 'Sobreposição dos radares dos dois atletas (0–100). Mesmas regras do radar de competências.' },
+  chartCargaIntensidade: { real: false,   txt: 'Intensidade física, de recuperação e semanal (0–10) por atleta. Estimada até a comissão registrar sRPE em Formação.' },
+  chartFisicoEvolucao:   { real: false,   txt: 'Peso corporal nas últimas 8 avaliações. Simulado até haver aferição real do clube.' },
+  chartFlexCadeia:       { real: false,   txt: 'Banco de Wells (cm) por avaliação. Simulado até haver aferição real do clube.' }
+};
+function metricChipHtml(note) {
+  var selo = note.real === true ? '<span class="cs-src real">Dado real</span>' : (note.real === 'misto' ? '<span class="cs-src real">Real</span> <span class="cs-src est">+ estimado</span>' : '<span class="cs-src est">Estimado</span>');
+  return '<b class="cs-metric-tag">Métrica</b><span>' + note.txt + ' ' + selo + '</span>';
+}
+function applyMetricChips() {
+  Object.keys(METRIC_NOTES).forEach(function (id) {
+    var cv = document.getElementById(id);
+    if (!cv) return;
+    var box = cv.closest('.card, .ov-card, .cmp-card') || cv.parentElement;
+    if (!box || box.querySelector('.cs-metric[data-for="' + id + '"]')) return;
+    var chip = document.createElement('div');
+    chip.className = 'cs-metric'; chip.setAttribute('data-for', id);
+    chip.innerHTML = metricChipHtml(METRIC_NOTES[id]);
+    box.appendChild(chip);
+  });
+}
 
 // ── Condição física do atleta (fonte única usada por Formação, Alertas e Elenco) ──
 // Enquanto não houver registro real (F1/F2), o status vem do modelo simulado da v4
@@ -10492,6 +10528,7 @@ function goTo(screenId, navEl) {
   if (screenId === 'taticas')      renderTaticasScreen();
   if (screenId === 'telestrador')  setTimeout(telInit, 30);
   if (screenId === 'jogadores')    renderVitrineJogadores();
+  setTimeout(function () { try { applyMetricChips(); } catch (e) {} }, 250);
   if (screenId === 'dashboard')    { try { renderDashTopRow(); renderDashAlerts(); } catch (e) { console.warn('dash', e); } }
 }
 function switchTab(e, paneId) {
@@ -10741,6 +10778,7 @@ function switchFormTab(name, btn) {
   else if (name === 'carga')        renderCarga();
   else if (name === 'fisico')       renderFisico();
   else if (name === 'antropometria') renderAntropometria();
+  setTimeout(function () { try { applyMetricChips(); } catch (e) {} }, 300);
 }
 
 // ── 1. MICROCICLO ─────────────────────────────
