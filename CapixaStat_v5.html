@@ -1966,6 +1966,13 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 /* T4 */
 .estilo-row { display:grid; grid-template-columns:1fr auto 52px; gap:8px; align-items:center; font-size:12.5px; color:var(--text-2); padding:3px 0; border-bottom:1px solid var(--border) }
 .estilo-row b { font-family:var(--font-mono); color:var(--text-1) } .estilo-row small { text-align:right; font-family:var(--font-mono); color:var(--brand) }
+
+/* X3 */
+.comp-out { display:flex; flex-wrap:wrap; gap:10px; margin-top:10px }
+.comp-out .cs-metric { flex-basis:100% }
+.comp-card { display:grid; grid-template-columns:repeat(3, auto); gap:4px 16px; padding:8px 12px; border-left:3px solid; border-radius:8px; background:var(--bg-raised); font-size:12.5px; color:var(--text-2) }
+.comp-card > b:first-child { grid-column:1 / -1; color:var(--text-1) }
+.comp-card span b { font-family:var(--font-mono); color:var(--text-1) }
 </style>
 </head>
 <body>
@@ -3113,12 +3120,15 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
                 </div>
                 <label class="sim-chk"><input type="checkbox" id="sim-loop"> Repetir</label>
                 <label class="sim-chk"><input type="checkbox" id="sim-trails" checked onchange="simRender()"> Rastros</label>
+                <label class="sim-chk" title="Polígono do bloco de cada time e distância entre as linhas (X3)"><input type="checkbox" id="sim-comp" onchange="simRender()"> Compactação</label>
+                <select id="sim-comp-lado" class="form-select" style="width:auto" onchange="simRender()" aria-label="Time da compactação"><option value="home">Meu time</option><option value="away">Adversário</option><option value="both">Os dois</option></select>
               </div>
               <div class="sim-row">
                 <input id="sim-caption" class="form-input" style="flex:1" maxlength="160" placeholder="Legenda deste quadro (ex.: o lateral sobe e o ponta entra por dentro)" oninput="simSetCaption(this.value)" aria-label="Legenda do quadro">
                 <button class="btn btn-ghost btn-sm" onclick="simDupFrame()">Duplicar quadro</button>
                 <button class="btn btn-ghost btn-sm" onclick="simDelFrame()">Excluir quadro</button>
               </div>
+              <div id="sim-comp-out" class="comp-out" hidden></div>
               <div class="cs-metric"><b class="cs-metric-tag">Como usar</b><span>Arraste jogadores e bola para montar o Q1. Clique em <b>+ Quadro</b> (copia as posições), mova quem se desloca e escreva a legenda. <b>▶</b> anima de um quadro para o outro. Azul = seu clube, laranja = adversário.</span></div>
             </div>
           </div>
@@ -3947,6 +3957,58 @@ function simPitchSvg() {
     '<rect x="-1.6" y="30.34" width="1.6" height="7.32" ' + L + '/><rect x="105" y="30.34" width="1.6" height="7.32" ' + L + '/>';
   return g;
 }
+
+// ── X3: compactação — polígono (fecho convexo) dos 10 de linha + distância entre linhas ──
+function convexHull(pts) {
+  pts = pts.slice().sort(function (a, b) { return a[0] - b[0] || a[1] - b[1]; });
+  if (pts.length < 3) return pts;
+  var cr = function (o, a, b) { return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]); };
+  var lo = [], up = [];
+  pts.forEach(function (p) { while (lo.length >= 2 && cr(lo[lo.length - 2], lo[lo.length - 1], p) <= 0) lo.pop(); lo.push(p); });
+  pts.slice().reverse().forEach(function (p) { while (up.length >= 2 && cr(up[up.length - 2], up[up.length - 1], p) <= 0) up.pop(); up.push(p); });
+  return lo.slice(0, -1).concat(up.slice(0, -1));
+}
+function polyArea(h) { var a = 0; for (var i = 0; i < h.length; i++) { var p = h[i], q = h[(i + 1) % h.length]; a += p[0] * q[1] - q[0] * p[1]; } return Math.abs(a) / 2; }
+// divide os 10 de linha em 3 linhas pela profundidade, cortando nos 2 maiores espaços
+function teamLines(pts, ataqueParaDireita) {
+  var xs = pts.map(function (p) { return p[0]; }).sort(function (a, b) { return a - b; });
+  if (!ataqueParaDireita) xs.reverse();
+  var gaps = []; for (var i = 1; i < xs.length; i++) gaps.push({ i: i, g: Math.abs(xs[i] - xs[i - 1]) });
+  var cortes = gaps.sort(function (a, b) { return b.g - a.g; }).slice(0, 2).map(function (g) { return g.i; }).sort(function (a, b) { return a - b; });
+  var grupos = [xs.slice(0, cortes[0]), xs.slice(cortes[0], cortes[1]), xs.slice(cortes[1])];
+  return grupos.map(function (g) { return { n: g.length, x: g.reduce(function (s, v) { return s + v; }, 0) / g.length }; });
+}
+function compactacao(pos, side) {
+  var pre = side === 'home' ? 'h' : 'a', pts = [];
+  for (var i = 1; i < 11; i++) if (pos[pre + i]) pts.push(pos[pre + i]);
+  if (pts.length < 4) return null;
+  var xs = pts.map(function (p) { return p[0]; }), ys = pts.map(function (p) { return p[1]; });
+  var hull = convexHull(pts), linhas = teamLines(pts, side === 'home');
+  return { side: side, hull: hull, area: polyArea(hull), prof: Math.max.apply(null, xs) - Math.min.apply(null, xs),
+    larg: Math.max.apply(null, ys) - Math.min.apply(null, ys), linhas: linhas,
+    d12: Math.abs(linhas[1].x - linhas[0].x), d23: Math.abs(linhas[2].x - linhas[1].x) };
+}
+function simCompSvg(pos) {
+  var chk = document.getElementById('sim-comp'), out = document.getElementById('sim-comp-out');
+  if (!chk || !chk.checked) { if (out) out.hidden = true; return ''; }
+  var lado = document.getElementById('sim-comp-lado').value, lados = lado === 'both' ? ['home', 'away'] : [lado], h = '', txt = '';
+  lados.forEach(function (sd) {
+    var c = compactacao(pos, sd); if (!c) return;
+    var cor = sd === 'home' ? '#5b95ff' : '#fb923c';
+    h += '<polygon points="' + c.hull.map(function (p) { return p[0].toFixed(2) + ',' + p[1].toFixed(2); }).join(' ') + '" fill="' + cor + '" fill-opacity=".14" stroke="' + cor + '" stroke-width=".4" stroke-dasharray="1.2 .8"/>';
+    c.linhas.forEach(function (l) { h += '<line x1="' + l.x.toFixed(2) + '" y1="0" x2="' + l.x.toFixed(2) + '" y2="68" stroke="' + cor + '" stroke-width=".3" opacity=".7"/>'; });
+    [[0, 1, c.d12], [1, 2, c.d23]].forEach(function (d) {
+      var a = c.linhas[d[0]].x, b = c.linhas[d[1]].x, y = sd === 'home' ? 2.2 : 66.2;
+      h += '<line x1="' + a + '" y1="' + y + '" x2="' + b + '" y2="' + y + '" stroke="#fff" stroke-width=".35"/><text x="' + ((a + b) / 2) + '" y="' + (y - .7) + '" text-anchor="middle" font-size="2" font-weight="700" fill="#fff" font-family="DM Sans, sans-serif">' + d[2].toFixed(1) + ' m</text>';
+    });
+    txt += '<div class="comp-card" style="border-color:' + cor + '"><b>' + (sd === 'home' ? 'Meu time' : 'Adversário') + '</b>' +
+      '<span>Profundidade <b>' + c.prof.toFixed(1) + ' m</b></span><span>Largura <b>' + c.larg.toFixed(1) + ' m</b></span><span>Área do bloco <b>' + Math.round(c.area) + ' m²</b></span>' +
+      '<span>Linhas: ' + c.linhas.map(function (l) { return l.n; }).join('-') + '</span><span>Defesa→meio <b>' + c.d12.toFixed(1) + ' m</b></span><span>Meio→ataque <b>' + c.d23.toFixed(1) + ' m</b></span></div>';
+  });
+  if (out) { out.hidden = false; out.innerHTML = txt + '<div class="cs-metric"><b class="cs-metric-tag">Compactação</b><span>Polígono = área ocupada pelos 10 jogadores de linha (sem goleiro). As linhas são separadas pelos dois maiores espaços em profundidade. Referência comum: bloco defensivo com profundidade de 25–35 m e menos de ~12 m entre as linhas fica difícil de atravessar. Medidas em metros num campo de 105 × 68 m.</span></div>'; }
+  return h;
+}
+
 function simRender(posOverride) {
   var svg = document.getElementById('sim-svg'); if (!svg || !SIM.frames.length) return;
   var fr = SIM.frames[SIM.cur], pos = posOverride || fr.pos;
@@ -3960,6 +4022,7 @@ function simRender(posOverride) {
         h += '<line x1="' + a[0] + '" y1="' + a[1] + '" x2="' + b[0] + '" y2="' + b[1] + '" stroke="' + (t.side === 'ball' ? '#fff' : t.side === 'home' ? '#9cc0ff' : '#fdba74') + '" stroke-width=".45" stroke-dasharray="1.2 .9" opacity=".85" marker-end="url(#sim-arr)"/>';
     });
   }
+  h += simCompSvg(pos); // X3
   h += '<defs><marker id="sim-arr" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="4" markerHeight="4" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#fff"/></marker></defs>';
   SIM.tokens.forEach(function (t) {
     var q = pos[t.id]; if (!q) return;

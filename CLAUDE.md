@@ -120,6 +120,8 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 
 ### Regras combinadas para a implementação
 - Trabalhar em **`CapixaStat_v5.html`**. **Não alterar a v4.** O React (`web-react/`) está parado.
+- **Só PC (21/11):** o CapixaStat é um site web para computador. Não fazer layout nem teste para celular;
+  o que já existe de responsivo pode ficar, mas não é mais critério de aceite.
 - Backup do estado original: `backup/CapixaStat_v4_original.html` + commit `b450ed6`
   ("backup antes das melhorias"). Git local (sem remoto configurado), `core.autocrlf=false`.
 - **Um commit por item**, com o ID na mensagem (ex.: "R1: ajuste de contraste").
@@ -142,7 +144,7 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 ✅ A1 · ✅ A2 · ✅ A3 · ✅ B1 · ✅ B2 · ✅ B3 · ✅ L2 · ✅ R2 · ✅ R3 · ✅ V1 · ✅ X1 · ✅ P2
 **Dados externos:** ✅ pesquisa de fontes · ✅ integração TheSportsDB (rotina + banco + fonte/data na tela)
 **Média:** ✅ A5 · ✅ A7 · ✅ A8 · ✅ P4 · ✅ P5 · ✅ F3 · ✅ F4 · ✅ T2 · ✅ T3 · ✅ X2 · ✅ Q2 · ✅ B6 · ✅ V5 ·
-✅ I2 · ✅ I3 · ✅ M2 · ✅ M4 · ✅ R5 · ✅ D4 · ✅ A6 · ✅ A9 · ✅ P3 · ✅ F5 · ✅ T4 · ⬜ X3 · ⬜ Q1 · ⬜ B5 ·
+✅ I2 · ✅ I3 · ✅ M2 · ✅ M4 · ✅ R5 · ✅ D4 · ✅ A6 · ✅ A9 · ✅ P3 · ✅ F5 · ✅ T4 · ✅ X3 · ⬜ Q1 · ⬜ B5 ·
 ⬜ V2 · ⬜ V4 · ⬜ L3 · ⬜ M1 · ⬜ R4 · ⬜ Q3 · ⬜ V3
 **Baixa:** ⬜ A10 · ⬜ X4 · ⬜ Q4 · ⬜ V6 · ⬜ M3 · ⬜ P6 · ⬜ F6 · ✅ B7 · ⬜ L4
 
@@ -384,6 +386,11 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
   (gols pró/jogo, gols contra/jogo invertido, posse, finalizações/jogo, precisão, escanteios, disciplina invertida) em
   **percentil entre os clubes capixabas**; tabela ao lado com o valor real. Gols de todos os jogos; o resto só de jogos com
   estatística oficial (contagem mostrada). Respeita o filtro de competição (D4).
+
+- **X3:** Simulador de Lances ganhou **Compactação** (checkbox + time: meu/adversário/os dois): fecho convexo dos 10 de
+  linha (`convexHull`, `polyArea`), linhas separadas pelos 2 maiores espaços em profundidade (`teamLines`), cotas em metros
+  entre linhas no campo e card com profundidade, largura, área (m²), desenho das linhas (ex.: 4-4-2) e distâncias
+  (`compactacao`, `simCompSvg`). Atualiza ao arrastar e na animação.
 
 ### ONDE PAROU (21/11, madrugada — limite de uso)
 Próximos itens Média (dif. média): D4, A6,
