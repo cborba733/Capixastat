@@ -2057,6 +2057,26 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .mat-form { display:grid; gap:8px; align-content:start }
 .mat-row { display:grid; grid-template-columns:1fr 1fr; gap:8px } .mat-row label { display:grid; gap:3px; font-size:12px; color:var(--text-3) }
 .mat-tab { width:100%; border-collapse:collapse; font-size:12px; margin-top:6px } .mat-tab th, .mat-tab td { padding:4px 6px; border-bottom:1px solid var(--border); text-align:left; color:var(--text-2) } .mat-tab td { font-family:var(--font-mono) }
+
+/* L4: assistente de primeiro acesso */
+.ob-overlay { position:fixed; inset:0; z-index:900; background:rgba(4,8,14,.72); display:flex; align-items:center; justify-content:center; padding:24px }
+.ob-overlay[hidden] { display:none }
+.ob-modal { width:720px; max-width:96vw; max-height:92vh; overflow:auto; background:var(--bg-surface); border:1px solid var(--border-md); border-radius:16px; padding:22px 26px; box-shadow:0 24px 70px rgba(0,0,0,.55) }
+.ob-modal h2 { font-family:var(--font-display); font-size:22px; color:var(--text-1); margin:10px 0 6px }
+.ob-modal p { font-size:13.5px; color:var(--text-2); margin:0 0 14px }
+.ob-steps { display:flex; gap:14px; font-size:12px; color:var(--text-3) } .ob-steps .on { color:var(--brand); font-weight:700 } .ob-steps .ok { color:var(--ok) }
+.ob-clubes { display:grid; grid-template-columns:repeat(4, 1fr); gap:8px }
+.ob-funcoes, .ob-telas { display:grid; grid-template-columns:repeat(2, 1fr); gap:8px }
+.ob-telas { grid-template-columns:repeat(3, 1fr) }
+.ob-opt, .ob-tela { display:flex; flex-direction:column; align-items:flex-start; gap:4px; text-align:left; padding:10px 12px; border-radius:10px; border:1px solid var(--border-md); background:var(--bg-raised); color:var(--text-1); cursor:pointer; font-family:inherit; font-size:13px }
+.ob-clubes .ob-opt { flex-direction:row; align-items:center; gap:8px } .ob-opt img { width:22px; height:22px; object-fit:contain }
+.ob-opt small, .ob-tela small { color:var(--text-3); font-size:12px }
+.ob-opt:hover, .ob-tela:hover { border-color:var(--brand) }
+.ob-opt.on { border-color:var(--brand); background:rgba(91,149,255,.14); box-shadow:inset 0 0 0 1px var(--brand) }
+.ob-opt:disabled { opacity:.4; cursor:not-allowed }
+.ob-tela b { color:var(--brand) }
+.ob-dica { margin-top:14px !important; font-size:12px !important }
+.ob-acoes { display:flex; gap:8px; margin-top:18px }
 </style>
 </head>
 <body>
@@ -2271,6 +2291,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
             <div class="user-role">Técnico · Real Noroeste</div>
           </div>
         </div>
+        <div onclick="obStart()" style="margin-top:8px;padding:6px 12px;font-size:12px;color:var(--text-3);cursor:pointer;text-align:center;border-radius:6px;border:1px solid rgba(255,255,255,0.07)" title="Escolher clube e função de novo (L4)">Rever apresentação</div>
         <div onclick="logout()" style="margin-top:8px;padding:6px 12px;font-size:12px;color:var(--text-3);cursor:pointer;text-align:center;border-radius:6px;border:1px solid rgba(255,255,255,0.07)" onmouseover="this.style.color='#f87171'" onmouseout="this.style.color='var(--text-3)'">Sair da conta</div>
         <button class="theme-toggle-btn" id="theme-toggle-btn" onclick="toggleTheme()">
           <span id="theme-icon">🌙</span><span id="theme-lbl">Tema Claro</span>
@@ -3614,6 +3635,81 @@ function updateSidebarUser(user) {
 }
 
 // ── Entrar no App ────────────────────────────
+
+// ══════════════════════════════════════════════════════════════════
+// L4: assistente de primeiro acesso — clube → função → por onde começar
+// ══════════════════════════════════════════════════════════════════
+var OB_FUNCOES = {
+  'Técnico': { d: 'Prepara o time e os jogos.', telas: [['time', 'Meu Time', 'forma, estilo e ranking Elo'], ['taticas', 'Táticas', 'formação e dossiê do adversário'], ['simulador', 'Simulador de Lances', 'monte e anime jogadas']] },
+  'Analista de Desempenho': { d: 'Analisa jogos, adversários e atletas.', telas: [['scout', 'Scout ao Vivo', 'marque as ações no campo'], ['video', 'Análise de Vídeo', 'posições, calor e compactação'], ['estatisticas', 'Estatísticas', 'números do campeonato']] },
+  'Preparador Físico': { d: 'Controla carga e recuperação.', telas: [['formacao', 'Formação', 'registro diário de esforço e bem-estar'], ['dashboard', 'Visão Geral', 'alertas de carga (ACWR)'], ['perfil', 'Perfil do Atleta', 'maturação e histórico']] },
+  'Médico / Fisioterapeuta': { d: 'Acompanha saúde e lesões.', telas: [['formacao', 'Formação', 'bem-estar e queixas de dor'], ['dashboard', 'Visão Geral', 'quem está em alerta'], ['perfil', 'Perfil do Atleta', 'maturação dos atletas da base']] },
+  'Scout': { d: 'Procura e avalia jogadores.', telas: [['jogadores', 'Vitrine de Jogadores', 'filtros, lista de observação'], ['comparativo', 'Comparativo', 'dois atletas lado a lado'], ['ranking', 'Ranking', 'os melhores por posição']] },
+  'Diretor': { d: 'Acompanha o clube e o elenco.', telas: [['dashboard', 'Visão Geral', 'resumo do clube'], ['time', 'Meu Time', 'desempenho e força (Elo)'], ['jogadores', 'Vitrine de Jogadores', 'elenco e mercado']] },
+  'Atleta': { d: 'Responde como está e quanto treinou.', telas: [['atleta', 'Meu dia', 'bem-estar e esforço em 1 minuto']] },
+  'Estudante': { d: 'Aprende análise de desempenho.', telas: [['estatisticas', 'Estatísticas', 'dados do campeonato'], ['ranking', 'Ranking', 'os melhores por posição'], ['comparativo', 'Comparativo', 'dois atletas lado a lado']] }
+};
+var OB = { passo: 0, clube: '', funcao: '' };
+function obChave() { var u = getCurrentUser() || {}; return 'capixastat_v5_onboard_' + (u.email || u.nome || 'anon'); }
+function obMaybeStart() {
+  var u = getCurrentUser(); if (!u) return;
+  var feito = false; try { feito = !!localStorage.getItem(obChave()); } catch (e) {}
+  if (!feito) obStart();
+}
+function obStart() {
+  var u = getCurrentUser() || {};
+  OB = { passo: 0, clube: resolveClube(u.clube) || '', funcao: u.funcao || '', travada: !!u.papel };
+  var ov = document.getElementById('ob-overlay');
+  if (!ov) { ov = document.createElement('div'); ov.id = 'ob-overlay'; ov.className = 'ob-overlay'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-labelledby', 'ob-tit'); document.body.appendChild(ov); }
+  ov.hidden = false; obRender();
+}
+function obRender() {
+  var ov = document.getElementById('ob-overlay'); if (!ov) return;
+  var passos = ['Seu clube', 'Sua função', 'Por onde começar'], c = '';
+  if (OB.passo === 0) {
+    var clubes = Object.keys(CLUBS).sort();
+    c = '<p>Os números da plataforma (elenco, alertas, adversários) são do clube escolhido.</p><div class="ob-clubes">' + clubes.map(function (n) {
+      var esc = _dashClubBadge(n);
+      return '<button type="button" class="ob-opt' + (OB.clube === n ? ' on' : '') + '" aria-pressed="' + (OB.clube === n) + '" onclick="OB.clube=\'' + n.replace(/'/g, "\\'") + '\';obRender()">' + (esc ? '<img src="' + esc + '" alt="" onerror="this.remove()">' : '') + '<span>' + n + '</span></button>';
+    }).join('') + '</div>';
+  } else if (OB.passo === 1) {
+    c = '<p>A função define o que você vê primeiro e o que pode registrar.' + (OB.travada ? ' <b>Sua função vem do cadastro na nuvem e só a administração muda.</b>' : '') + '</p><div class="ob-funcoes">' + Object.keys(OB_FUNCOES).map(function (f) {
+      return '<button type="button" class="ob-opt' + (OB.funcao === f ? ' on' : '') + '" aria-pressed="' + (OB.funcao === f) + '"' + (OB.travada && OB.funcao !== f ? ' disabled' : '') + ' onclick="OB.funcao=\'' + f + '\';obRender()"><b>' + f + '</b><small>' + OB_FUNCOES[f].d + '</small></button>';
+    }).join('') + '</div>';
+  } else {
+    var info = OB_FUNCOES[OB.funcao] || OB_FUNCOES['Estudante'];
+    c = '<p>Pronto! Para <b>' + (OB.funcao || 'você') + '</b> no <b>' + OB.clube + '</b>, comece por aqui:</p><div class="ob-telas">' + info.telas.map(function (t) {
+      return '<button type="button" class="ob-tela" onclick="obConcluir(\'' + t[0] + '\')"><b>' + t[1] + '</b><small>' + t[2] + '</small></button>';
+    }).join('') + '</div><p class="ob-dica">Os números com selo <span class="cs-src real">Dado real</span> vêm das partidas oficiais; com <span class="cs-src est">estimativa</span>, de modelo. Para refazer esta apresentação, use <b>Rever apresentação</b> no menu, acima de Sair da conta.</p>';
+  }
+  var podeAvancar = OB.passo === 0 ? !!OB.clube : OB.passo === 1 ? !!OB.funcao : true;
+  ov.innerHTML = '<div class="ob-modal"><div class="ob-steps">' + passos.map(function (t, i) { return '<span class="' + (i === OB.passo ? 'on' : i < OB.passo ? 'ok' : '') + '">' + (i + 1) + '. ' + t + '</span>'; }).join('') + '</div>' +
+    '<h2 id="ob-tit">' + (OB.passo === 0 ? 'Bem-vindo ao CapixaStat' : passos[OB.passo]) + '</h2>' + c +
+    '<div class="ob-acoes"><button type="button" class="btn btn-ghost btn-sm" onclick="obPular()">Pular</button><span style="flex:1"></span>' +
+    (OB.passo > 0 ? '<button type="button" class="btn btn-ghost btn-sm" onclick="OB.passo--;obRender()">Voltar</button>' : '') +
+    (OB.passo < 2 ? '<button type="button" class="btn btn-primary btn-sm" ' + (podeAvancar ? '' : 'disabled ') + 'onclick="OB.passo++;obRender()">Continuar</button>' : '<button type="button" class="btn btn-primary btn-sm" onclick="obConcluir()">Concluir</button>') + '</div></div>';
+  var foco = ov.querySelector('.ob-opt.on, .ob-tela, .btn-primary'); if (foco) foco.focus();
+}
+function obSalvar() {
+  var u = getCurrentUser() || {};
+  if (OB.clube) u.clube = OB.clube;
+  if (OB.funcao && !OB.travada) u.funcao = OB.funcao;
+  setCurrentUser(u);
+  try { localStorage.setItem(obChave(), new Date().toISOString()); } catch (e) {}
+  try { applyPermissions(); updateGlobalStats(); renderDashTopRow(); renderDashAlerts(); } catch (e) {}
+}
+function obConcluir(tela) {
+  obSalvar();
+  document.getElementById('ob-overlay').hidden = true;
+  goTo(tela || 'dashboard');
+  csToast('Tudo pronto' + (OB.clube ? ' — ' + OB.clube : ''));
+}
+function obPular() {
+  try { localStorage.setItem(obChave(), 'pulado'); } catch (e) {}
+  document.getElementById('ob-overlay').hidden = true;
+}
+document.addEventListener('keydown', function (e) { var ov = document.getElementById('ob-overlay'); if (e.key === 'Escape' && ov && !ov.hidden) obPular(); });
+
 function enterApp() {
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').classList.add('visible');
@@ -3626,6 +3722,7 @@ function enterApp() {
   try { applyPermissions(); } catch (e) {}
   csSyncPull().then(function () { try { renderDashAlerts(); } catch (e) {} });
   csCloudPull();
+  setTimeout(function () { try { obMaybeStart(); } catch (e) { console.warn('L4', e); } }, 700);
 }
 
 // ── Atualizar KPIs com dados reais ───────────

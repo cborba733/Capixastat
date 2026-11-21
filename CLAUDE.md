@@ -146,7 +146,7 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 **Média:** ✅ A5 · ✅ A7 · ✅ A8 · ✅ P4 · ✅ P5 · ✅ F3 · ✅ F4 · ✅ T2 · ✅ T3 · ✅ X2 · ✅ Q2 · ✅ B6 · ✅ V5 ·
 ✅ I2 · ✅ I3 · ✅ M2 · ✅ M4 · ✅ R5 · ✅ D4 · ✅ A6 · ✅ A9 · ✅ P3 · ✅ F5 · ✅ T4 · ✅ X3 · ✅ Q1 · ✅ B5 ·
 ✅ V2 · ✅ V4 · ✅ L3 · ✅ M1 · ✅ R4 · ✅ Q3 · ✅ V3
-**Baixa:** ✅ A10 · ✅ X4 · ✅ Q4 · ✅ V6 · ✅ M3 · ✅ P6 · ✅ F6 · ✅ B7 · ⬜ L4
+**Baixa:** ✅ A10 · ✅ X4 · ✅ Q4 · ✅ V6 · ✅ M3 · ✅ P6 · ✅ F6 · ✅ B7 · ✅ L4
 
 ### Notas por item
 - **R1:** `--text-3` escuro `#4a6a7a`→`#8299aa`, `--text-2` →`#a9bccb`; tema claro: text-3 `#56667a`,
@@ -481,6 +481,12 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
   carga; gráfico altura × distância do pico por idade; tabela de medidas. Selo "estimativa" e aviso de erro ±1 ano.
   Dados em `capixastat_v5_medidas` → nuvem na chave **`medidas`** (adicionada em `backend/routes/dados.js` e no OpenAPI;
   9 testes do backend passando). Nenhuma medida real cadastrada — o card começa vazio.
+
+- **L4:** **assistente de primeiro acesso** (`obStart`, `obRender`, `obConcluir`, `obPular`; abre sozinho no 1º login de
+  cada usuário — marca `capixastat_v5_onboard_<email|nome>`): 1) clube (10 clubes com escudo), 2) função (8 funções com
+  descrição; travada quando o papel vem do cadastro na nuvem), 3) por onde começar — 3 telas sugeridas por função
+  (`OB_FUNCOES`) e legenda dos selos real/estimativa. Grava clube/função no usuário atual e reaplica permissões.
+  "Pular" e Esc fecham; **Rever apresentação** no menu, acima de Sair da conta, reabre.
 
 ### ONDE PAROU (21/11, madrugada — limite de uso)
 Próximos itens Média (dif. média): D4, A6,
