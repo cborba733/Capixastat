@@ -56,7 +56,7 @@
       "get": { "summary": "Eventos de jogo (?partida= ou ?clube=)", "security": [{ "bearer": [] }], "responses": { "200": { "description": "ok" } } },
       "post": { "summary": "Marca evento no campo (técnico, analista, scout)", "security": [{ "bearer": [] }],
         "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Evento" } } } }, "responses": { "201": { "description": "criado" } } } },
-    "/api/dados/{chave}": { "parameters": [{ "name": "chave", "in": "path", "required": true, "schema": { "type": "string", "enum": ["taticas", "taticas_presets", "telestracao", "fotos", "filtros", "lances", "observacao", "anotacoes", "relatorios", "microciclos"] } }],
+    "/api/dados/{chave}": { "parameters": [{ "name": "chave", "in": "path", "required": true, "schema": { "type": "string", "enum": ["taticas", "taticas_presets", "telestracao", "fotos", "filtros", "lances", "observacao", "anotacoes", "relatorios", "microciclos", "medidas"] } }],
       "get": { "summary": "Documento do usuário", "security": [{ "bearer": [] }], "responses": { "200": { "description": "ok" } } },
       "put": { "summary": "Salva documento { dados }", "security": [{ "bearer": [] }], "responses": { "200": { "description": "atualizado" }, "201": { "description": "criado" } } } },
     "/api/fontes/status": { "get": { "summary": "Últimas importações de dados externos (procedência — B7)", "responses": { "200": { "description": "ok" } } } },

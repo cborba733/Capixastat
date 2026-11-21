@@ -146,7 +146,7 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 **Média:** ✅ A5 · ✅ A7 · ✅ A8 · ✅ P4 · ✅ P5 · ✅ F3 · ✅ F4 · ✅ T2 · ✅ T3 · ✅ X2 · ✅ Q2 · ✅ B6 · ✅ V5 ·
 ✅ I2 · ✅ I3 · ✅ M2 · ✅ M4 · ✅ R5 · ✅ D4 · ✅ A6 · ✅ A9 · ✅ P3 · ✅ F5 · ✅ T4 · ✅ X3 · ✅ Q1 · ✅ B5 ·
 ✅ V2 · ✅ V4 · ✅ L3 · ✅ M1 · ✅ R4 · ✅ Q3 · ✅ V3
-**Baixa:** ✅ A10 · ✅ X4 · ✅ Q4 · ✅ V6 · ✅ M3 · ✅ P6 · ⬜ F6 · ✅ B7 · ⬜ L4
+**Baixa:** ✅ A10 · ✅ X4 · ✅ Q4 · ✅ V6 · ✅ M3 · ✅ P6 · ✅ F6 · ✅ B7 · ⬜ L4
 
 ### Notas por item
 - **R1:** `--text-3` escuro `#4a6a7a`→`#8299aa`, `--text-2` →`#a9bccb`; tema claro: text-3 `#56667a`,
@@ -473,6 +473,14 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
   barras verdes/vermelhas com o saldo das ações do seu time a cada 5 min (gol +3, finalização +1 + 5×xG, passe-chave +1,
   drible/recuperação +0,7 ×1,3 no terço final; erro −0,7, falta −0,5, amarelo −1, vermelho −3), melhor e pior momento,
   tooltip com positivas/negativas. Aparece com ≥ 5 marcações (só usa o que foi marcado — o Scout não registra o adversário).
+
+- **F6:** card **Maturação e crescimento** no Perfil (só atletas ≤ 18 anos ou com medidas): comissão registra nascimento,
+  sexo, data, altura, altura sentado (opcional) e peso (`matAdd`, validações de faixa); calcula a **distância do pico de
+  crescimento (PHV)** por Mirwald 2002 (com altura sentado) ou Moore 2015 (só idade + altura; versão para meninas),
+  idade estimada do pico, velocidade de crescimento (cm/ano) e fase (antes / perto / depois do pico) com orientação de
+  carga; gráfico altura × distância do pico por idade; tabela de medidas. Selo "estimativa" e aviso de erro ±1 ano.
+  Dados em `capixastat_v5_medidas` → nuvem na chave **`medidas`** (adicionada em `backend/routes/dados.js` e no OpenAPI;
+  9 testes do backend passando). Nenhuma medida real cadastrada — o card começa vazio.
 
 ### ONDE PAROU (21/11, madrugada — limite de uso)
 Próximos itens Média (dif. média): D4, A6,

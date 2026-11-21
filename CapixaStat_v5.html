@@ -2049,6 +2049,14 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .cs-editado { display:inline-flex; align-items:center; gap:6px; font-size:11.5px; font-weight:700; color:var(--warn); border:1px dashed var(--warn); border-radius:999px; padding:2px 4px 2px 10px; white-space:nowrap }
 .cs-editado[hidden] { display:none }
 .cs-editado button { background:var(--warn); color:#111; border:0; border-radius:999px; font-size:11px; font-weight:700; padding:2px 8px; cursor:pointer }
+
+/* F6 */
+.mat-grid { display:grid; grid-template-columns:1.2fr 1fr; gap:18px }
+.mat-kpis { display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; margin-bottom:8px }
+.mat-kpis > div { background:var(--bg-raised); border-radius:8px; padding:8px 10px } .mat-kpis small { display:block; font-size:11px; color:var(--text-3) } .mat-kpis b { font-family:var(--font-mono); color:var(--text-1); font-size:15px }
+.mat-form { display:grid; gap:8px; align-content:start }
+.mat-row { display:grid; grid-template-columns:1fr 1fr; gap:8px } .mat-row label { display:grid; gap:3px; font-size:12px; color:var(--text-3) }
+.mat-tab { width:100%; border-collapse:collapse; font-size:12px; margin-top:6px } .mat-tab th, .mat-tab td { padding:4px 6px; border-bottom:1px solid var(--border); text-align:left; color:var(--text-2) } .mat-tab td { font-family:var(--font-mono) }
 </style>
 </head>
 <body>
@@ -2680,6 +2688,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
             </div>
             <!-- A3: números por 90 minutos e percentil contra a mesma posição -->
             <div class="card" id="p-per90" style="margin-bottom:16px"></div>
+            <!-- F6: maturação (PHV) e curva de crescimento — atletas da base -->
+            <div class="card" id="p-maturacao" style="margin-bottom:16px" hidden></div>
             <div class="grid-2-eq">
               <div class="card" id="p-indicators">
                 <div class="card-title">Indicadores de desempenho</div>
@@ -4713,7 +4723,7 @@ var CS_PONTOS = ['circle', 'rect', 'triangle', 'rectRot', 'crossRot', 'star'];
 // Qualquer gravação no localStorage destas chaves agenda o envio (1,5 s depois da última mudança).
 // Ao entrar, baixa o que estiver mais novo no servidor. Sem login real, tudo continua só local.
 // ══════════════════════════════════════════════════════════════════
-var CS_CLOUD_KEYS = { capixastat_taticas: 'taticas', capixastat_taticas_presets: 'taticas_presets', capixastat_tel: 'telestracao', capixastat_userphotos: 'fotos', capixastat_v5_filtros: 'filtros', capixastat_v5_lances: 'lances', capixastat_v5_obs: 'observacao', capixastat_v5_relatorios: 'relatorios', capixastat_v5_microciclos: 'microciclos', capixastat_v5_anotacoes: 'anotacoes' };
+var CS_CLOUD_KEYS = { capixastat_taticas: 'taticas', capixastat_taticas_presets: 'taticas_presets', capixastat_tel: 'telestracao', capixastat_userphotos: 'fotos', capixastat_v5_filtros: 'filtros', capixastat_v5_lances: 'lances', capixastat_v5_obs: 'observacao', capixastat_v5_relatorios: 'relatorios', capixastat_v5_microciclos: 'microciclos', capixastat_v5_anotacoes: 'anotacoes', capixastat_v5_medidas: 'medidas' };
 var _csCloudTimers = {}, _csCloudPulling = false;
 function csCloudStamps() { try { return JSON.parse(localStorage.getItem('capixastat_v5_stamps') || '{}'); } catch (e) { return {}; } }
 function csCloudSetStamp(chave, t) { var s = csCloudStamps(); s[chave] = t; try { Storage.prototype._csOrigSet.call(localStorage, 'capixastat_v5_stamps', JSON.stringify(s)); } catch (e) {} }
@@ -13111,6 +13121,96 @@ function per90Peers(group) {
   _per90Cache[group] = arr;
   return arr;
 }
+
+// ══════════════════════════════════════════════════════════════════
+// F6: maturação biológica (PHV = pico de velocidade de crescimento) e curva de crescimento
+// Mirwald et al. (2002) quando há altura sentado; senão Moore et al. (2015), só com idade e altura.
+// ══════════════════════════════════════════════════════════════════
+var MAT_IDADE_MAX = 18;
+function matAll() { try { return JSON.parse(localStorage.getItem('capixastat_v5_medidas') || '{}'); } catch (e) { return {}; } }
+function matSaveAll(o) { try { localStorage.setItem('capixastat_v5_medidas', JSON.stringify(o)); } catch (e) { csToast('Armazenamento cheio'); } }
+function matIdade(nasc, data) { return (new Date(data) - new Date(nasc)) / (365.25 * 864e5); }
+// maturity offset (anos): negativo = antes do pico, positivo = depois
+function matOffset(r, nasc, sexo) {
+  var A = matIdade(nasc, r.data), H = +r.altura, SH = +r.sentado, W = +r.peso;
+  if (!(A > 6 && A < 22 && H > 90)) return null;
+  if (sexo !== 'F' && SH > 40 && W > 15) { // Mirwald 2002 (meninos)
+    var LL = H - SH;
+    return { mo: -9.236 + 0.0002708 * (LL * SH) - 0.001663 * (A * LL) + 0.007216 * (A * SH) + 0.02292 * (W / H * 100), idade: A, metodo: 'Mirwald 2002' };
+  }
+  if (sexo === 'F') return { mo: -7.709133 + 0.0042232 * (A * H), idade: A, metodo: 'Moore 2015 (meninas)' };
+  return { mo: -7.999994 + 0.0036124 * (A * H), idade: A, metodo: 'Moore 2015' };
+}
+function matFase(mo) {
+  if (mo < -1) return { t: 'Antes do pico', c: 'info', d: 'Ainda não chegou ao estirão. Bom momento para técnica, coordenação e velocidade.' };
+  if (mo <= 1) return { t: 'Perto do pico (PHV)', c: 'warn', d: 'Fase de crescimento rápido: mais risco de lesão por sobrecarga (joelho, calcanhar, coluna). Controlar saltos, sprints repetidos e volume; atenção à coordenação, que pode piorar por um tempo.' };
+  return { t: 'Depois do pico', c: 'ok', d: 'Estirão passou. Força e potência respondem melhor agora; carga pode subir de forma gradual.' };
+}
+function renderMaturacao(p) {
+  var el = document.getElementById('p-maturacao'); if (!el || !p) return;
+  var all = matAll(), m = all[p.id] || { nasc: '', sexo: 'M', registros: [] };
+  var temReg = m.registros && m.registros.length;
+  if (!(p.idade && p.idade <= MAT_IDADE_MAX) && !temReg) { el.hidden = true; return; }
+  el.hidden = false;
+  var regs = (m.registros || []).slice().sort(function (a, b) { return a.data < b.data ? -1 : 1; });
+  var calc = m.nasc ? regs.map(function (r) { return { r: r, o: matOffset(r, m.nasc, m.sexo) }; }).filter(function (x) { return x.o; }) : [];
+  var ult = calc[calc.length - 1];
+  var vel = null;
+  if (regs.length >= 2 && m.nasc) { var a = regs[regs.length - 2], b = regs[regs.length - 1], dt = matIdade(a.data, b.data); if (dt > 0.15) vel = (b.altura - a.altura) / dt; }
+  var podeEditar = csPode('players:write') || ['preparador', 'medico'].indexOf(csPapel()) >= 0;
+  var resumo = '';
+  if (ult) {
+    var f = matFase(ult.o.mo);
+    resumo = '<div class="mat-kpis"><div><small>Distância do pico</small><b>' + (ult.o.mo > 0 ? '+' : '') + ult.o.mo.toFixed(1) + ' ano(s)</b></div>' +
+      '<div><small>Idade estimada do pico</small><b>' + (ult.o.idade - ult.o.mo).toFixed(1) + ' anos</b></div>' +
+      '<div><small>Velocidade de crescimento</small><b>' + (vel == null ? '—' : vel.toFixed(1) + ' cm/ano') + '</b></div>' +
+      '<div><small>Fase</small><b><span class="cs-status ' + f.c + '">' + f.t + '</span></b></div></div>' +
+      '<div class="dash-sub" style="text-align:left">' + f.d + '</div>';
+  } else resumo = '<div class="tl2-empty">' + (m.nasc ? 'Registre a primeira medida.' : 'Informe a data de nascimento e registre altura e peso para estimar a maturação.') + '</div>';
+  el.innerHTML = '<div class="card-title">Maturação e crescimento <span>atleta da base · ' + (ult ? 'estimativa (' + ult.o.metodo + ')' : 'sem medidas') + ' <span class="cs-src est">estimativa</span></span></div>' +
+    '<div class="mat-grid"><div>' + resumo + (calc.length >= 2 ? '<canvas id="chartMat" height="130"></canvas>' : '') + '</div>' +
+    '<div class="mat-form">' + (podeEditar ?
+      '<div class="mat-row"><label>Nascimento <input type="date" id="mat-nasc" class="form-input" value="' + (m.nasc || '') + '"></label><label>Sexo <select id="mat-sexo" class="form-select"><option value="M"' + (m.sexo !== 'F' ? ' selected' : '') + '>Masculino</option><option value="F"' + (m.sexo === 'F' ? ' selected' : '') + '>Feminino</option></select></label></div>' +
+      '<div class="mat-row"><label>Data <input type="date" id="mat-data" class="form-input" value="' + csToday() + '"></label><label>Altura (cm) <input type="number" id="mat-alt" class="form-input" min="100" max="220" step="0.1"></label></div>' +
+      '<div class="mat-row"><label>Altura sentado (cm) <input type="number" id="mat-sent" class="form-input" min="50" max="120" step="0.1" placeholder="opcional"></label><label>Peso (kg) <input type="number" id="mat-peso" class="form-input" min="20" max="130" step="0.1"></label></div>' +
+      '<button class="btn btn-primary btn-sm" onclick="matAdd(\'' + p.id + '\')">Registrar medida</button>' : csSemPermissao('Só a comissão registra medidas.')) +
+      (regs.length ? '<table class="mat-tab"><thead><tr><th>Data</th><th>Altura</th><th>Sentado</th><th>Peso</th><th>Pico</th>' + (podeEditar ? '<th></th>' : '') + '</tr></thead><tbody>' + regs.slice().reverse().map(function (r) {
+        var o = m.nasc ? matOffset(r, m.nasc, m.sexo) : null;
+        return '<tr><td>' + csFmtDate(r.data) + '</td><td>' + r.altura + '</td><td>' + (r.sentado || '—') + '</td><td>' + (r.peso || '—') + '</td><td>' + (o ? (o.mo > 0 ? '+' : '') + o.mo.toFixed(1) : '—') + '</td>' +
+          (podeEditar ? '<td><button class="btn btn-ghost btn-sm" onclick="matDel(\'' + p.id + '\',\'' + r.data + '\')" aria-label="Excluir medida de ' + csFmtDate(r.data) + '">✕</button></td>' : '') + '</tr>'; }).join('') + '</tbody></table>' : '') +
+    '</div></div>' +
+    '<div class="cs-metric"><b class="cs-metric-tag">PHV</b><span>Pico de velocidade de crescimento: a fase do estirão. "Distância do pico" é estimada por equação (Mirwald 2002 com altura sentado; Moore 2015 só com idade e altura) e tem erro de cerca de ±1 ano — use para planejar carga e comparar atletas pela idade biológica, não para selecionar. Meça a cada 3 meses, no mesmo horário.</span></div>';
+  if (calc.length >= 2) setTimeout(function () {
+    var cc = _chartColors();
+    mkChart('chartMat', { type: 'line', data: { labels: calc.map(function (x) { return x.o.idade.toFixed(1); }), datasets: [
+      { label: 'Altura (cm)', data: calc.map(function (x) { return +x.r.altura; }), borderColor: csData(0), backgroundColor: 'transparent', yAxisID: 'y', tension: .3 },
+      { label: 'Distância do pico (anos)', data: calc.map(function (x) { return +x.o.mo.toFixed(2); }), borderColor: csData(2), backgroundColor: 'transparent', yAxisID: 'y2', tension: .3 }] },
+      options: { responsive: true, plugins: { legend: { labels: { color: cc.legend } } }, scales: {
+        x: { title: { display: true, text: 'idade (anos)', color: cc.tick }, ticks: { color: cc.tick }, grid: { color: cc.grid } },
+        y: { position: 'left', ticks: { color: cc.tick }, grid: { color: cc.grid } },
+        y2: { position: 'right', ticks: { color: cc.tick }, grid: { display: false } } } } });
+  }, 60);
+}
+function matAdd(id) {
+  var v = function (k) { return document.getElementById(k).value; };
+  var nasc = v('mat-nasc'), data = v('mat-data'), alt = +v('mat-alt'), sent = +v('mat-sent') || null, peso = +v('mat-peso') || null;
+  if (!nasc) { csToast('Informe a data de nascimento'); return; }
+  if (!data || !(alt >= 100 && alt <= 220)) { csToast('Informe data e altura (100 a 220 cm)'); return; }
+  if (sent && !(sent > alt * .4 && sent < alt * .65)) { csToast('Altura sentado fora do normal (40–65% da altura)'); return; }
+  if (matIdade(nasc, data) < 6 || matIdade(nasc, data) > 22) { csToast('Idade na data da medida fora de 6–22 anos'); return; }
+  var all = matAll(), m = all[id] = all[id] || { registros: [] };
+  m.nasc = nasc; m.sexo = v('mat-sexo');
+  m.registros = (m.registros || []).filter(function (r) { return r.data !== data; });
+  m.registros.push({ data: data, altura: alt, sentado: sent, peso: peso });
+  matSaveAll(all); renderMaturacao(PLAYERS[id]); csToast('Medida registrada');
+}
+function matDel(id, data) {
+  if (!confirm('Excluir a medida de ' + csFmtDate(data) + '?')) return;
+  var all = matAll(); if (!all[id]) return;
+  all[id].registros = all[id].registros.filter(function (r) { return r.data !== data; });
+  matSaveAll(all); renderMaturacao(PLAYERS[id]);
+}
+
 function renderPer90Card(p) {
   var el = document.getElementById('p-per90');
   if (!el || !p) return;
@@ -13145,6 +13245,7 @@ function renderPer90Card(p) {
   showPlayer = function (id) {
     var r = _orig.apply(this, arguments);
     try { renderPer90Card(PLAYERS[id]); } catch (e) { console.warn('A3', e); }
+    try { renderMaturacao(PLAYERS[id]); } catch (e) { console.warn('F6', e); }
     return r;
   };
 })();
