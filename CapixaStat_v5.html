@@ -1882,6 +1882,14 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .md-destaque small { display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--text-3) }
 .md-destaque > div:first-child b { display:block; font-size:16px; color:var(--text-1) } .md-destaque > div:first-child span { font-size:12px; color:var(--text-2) }
 .md-d-n { text-align:center } .md-d-n b { display:block; font-family:var(--font-mono); font-size:20px; color:var(--text-1) }
+
+/* F4 */
+.mc-head { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px; margin-bottom:16px }
+.mc-title { font-size:14px; font-weight:700; color:var(--text-1) } .mc-sub { font-size:12px; color:var(--text-3); margin-left:6px }
+.mc-actions { display:flex; flex-wrap:wrap; gap:6px; align-items:center }
+.mc-x { background:none; border:none; color:inherit; opacity:.55; cursor:pointer; font-size:11px; padding:0 2px }
+.mc-x:hover { opacity:1 }
+.mc-add { display:flex; gap:4px; margin-top:6px } .mc-add .form-select { font-size:11px; padding:4px 6px; min-width:0; flex:1 }
 </style>
 </head>
 <body>
@@ -3886,7 +3894,7 @@ function regAtletaToggle() {
 // Qualquer gravação no localStorage destas chaves agenda o envio (1,5 s depois da última mudança).
 // Ao entrar, baixa o que estiver mais novo no servidor. Sem login real, tudo continua só local.
 // ══════════════════════════════════════════════════════════════════
-var CS_CLOUD_KEYS = { capixastat_taticas: 'taticas', capixastat_taticas_presets: 'taticas_presets', capixastat_tel: 'telestracao', capixastat_userphotos: 'fotos', capixastat_v5_filtros: 'filtros', capixastat_v5_lances: 'lances', capixastat_v5_obs: 'observacao', capixastat_v5_relatorios: 'relatorios' };
+var CS_CLOUD_KEYS = { capixastat_taticas: 'taticas', capixastat_taticas_presets: 'taticas_presets', capixastat_tel: 'telestracao', capixastat_userphotos: 'fotos', capixastat_v5_filtros: 'filtros', capixastat_v5_lances: 'lances', capixastat_v5_obs: 'observacao', capixastat_v5_relatorios: 'relatorios', capixastat_v5_microciclos: 'microciclos' };
 var _csCloudTimers = {}, _csCloudPulling = false;
 function csCloudStamps() { try { return JSON.parse(localStorage.getItem('capixastat_v5_stamps') || '{}'); } catch (e) { return {}; } }
 function csCloudSetStamp(chave, t) { var s = csCloudStamps(); s[chave] = t; try { Storage.prototype._csOrigSet.call(localStorage, 'capixastat_v5_stamps', JSON.stringify(s)); } catch (e) {} }
@@ -12425,37 +12433,72 @@ const MOCK_WEEK = [
     { tipo:'🏆 Vitória ES × Forte FC', dur:'90min', ath:18, cls:'ms-jogo', int:'Jogo', md:'MD'}]}
 ];
 
-function renderMicrociclo() {
+// ── F4: microciclo editável (semana real), modelos salvos e aplicados em outras semanas ──
+var MC_TIPOS = [
+  { tipo: 'Preparação Física', cls: 'ms-alta', int: 'Alta', dur: 90 }, { tipo: 'Treino Tático', cls: 'ms-media', int: 'Média', dur: 100 },
+  { tipo: 'Treino Técnico', cls: 'ms-media', int: 'Média', dur: 90 }, { tipo: 'Recuperação', cls: 'ms-baixa', int: 'Baixa', dur: 60 },
+  { tipo: 'Ativação Pré-Jogo', cls: 'ms-baixa', int: 'Baixa', dur: 45 }, { tipo: 'Jogo', cls: 'ms-jogo', int: 'Jogo', dur: 95 },
+  { tipo: 'Análise de Vídeo', cls: 'ms-off', int: 'Teórico', dur: 45 }, { tipo: 'Folga', cls: 'ms-off', int: 'Folga', dur: 0 }
+];
+var MC = { offset: 0 };
+var MC_DIAS = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'];
+function mcData() { try { return JSON.parse(localStorage.getItem('capixastat_v5_microciclos') || '{"semanas":{},"modelos":[]}'); } catch (e) { return { semanas: {}, modelos: [] }; } }
+function mcSave(d) { try { localStorage.setItem('capixastat_v5_microciclos', JSON.stringify(d)); } catch (e) { csToast('Armazenamento cheio'); } }
+function mcMonday(offset) { var d = new Date(); d.setHours(12, 0, 0, 0); var dow = (d.getDay() + 6) % 7; d.setDate(d.getDate() - dow + offset * 7); return d; }
+function mcKey(offset) { var d = mcMonday(offset); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function mcExemplo() { return MOCK_WEEK.map(function (day) { return day.sessions.map(function (x) { return { tipo: x.tipo, cls: x.cls, int: x.int, dur: parseInt(x.dur, 10) || 0, md: x.md || '' }; }); }); }
+function mcWeek() { var d = mcData(), k = mcKey(MC.offset); return d.semanas[k] ? { dias: d.semanas[k], salva: true } : { dias: (MC.offset === 0 && !Object.keys(d.semanas).length) ? mcExemplo() : [[], [], [], [], [], [], []], salva: false }; }
+function mcSetWeek(dias) { var d = mcData(); d.semanas[mcKey(MC.offset)] = dias; mcSave(d); }
+function mcAdd(i) {
+  var sel = document.getElementById('mc-add-' + i); var t = MC_TIPOS[+sel.value]; if (!t) return;
+  var w = mcWeek(); w.dias[i].push({ tipo: t.tipo, cls: t.cls, int: t.int, dur: t.dur, md: '' }); mcSetWeek(w.dias); renderMicrociclo(true);
+}
+function mcDel(i, j) { var w = mcWeek(); w.dias[i].splice(j, 1); mcSetWeek(w.dias); renderMicrociclo(true); }
+function mcNav(n) { MC.offset = n === 0 ? 0 : MC.offset + n; renderMicrociclo(true); }
+function mcSalvarModelo() {
+  var nome = prompt('Nome do modelo (ex.: Semana com jogo no domingo):'); if (!nome) return;
+  var d = mcData(); d.modelos = d.modelos.filter(function (m) { return m.nome !== nome; }); d.modelos.push({ nome: nome.slice(0, 60), dias: mcWeek().dias }); mcSave(d);
+  csToast('Modelo "' + nome + '" salvo'); renderMicrociclo(true);
+}
+function mcAplicarModelo(i) {
+  var m = mcData().modelos[+i]; if (!m) return;
+  if (mcWeek().salva && !confirm('Substituir as sessões desta semana pelo modelo "' + m.nome + '"?')) return;
+  mcSetWeek(JSON.parse(JSON.stringify(m.dias))); csToast('Modelo aplicado'); renderMicrociclo(true);
+}
+function mcExcluirModelo() {
+  var sel = document.getElementById('mc-modelos'); var d = mcData(); var m = d.modelos[+sel.value];
+  if (!m || !confirm('Excluir o modelo "' + m.nome + '"?')) return; d.modelos.splice(+sel.value, 1); mcSave(d); renderMicrociclo(true);
+}
+function renderMicrociclo(force) {
   const panel = document.getElementById('ftab-microciclo');
-  if (!panel || panel.dataset.rendered) return;
+  if (!panel || (panel.dataset.rendered && !force)) return;
   panel.dataset.rendered = '1';
-
-  let h = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'
-    + '<div><span style="font-size:13px;font-weight:700;color:var(--text-1)">Semana 05–11 de Maio, 2026</span>'
-    + ' <span style="font-size:12px;color:var(--text-3);margin-left:8px">Microciclo 19 · Próximo jogo: Dom 11/05</span></div>'
-    + '<div style="display:flex;gap:6px"><button class="btn btn-secondary btn-sm">← Anterior</button>'
-    + '<button class="btn btn-secondary btn-sm">Próxima →</button></div></div>';
-
+  var seg = mcMonday(MC.offset), dom = new Date(seg); dom.setDate(seg.getDate() + 6);
+  var f = function (d) { return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0'); };
+  var w = mcWeek(), modelos = mcData().modelos, hoje = new Date(); hoje.setHours(12, 0, 0, 0);
+  var carga = 0; w.dias.forEach(function (d) { d.forEach(function (x) { carga += x.dur || 0; }); });
+  let h = '<div class="mc-head"><div><span class="mc-title">Semana ' + f(seg) + ' – ' + f(dom) + '</span>' +
+    (w.salva ? ' <span class="cs-src real">planejada</span>' : (MC.offset === 0 && !Object.keys(mcData().semanas).length ? ' <span class="cs-src est">exemplo</span>' : ' <span class="cs-src est">vazia</span>')) +
+    ' <span class="mc-sub">' + carga + ' min planejados</span></div>' +
+    '<div class="mc-actions"><button class="btn btn-ghost btn-sm" onclick="mcNav(-1)">← Anterior</button><button class="btn btn-ghost btn-sm" onclick="mcNav(0)">Hoje</button><button class="btn btn-ghost btn-sm" onclick="mcNav(1)">Próxima →</button>' +
+    '<select id="mc-modelos" class="form-select" style="width:auto" onchange="if(this.value!==\'\')mcAplicarModelo(this.value)" aria-label="Aplicar modelo"><option value="">Aplicar modelo…</option>' + modelos.map(function (m, i) { return '<option value="' + i + '">' + m.nome + '</option>'; }).join('') + '</select>' +
+    '<button class="btn btn-ghost btn-sm" onclick="mcSalvarModelo()">Salvar como modelo</button>' + (modelos.length ? '<button class="btn btn-ghost btn-sm" onclick="mcExcluirModelo()" title="Selecione um modelo e clique para excluir">Excluir modelo</button>' : '') + '</div></div>';
   h += '<div class="micro-calendar">';
-  MOCK_WEEK.forEach(day => {
-    h += `<div class="micro-day${day.today?' today':''}">`;
-    h += `<div class="micro-day-label">${day.label}</div>`;
-    h += `<div class="micro-day-num">${day.date}</div>`;
-    day.sessions.forEach(s => {
-      h += `<div class="micro-sess ${s.cls}" onclick="switchFormTab('sessoes',document.querySelectorAll('.form-tab')[1]);showSessaoByTipo('${s.tipo.replace(/'/g,"\\'")}')">`;
-      h += `<div style="font-weight:700">${s.tipo}${s.md?`<span class="md-tag">${s.md}</span>`:''}</div>`;
-      h += `<div style="font-size:11px;opacity:.65;margin-top:2px">${s.dur} · ${s.ath} atletas</div></div>`;
+  w.dias.forEach(function (sess, i) {
+    var d = new Date(seg); d.setDate(seg.getDate() + i);
+    h += '<div class="micro-day' + (d.getTime() === hoje.getTime() ? ' today' : '') + '"><div class="micro-day-label">' + MC_DIAS[i] + '</div><div class="micro-day-num">' + f(d) + '</div>';
+    sess.forEach(function (x, j) {
+      h += '<div class="micro-sess ' + x.cls + '"><div style="font-weight:700;display:flex;justify-content:space-between;gap:4px">' + x.tipo + (x.md ? '<span class="md-tag">' + x.md + '</span>' : '') +
+        '<button class="mc-x" onclick="mcDel(' + i + ',' + j + ')" aria-label="Remover sessão">✕</button></div><div style="font-size:11px;opacity:.75;margin-top:2px">' + (x.dur ? x.dur + ' min · ' : '') + x.int + '</div></div>';
     });
-    h += '</div>';
+    h += '<div class="mc-add"><select id="mc-add-' + i + '" class="form-select" aria-label="Tipo de sessão">' + MC_TIPOS.map(function (t, k) { return '<option value="' + k + '">' + t.tipo + '</option>'; }).join('') + '</select><button class="btn btn-ghost btn-sm" onclick="mcAdd(' + i + ')" aria-label="Adicionar sessão">+</button></div></div>';
   });
   h += '</div>';
-
   h += '<div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">';
-  [['ms-alta','Alta intensidade'],['ms-media','Média intensidade'],['ms-baixa','Baixa / Recuperação'],
-   ['ms-jogo','Dia de Jogo'],['ms-off','Teórico / Folga']].forEach(([cls,lbl]) => {
-    h += `<div style="display:flex;align-items:center;gap:5px"><div class="micro-sess ${cls}" style="margin:0;padding:3px 8px;font-size:11px">${lbl}</div></div>`;
+  [['ms-alta','Alta intensidade'],['ms-media','Média intensidade'],['ms-baixa','Baixa / Recuperação'],['ms-jogo','Dia de Jogo'],['ms-off','Teórico / Folga']].forEach(function (a) {
+    h += '<div style="display:flex;align-items:center;gap:5px"><div class="micro-sess ' + a[0] + '" style="margin:0;padding:3px 8px;font-size:11px">' + a[1] + '</div></div>';
   });
-  h += '</div>';
+  h += '</div><div class="cs-metric"><b class="cs-metric-tag">Dica</b><span>Monte uma semana típica (ex.: jogo no domingo), clique em <b>Salvar como modelo</b> e use <b>Aplicar modelo</b> nas próximas semanas.</span></div>';
   panel.innerHTML = h;
 }
 
