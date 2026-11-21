@@ -139,7 +139,7 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 
 ### Status dos itens (✅ feito · ⏳ em andamento · ⬜ pendente)
 **Alta:** ✅ R1 · ✅ I1 · ✅ L1 · ✅ I4 · ✅ D1 · ✅ D2 · ✅ D3 · ✅ A4 · ✅ P1 · ✅ F1 · ✅ F2 · ✅ T1 · ✅ B4 ·
-⬜ A1 · ⬜ A2 · ⬜ A3 · ⬜ B1 · ⬜ B2 · ⬜ B3 · ⬜ L2 · ⬜ R2 · ⬜ R3 · ⬜ V1 · ⬜ X1 · ⬜ P2
+✅ A1 · ⬜ A2 · ⬜ A3 · ⬜ B1 · ⬜ B2 · ⬜ B3 · ⬜ L2 · ⬜ R2 · ⬜ R3 · ⬜ V1 · ⬜ X1 · ⬜ P2
 **Dados externos:** ⬜ pesquisa de fontes · ⬜ integração (rotina + banco + fonte/data na tela)
 **Média:** ⬜ A5 · ⬜ A7 · ⬜ A8 · ⬜ P4 · ⬜ P5 · ⬜ F3 · ⬜ F4 · ⬜ T2 · ⬜ T3 · ⬜ X2 · ⬜ Q2 · ⬜ B6 · ⬜ V5 ·
 ⬜ I2 · ⬜ I3 · ⬜ M2 · ⬜ M4 · ⬜ R5 · ⬜ D4 · ⬜ A6 · ⬜ A9 · ⬜ P3 · ⬜ F5 · ⬜ T4 · ⬜ X3 · ⬜ Q1 · ⬜ B5 ·
@@ -207,6 +207,12 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
   validação). `db.js` aceita **`DB_MEMORY=1`** (pg-mem, banco em memória para testes/dev sem Supabase).
   `server.js` exporta `app` e só escuta quando executado direto. Testes: `cd backend && npm test`
   (node:test, 4 testes). Front: `csSyncPush/csSyncDelete/csSyncPull` (só com token real ≠ 'teste-local').
+
+- **A1:** Vitrine virou busca: escopo "Meu elenco | Toda a base" (765), filtros principais (nome, posição,
+  competição, ordem) + "Mais filtros" (clube, idade, minutos, gols, assist., score, só estatística real),
+  filtros salvos (localStorage `capixastat_v5_filtros`), "Mostrar mais" de 60 em 60. Helpers
+  **`playerAgg(p, comp)`** (soma `p.stats[comp]`: jogos, gols, assists, amarelos, vermelhos, minutos) e
+  `COMP_LABELS` (competições do recorte ES: capixabao, copaEs, serieD, copaVerde, c_copa_do_brasil).
 
 ## Trabalhos futuros
 _(preencher na revisão de segunda-feira com o que não der tempo)_

@@ -1697,6 +1697,23 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .mini-form i { width:18px; height:18px; border-radius:50%; font-style:normal; font-size:10px; font-weight:800; color:#fff; display:inline-flex; align-items:center; justify-content:center }
 .mini-form i.V { background:var(--ok) } .mini-form i.E { background:#64748b } .mini-form i.D { background:var(--danger) }
 .cls-form-h { text-align:center }
+
+/* A1: filtros da Vitrine */
+.vf-bar { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:10px }
+.vf-bar .search-input { flex:1 1 200px; min-width:160px }
+.vf-bar .form-select { width:auto; min-width:140px }
+.vf-scope { display:inline-flex; border:1px solid var(--border-md); border-radius:9px; overflow:hidden }
+.vf-seg { background:transparent; border:none; color:var(--text-2); padding:7px 12px; font-size:12.5px; font-weight:600; cursor:pointer; font-family:var(--font-ui) }
+.vf-seg.active { background:var(--brand-dim); color:var(--brand) }
+.vf-more[hidden] { display:none !important }
+.vf-more { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; padding:12px; margin-bottom:10px; border:1px solid var(--border); border-radius:10px; background:var(--bg-surface) }
+.vf-more label { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; color:var(--text-2) }
+.vf-more .vf-chk { flex-direction:row; align-items:center; gap:8px; font-weight:500 }
+.vf-status { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; margin-bottom:14px; font-size:13px; color:var(--text-2) }
+.vf-saved { display:flex; gap:6px; flex-wrap:wrap; align-items:center }
+.vf-saved .form-select { width:auto; min-width:170px }
+.vf-more-card { border-style:dashed !important; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; cursor:pointer; color:var(--text-3); font-size:13px; min-height:160px }
+.pcs-min { margin-top:8px; font-size:11px; color:var(--text-3); text-align:center }
 </style>
 </head>
 <body>
@@ -2022,10 +2039,36 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
           <div class="topbar-right"><button class="btn btn-primary btn-sm" onclick="goTo('cadastro-jogador',document.querySelector('[data-screen=cadastro-jogador]'))">+ Cadastrar Atleta</button></div>
         </div>
         <div class="content">
-          <div class="search-bar">
-            <input id="vitrine-busca" class="search-input" placeholder="Buscar atleta por nome ou posição..." oninput="renderVitrineJogadores()">
-            <select id="vitrine-pos" class="form-select" style="width:150px" onchange="renderVitrineJogadores()"><option value="">Todas posições</option><option value="Goleiro">Goleiro</option><option value="Zagueiro">Zagueiro</option><option value="Lateral">Lateral</option><option value="Volante">Volante</option><option value="Meia">Meia</option><option value="Atacante">Atacante</option></select>
-            <select id="vitrine-ordem" class="form-select" style="width:160px" onchange="renderVitrineJogadores()"><option value="score_desc">Ordenar: Score ↓</option><option value="gols_desc">Ordenar: Gols ↓</option><option value="nome_asc">Ordenar: Nome A-Z</option></select>
+          <!-- A1: busca com filtros principais + "mais filtros" + filtros salvos -->
+          <div class="vf-bar">
+            <div class="vf-scope" role="group" aria-label="Escopo da busca">
+              <button id="vf-scope-elenco" class="vf-seg active" onclick="vfSetScope('elenco')">Meu elenco</button>
+              <button id="vf-scope-base" class="vf-seg" onclick="vfSetScope('base')">Toda a base</button>
+            </div>
+            <input id="vitrine-busca" class="search-input" placeholder="Buscar por nome..." oninput="renderVitrineJogadores()" aria-label="Buscar atleta por nome">
+            <select id="vitrine-pos" class="form-select" onchange="renderVitrineJogadores()" aria-label="Posição"><option value="">Todas as posições</option><option>Goleiro</option><option>Zagueiro</option><option>Lateral</option><option>Volante</option><option>Meia</option><option>Atacante</option></select>
+            <select id="vf-comp" class="form-select" onchange="renderVitrineJogadores()" aria-label="Competição"></select>
+            <select id="vitrine-ordem" class="form-select" onchange="renderVitrineJogadores()" aria-label="Ordenar"><option value="score_desc">Ordenar: Score ↓</option><option value="gols_desc">Gols ↓</option><option value="assists_desc">Assistências ↓</option><option value="min_desc">Minutos ↓</option><option value="idade_asc">Idade ↑</option><option value="nome_asc">Nome A–Z</option></select>
+            <button class="btn btn-ghost btn-sm" id="vf-more-btn" onclick="vfToggleMore()" aria-expanded="false">Mais filtros ▾</button>
+          </div>
+          <div class="vf-more" id="vf-more" hidden>
+            <label>Clube<select id="vf-clube" class="form-select" onchange="renderVitrineJogadores()"></select></label>
+            <label>Idade mín.<input id="vf-idmin" type="number" min="14" max="45" class="form-input" oninput="renderVitrineJogadores()"></label>
+            <label>Idade máx.<input id="vf-idmax" type="number" min="14" max="45" class="form-input" oninput="renderVitrineJogadores()"></label>
+            <label>Minutos mín.<input id="vf-min" type="number" min="0" step="45" class="form-input" oninput="renderVitrineJogadores()"></label>
+            <label>Gols mín.<input id="vf-gols" type="number" min="0" class="form-input" oninput="renderVitrineJogadores()"></label>
+            <label>Assist. mín.<input id="vf-ast" type="number" min="0" class="form-input" oninput="renderVitrineJogadores()"></label>
+            <label>Score mín.<input id="vf-score" type="number" min="0" max="100" class="form-input" oninput="renderVitrineJogadores()"></label>
+            <label class="vf-chk"><input id="vf-real" type="checkbox" onchange="renderVitrineJogadores()"> Só com estatística real</label>
+          </div>
+          <div class="vf-status">
+            <span id="vf-count"></span>
+            <span class="vf-saved">
+              <select id="vf-saved" class="form-select" onchange="vfApplySaved(this.value)" aria-label="Filtros salvos"></select>
+              <button class="btn btn-ghost btn-sm" onclick="vfSave()">Salvar filtro</button>
+              <button class="btn btn-ghost btn-sm" onclick="vfDeleteSaved()" title="Excluir o filtro salvo selecionado">Excluir</button>
+              <button class="btn btn-ghost btn-sm" onclick="vfClear()">Limpar</button>
+            </span>
           </div>
           <div class="player-grid" id="vitrine-grid">
             <!-- Renderizado dinamicamente pelo JS -->
@@ -10746,63 +10789,146 @@ function renderRankingScreen() {
   }
 }
 
-function renderVitrineJogadores() {
-  const busca = (document.getElementById('vitrine-busca')?.value || '').toLowerCase();
-  const pos   = document.getElementById('vitrine-pos')?.value || '';
-  const ordem = document.getElementById('vitrine-ordem')?.value || 'score_desc';
+// ── Estatísticas agregadas por competição (stats.<comp>.{jogos,gols,assists,amarelos,vermelhos,minutos}) ──
+// Competições do recorte capixaba (as demais chaves de `stats` vêm da carreira em outras ligas)
+var COMP_LABELS = { capixabao: 'Capixabão', copaEs: 'Copa ES', serieD: 'Série D', copaVerde: 'Copa Verde', c_copa_do_brasil: 'Copa do Brasil' };
+function playerAgg(p, comp) {
+  var st = p.stats || {};
+  var keys = comp ? [comp] : Object.keys(st);
+  var a = { jogos: 0, gols: 0, assists: 0, amarelos: 0, vermelhos: 0, minutos: 0, real: false };
+  keys.forEach(function (k) { var x = st[k]; if (!x) return; a.real = true; ['jogos', 'gols', 'assists', 'amarelos', 'vermelhos', 'minutos'].forEach(function (f) { a[f] += +x[f] || 0; }); });
+  if (!a.real && !comp) { a.jogos = +p.jogos || 0; a.gols = +p.gols || 0; a.assists = +p.assists || 0; }
+  return a;
+}
+function compKeysAll() {
+  var ks = {}; Object.values(PLAYERS).forEach(function (p) { Object.keys(p.stats || {}).forEach(function (k) { ks[k] = 1; }); });
+  return Object.keys(COMP_LABELS).filter(function (k) { return ks[k]; });
+}
 
-  // Filtra apenas atletas do clube do usuário logado
-  const user = getCurrentUser();
-  const clubeNome = user ? resolveClube(user.clube) : Object.keys(CLUBS)[0];
-
-  // Atualiza topbar
-  const sub = document.getElementById('vitrine-topbar-sub');
-
-  let arr = Object.values(PLAYERS).filter(p => p.clube === clubeNome);
-
-  if (busca) arr = arr.filter(p => p.nome.toLowerCase().includes(busca) || p.pos.toLowerCase().includes(busca));
-  if (pos)   arr = arr.filter(p => p.pos === pos);
-
-  if (sub) sub.textContent = clubeNome + ' · ' + arr.length + ' atleta' + (arr.length !== 1 ? 's' : '');
-
-  if (ordem === 'score_desc') arr.sort((a, b) => b.score - a.score);
-  else if (ordem === 'gols_desc') arr.sort((a, b) => b.gols - a.gols);
-  else if (ordem === 'nome_asc') arr.sort((a, b) => a.nome.localeCompare(b.nome));
-
-  const grid = document.getElementById('vitrine-grid');
-  if (!grid) return;
-  
-  let html = '';
-  arr.forEach(p => {
-    const val1 = p.pos === 'Goleiro' ? p.indicators[0].v.replace('%', '') : p.gols;
-    const lbl1 = p.pos === 'Goleiro' ? 'Defesas' : 'Gols';
-    const val2 = p.pos === 'Goleiro' ? p.indicators[2].v : p.assists;
-    const lbl2 = p.pos === 'Goleiro' ? 'GS/jogo' : 'Assist.';
-    const scoreText = Math.round(p.score);
-    const clubeShort = p.clube.split(' · ')[0];
-
-    html += `
-      <div class="player-card" onclick="showPlayer('${p.id}')">
-        <div class="player-av-lg" style="background:${p.color},.12);color:${p.pointColor};border-color:${p.pointColor};overflow:hidden">${playerAvatarInner(p, 64)}</div>
-        <div class="player-card-name">${p.nome}</div>
-        <div class="player-card-club">${clubeShort}</div>
-        <div style="margin-top:8px"><span class="badge ${p.badgeClass}">${p.pos}</span></div>
-        <div class="player-card-stats">
-          <div><div class="pcs-val text-green">${val1}</div><div class="pcs-lbl">${lbl1}</div></div>
-          <div><div class="pcs-val text-blue">${val2}</div><div class="pcs-lbl">${lbl2}</div></div>
-          <div><div class="pcs-val text-amber">${scoreText}</div><div class="pcs-lbl">Score</div></div>
-        </div>
-      </div>
-    `;
+// ── A1: Vitrine com busca e filtros ──────────────────────────────
+var VF_STATE = { scope: 'elenco', limit: 60 };
+var VF_FIELDS = ['vitrine-busca', 'vitrine-pos', 'vf-comp', 'vitrine-ordem', 'vf-clube', 'vf-idmin', 'vf-idmax', 'vf-min', 'vf-gols', 'vf-ast', 'vf-score', 'vf-real'];
+function vfVal(id) { var el = document.getElementById(id); if (!el) return ''; return el.type === 'checkbox' ? el.checked : el.value; }
+function vfSetScope(sc) {
+  VF_STATE.scope = sc; VF_STATE.limit = 60;
+  document.getElementById('vf-scope-elenco').classList.toggle('active', sc === 'elenco');
+  document.getElementById('vf-scope-base').classList.toggle('active', sc === 'base');
+  renderVitrineJogadores();
+}
+function vfToggleMore() {
+  var m = document.getElementById('vf-more'), b = document.getElementById('vf-more-btn');
+  m.hidden = !m.hidden; b.setAttribute('aria-expanded', String(!m.hidden)); b.textContent = m.hidden ? 'Mais filtros ▾' : 'Menos filtros ▴';
+}
+function vfInitSelects() {
+  var comp = document.getElementById('vf-comp');
+  if (comp && !comp.options.length) comp.innerHTML = '<option value="">Todas as competições</option>' + compKeysAll().map(function (k) { return '<option value="' + k + '">' + (COMP_LABELS[k] || k) + '</option>'; }).join('');
+  var cl = document.getElementById('vf-clube');
+  if (cl && !cl.options.length) {
+    var clubs = {}; Object.values(PLAYERS).forEach(function (p) { clubs[p.clube] = 1; });
+    cl.innerHTML = '<option value="">Todos os clubes</option>' + Object.keys(clubs).sort().map(function (c) { return '<option>' + c + '</option>'; }).join('');
+  }
+  vfRenderSaved();
+}
+function vfSavedAll() { try { return JSON.parse(localStorage.getItem('capixastat_v5_filtros') || '[]'); } catch (e) { return []; } }
+function vfRenderSaved() {
+  var sel = document.getElementById('vf-saved'); if (!sel) return;
+  sel.innerHTML = '<option value="">Filtros salvos…</option>' + vfSavedAll().map(function (f, i) { return '<option value="' + i + '">' + f.nome + '</option>'; }).join('');
+}
+function vfSave() {
+  var nome = prompt('Nome do filtro (ex.: Atacantes sub-23 com 450+ min):');
+  if (!nome) return;
+  var f = { nome: nome.slice(0, 60), scope: VF_STATE.scope, v: {} };
+  VF_FIELDS.forEach(function (id) { f.v[id] = vfVal(id); });
+  var all = vfSavedAll(); all.push(f);
+  try { localStorage.setItem('capixastat_v5_filtros', JSON.stringify(all)); } catch (e) {}
+  vfRenderSaved(); csToast('Filtro "' + f.nome + '" salvo');
+}
+function vfApplySaved(i) {
+  var f = vfSavedAll()[+i]; if (!f) return;
+  VF_FIELDS.forEach(function (id) { var el = document.getElementById(id); if (!el) return; if (el.type === 'checkbox') el.checked = !!f.v[id]; else el.value = f.v[id] || ''; });
+  vfSetScope(f.scope || 'elenco');
+}
+function vfDeleteSaved() {
+  var sel = document.getElementById('vf-saved'); if (!sel || sel.value === '') return;
+  var all = vfSavedAll(); var f = all[+sel.value];
+  if (!f || !confirm('Excluir o filtro "' + f.nome + '"?')) return;
+  all.splice(+sel.value, 1); try { localStorage.setItem('capixastat_v5_filtros', JSON.stringify(all)); } catch (e) {}
+  vfRenderSaved();
+}
+function vfClear() {
+  VF_FIELDS.forEach(function (id) { var el = document.getElementById(id); if (!el) return; if (el.type === 'checkbox') el.checked = false; else if (el.tagName === 'SELECT') el.selectedIndex = 0; else el.value = ''; });
+  renderVitrineJogadores();
+}
+function vfFilteredPlayers() {
+  var user = getCurrentUser();
+  var clubeNome = user ? resolveClube(user.clube) : null;
+  var busca = String(vfVal('vitrine-busca')).toLowerCase().trim();
+  var pos = vfVal('vitrine-pos'), comp = vfVal('vf-comp'), clube = vfVal('vf-clube');
+  var num = function (id) { var v = vfVal(id); return v === '' ? null : +v; };
+  var idmin = num('vf-idmin'), idmax = num('vf-idmax'), mmin = num('vf-min'), gmin = num('vf-gols'), amin = num('vf-ast'), smin = num('vf-score');
+  var soReal = vfVal('vf-real');
+  var arr = Object.values(PLAYERS).filter(function (p) {
+    if (VF_STATE.scope === 'elenco' && clubeNome && p.clube !== clubeNome) return false;
+    if (VF_STATE.scope === 'base' && clube && p.clube !== clube) return false;
+    if (busca && p.nome.toLowerCase().indexOf(busca) === -1) return false;
+    if (pos && p.pos !== pos) return false;
+    if (idmin !== null && !(p.idade >= idmin)) return false;
+    if (idmax !== null && !(p.idade <= idmax)) return false;
+    var a = playerAgg(p, comp || null); p._agg = a;
+    if (comp && !(p.stats && p.stats[comp])) return false;
+    if (soReal && !a.real) return false;
+    if (mmin !== null && a.minutos < mmin) return false;
+    if (gmin !== null && a.gols < gmin) return false;
+    if (amin !== null && a.assists < amin) return false;
+    if (smin !== null && !(p.score >= smin)) return false;
+    return true;
   });
-
-  html += `
-    <div class="player-card" style="border-style:dashed;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer" onclick="goTo('cadastro-jogador',document.querySelector('[data-screen=cadastro-jogador]'))">
-      <div style="font-size:28px;color:var(--text-3)">+</div>
-      <div style="font-size:13px;color:var(--text-3)">Cadastrar novo atleta</div>
-    </div>
-  `;
-
+  var ordem = vfVal('vitrine-ordem') || 'score_desc';
+  var cmp = {
+    score_desc: function (a, b) { return b.score - a.score; },
+    gols_desc: function (a, b) { return b._agg.gols - a._agg.gols || b.score - a.score; },
+    assists_desc: function (a, b) { return b._agg.assists - a._agg.assists || b.score - a.score; },
+    min_desc: function (a, b) { return b._agg.minutos - a._agg.minutos; },
+    idade_asc: function (a, b) { return (a.idade || 99) - (b.idade || 99); },
+    nome_asc: function (a, b) { return a.nome.localeCompare(b.nome); }
+  }[ordem];
+  arr.sort(cmp);
+  return { arr: arr, clubeNome: clubeNome, comp: comp };
+}
+function renderVitrineJogadores() {
+  vfInitSelects();
+  var r = vfFilteredPlayers(), arr = r.arr;
+  var sub = document.getElementById('vitrine-topbar-sub');
+  if (sub) sub.textContent = (VF_STATE.scope === 'elenco' ? (r.clubeNome || 'Elenco') : 'Toda a base de atletas') + ' · ' + arr.length + ' atleta' + (arr.length !== 1 ? 's' : '');
+  var cnt = document.getElementById('vf-count');
+  if (cnt) cnt.innerHTML = '<b>' + arr.length + '</b> atleta(s) encontrados' + (r.comp ? ' · números da ' + (COMP_LABELS[r.comp] || r.comp) : ' · números da temporada');
+  var grid = document.getElementById('vitrine-grid');
+  if (!grid) return;
+  if (typeof VF_VIEW !== 'undefined' && VF_VIEW === 'tabela' && typeof renderVitrineTabela === 'function') { renderVitrineTabela(arr, grid); return; }
+  grid.className = 'player-grid';
+  var html = '';
+  arr.slice(0, VF_STATE.limit).forEach(function (p) {
+    var a = p._agg || playerAgg(p);
+    var gk = p.pos === 'Goleiro';
+    var val1 = gk ? String(p.indicators[0].v).replace('%', '') : a.gols;
+    var lbl1 = gk ? 'Defesas' : 'Gols';
+    var val2 = gk ? p.indicators[2].v : a.assists;
+    var lbl2 = gk ? 'GS/jogo' : 'Assist.';
+    var st = (typeof playerStatusIcons === 'function') ? playerStatusIcons(p) : '';
+    html += '<div class="player-card" onclick="window._profileExplicit=true;showPlayer(\'' + p.id + '\')">' +
+      '<div class="player-av-lg" style="background:' + p.color + ',.12);color:' + p.pointColor + ';border-color:' + p.pointColor + ';overflow:hidden">' + playerAvatarInner(p, 64) + '</div>' +
+      '<div class="player-card-name">' + p.nome + st + '</div>' +
+      '<div class="player-card-club">' + p.clube.split(' · ')[0] + (p.idade ? ' · ' + p.idade + ' anos' : '') + '</div>' +
+      '<div style="margin-top:8px"><span class="badge ' + p.badgeClass + '">' + p.pos + '</span> ' + (a.real ? '' : '<span class="cs-src est" title="Sem estatística real por competição">est.</span>') + '</div>' +
+      '<div class="player-card-stats">' +
+        '<div><div class="pcs-val">' + val1 + '</div><div class="pcs-lbl">' + lbl1 + '</div></div>' +
+        '<div><div class="pcs-val">' + val2 + '</div><div class="pcs-lbl">' + lbl2 + '</div></div>' +
+        '<div><div class="pcs-val">' + Math.round(p.score) + '</div><div class="pcs-lbl">Score</div></div>' +
+      '</div>' + (a.minutos ? '<div class="pcs-min">' + a.minutos + ' min</div>' : '') + '</div>';
+  });
+  if (arr.length > VF_STATE.limit) html += '<div class="player-card vf-more-card" onclick="VF_STATE.limit+=60;renderVitrineJogadores()"><div style="font-size:22px">+</div><div>Mostrar mais ' + Math.min(60, arr.length - VF_STATE.limit) + ' de ' + (arr.length - VF_STATE.limit) + '</div></div>';
+  if (!arr.length) html = '<div class="tl2-empty" style="grid-column:1/-1">Nenhum atleta com esses filtros. <span class="team-link" onclick="vfClear()">Limpar filtros</span></div>';
+  if (VF_STATE.scope === 'elenco') html += '<div class="player-card vf-more-card" onclick="goTo(\'cadastro-jogador\')"><div style="font-size:22px">+</div><div>Cadastrar novo atleta</div></div>';
   grid.innerHTML = html;
 }
 
