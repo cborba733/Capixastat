@@ -488,11 +488,42 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
   (`OB_FUNCOES`) e legenda dos selos real/estimativa. Grava clube/função no usuário atual e reaplica permissões.
   "Pular" e Esc fecham; **Rever apresentação** no menu, acima de Sair da conta, reabre.
 
-### ONDE PAROU (21/11, madrugada — limite de uso)
-Próximos itens Média (dif. média): D4, A6,
-A9, P3, F5, T4, X3, Q1, B5, V2, V4, L3, M1, R4; depois Q3, V3; depois Baixa. Segunda à noite: só revisão.
-Pendências do Caio: rodar `backend/schema.sql` no Supabase, publicar API no Render (`render.yaml`), opcional
-conta API-Football (`API_FOOTBALL_KEY` no backend/.env).
+### Revisão final (21/11/2026)
+- **Todos os itens da proposta estão feitos** (Alta, Média e Baixa) — um commit por item no git local.
+- Passada em todas as 17 telas da v5, tema escuro e claro: **nenhum erro de JavaScript** no console (só 403/CORS de
+  fotos e escudos externos, que já existiam na v4 e não quebram nada).
+- Corrigido na revisão: a tela **Ranking** só desenhava pódio e tabela depois de clicar numa aba (bug herdado da v4).
+- Testado de ponta a ponta com o backend em memória: cadastro/login real, sincronização de documentos (ex.: `medidas`),
+  registros de sRPE (incluir e apagar) e o fluxo do **atleta** (entra direto em "Meu dia", grava bem-estar e esforço só
+  para si).
+- Testes automáticos: backend **9** (`npm test`), serviço Python **8** (`servico-python`), visão computacional **14**
+  (`poc-cv`). `tools/checkjs.py` sem erro de sintaxe. **A v4 continua idêntica ao backup.**
+
+### Pendências do Caio (não dependem de código)
+1. Rodar `backend/schema.sql` no Supabase (cria as tabelas novas).
+2. Publicar a API no Render pelo `render.yaml` (Blueprint) e preencher `DATABASE_URL`, `JWT_SECRET`, `CORS_ORIGIN`.
+   O serviço Python (`capixastat-calculos`) também está no `render.yaml`, é opcional.
+3. (Opcional) Conta na API-Football → `API_FOOTBALL_KEY` no `backend/.env`.
+4. Colar no relatório a seção `docs/relatorio_secao_visao_computacional.md` (V6).
 
 ## Trabalhos futuros
-_(preencher na revisão de segunda-feira com o que não der tempo)_
+O que ficou de fora ou só parcialmente feito, em ordem de valor:
+- **Visão computacional em vídeo real:** V1/V2/V3 foram testados com dados sintéticos e um YOLO falso (sem GPU nem
+  `ultralytics` nesta máquina). Falta rodar `example_tracking.py --calib --times` num clipe real de jogo capixaba,
+  conferir a separação de times e abrir o CSV na aba Análise de Vídeo com o vídeo sincronizado.
+- **Recalibração automática** da homografia a cada corte de câmera (detectar linhas do campo) e reidentificação de
+  jogadores (manter o mesmo ID; ligar ID ao atleta pelo número da camisa).
+- **GIF do lance (Q3):** hoje exporta MP4/WebM; GIF precisaria de biblioteca (ex.: gif.js).
+- **Scout do adversário:** o Scout ao Vivo marca só o próprio time; o momentum (P6) e a nota (A9) ficariam completos
+  com as ações do adversário.
+- **Dados físicos reais:** as abas Físico/Antropometria da Formação e alguns eixos do radar (Dribles, Físico,
+  Consistência) seguem estimados — dependem de aferição do clube ou de GPS/câmera tática. A maturação (F6) já recebe
+  medidas reais, mas começa vazia.
+- **Mais fontes de dados:** só o TheSportsDB (Capixabão) está integrado na rotina diária; API-Football depende da
+  chave. Minutos por jogo de cada atleta não vêm das fontes abertas (o recorte "últimos 5 jogos" do A6 não tem minutos).
+- **Plataforma consumir o serviço Python (B5):** hoje os cálculos rodam no navegador; o serviço tem as mesmas fórmulas,
+  testadas, mas a tela ainda não chama a API dele.
+- **Presets táticos com selo "editado" (M3):** feito para filtros da Vitrine e lances do Simulador; falta no Quadro
+  Tático.
+- **Layout para celular:** fora do escopo — o CapixaStat é um site para PC (decisão de 21/11).
+- **React (`web-react/`):** parado; a v5 em HTML é a versão de entrega.
