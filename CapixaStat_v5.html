@@ -1921,6 +1921,15 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 
 /* I3: logo */
 .cs-logo { width:26px; height:26px; flex-shrink:0 } .cs-logo.lg { width:56px; height:56px }
+
+/* M2: microinterações */
+.tab-pane.active, .form-tab-panel.active, .md-tab-panel, #time-tab-body > * { animation: csFadeUp .25s ease both }
+@keyframes csFadeUp { from { opacity:0; transform:translateY(4px) } to { opacity:1; transform:none } }
+.cs-skel-wrap { display:grid; gap:10px; padding:6px 0 }
+.cs-skel { height:14px; border-radius:7px; background:linear-gradient(90deg, var(--bg-raised) 0%, var(--bg-overlay) 50%, var(--bg-raised) 100%); background-size:200% 100%; animation: csShimmer 1.2s linear infinite }
+@keyframes csShimmer { from { background-position:200% 0 } to { background-position:-200% 0 } }
+.btn, .vf-seg, .nav-item, .card, .player-card { transition: background-color .18s ease, color .18s ease, border-color .18s ease, transform .18s ease, box-shadow .18s ease }
+.btn:active, .vf-seg:active { transform: scale(.97) }
 </style>
 </head>
 <body>
@@ -3552,7 +3561,7 @@ var EXT_FONTES = { thesportsdb: { nome: 'TheSportsDB', url: 'https://www.thespor
 function extFmtDT(iso) { if (!iso) return '—'; var d = new Date(iso); return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); }
 async function renderFontesExternas() {
   var el = document.getElementById('ext-card'); if (!el) return;
-  el.innerHTML = '<div class="card-title">Dados externos <span>carregando…</span></div>';
+  el.innerHTML = '<div class="card-title">Dados externos <span>carregando…</span></div>' + csSkeleton(4);
   var st, jogos, tab;
   try {
     var q = '?competicao=' + EXT.comp + '&temporada=' + EXT.temporada;
@@ -4378,6 +4387,24 @@ function renderTimeDestaques(c, allMatches) {
     '<div class="card"><div class="dash-mini-lbl"><span>Melhor avaliados</span><span>score 0–100</span></div>' + top(elenco, 'score', function (v) { return (+v).toFixed(0); }) + '</div>';
 }
 
+
+// ── M2: microinterações ──
+function csReduceMotion() { return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
+function csCountUp(el, alvo, casas) {
+  if (!el) return;
+  var fmt = function (v) { return casas ? v.toFixed(casas) : String(Math.round(v)); };
+  if (csReduceMotion() || !isFinite(alvo)) { el.textContent = fmt(+alvo || 0); return; }
+  var t0 = null, dur = 700;
+  var step = function (ts) { if (t0 === null) t0 = ts; var k = Math.min(1, (ts - t0) / dur), e = 1 - Math.pow(1 - k, 3); el.textContent = fmt(alvo * e); if (k < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+  // garantia: em aba oculta o requestAnimationFrame pausa — o valor final aparece de qualquer jeito
+  setTimeout(function () { el.textContent = fmt(alvo); }, dur + 150);
+}
+function csSkeleton(linhas) {
+  var h = ''; for (var i = 0; i < (linhas || 3); i++) h += '<div class="cs-skel" style="width:' + (60 + (i * 13) % 40) + '%"></div>';
+  return '<div class="cs-skel-wrap" aria-busy="true" aria-label="Carregando">' + h + '</div>';
+}
+
 // ── D1: topo da Visão Geral (próximo jogo + forma) ────────────────
 function _dashClubBadge(nome) {
   return (CLUBS[nome] && CLUBS[nome].escudo) || (typeof EXTRA_BADGES !== 'undefined' && EXTRA_BADGES[nome]) || '';
@@ -4458,10 +4485,11 @@ function updateGlobalStats() {
   const elPar = document.getElementById('dash-kpi-partidas');
   const elMed = document.getElementById('dash-kpi-media');
   const elClb = document.getElementById('dash-kpi-clubes');
-  if (elJog) elJog.textContent = totalJogadores;
-  if (elPar) elPar.textContent = totalPartidas;
-  if (elMed) elMed.textContent = mediaGols;
-  if (elClb) elClb.textContent = totalClubes;
+  // M2: números dos KPIs sobem animados (contador)
+  csCountUp(elJog, totalJogadores, 0);
+  csCountUp(elPar, totalPartidas, 0);
+  csCountUp(elMed, +mediaGols, 1);
+  csCountUp(elClb, totalClubes, 0);
 
   // Dashboard deltas
   const dJog = document.getElementById('dash-kpi-jogadores-delta');
