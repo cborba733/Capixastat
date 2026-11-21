@@ -30,9 +30,28 @@ bruto de partidas do futebol capixaba.
   material — por isso a POC foca em detecção + rastreamento.
 - **Marca qualquer pessoa**: o YOLO detecta árbitros, bandeirinhas, gandulas e reservas, não só jogadores.
 
+## V1 — Homografia com 4 cliques (pixels → metros) — `homografia.py`
+A posição que o YOLO devolve está em **pixels**. Para falar em posição no campo, distância ou
+mapa de calor real é preciso converter para **metros**. A homografia é uma matriz 3×3 calculada a
+partir de **4 pontos do gramado que você clica** e cuja posição real é conhecida (ex.: os 4 cantos
+da grande área).
+
+```bash
+pip install numpy opencv-python
+python homografia.py pontos                       # lista os pontos de referência (FIFA 105×68 m)
+python homografia.py calibrar --video clip.mp4 --quadro 0     --pontos ga_dir_sup ga_dir_inf ga_dir_linha_inf ga_dir_linha_sup --saida calib.json
+python example_tracking.py --video clip.mp4 --calib calib.json --out saida/   # gera saida/posicoes.csv
+python -m unittest test_homografia.py               # 7 testes (só precisa de numpy)
+```
+- Matemática própria (DLT com numpy), comentada linha a linha — o OpenCV só abre a janela de clique.
+- Usa o **pé do jogador** (centro da base da caixa) e descarta o que cai fora do gramado (torcida, banco).
+- `posicoes.csv`: `quadro, tempo_s, id, classe, x_px, y_px, x_m, y_m`.
+- **Limite:** a calibração só vale enquanto a câmera não se mexe. Na transmissão é preciso recalibrar
+  a cada corte de câmera; com câmera tática fixa, calibra-se uma vez só.
+
 ## Para onde evolui
 - **Separar por time** (cor da camisa) e filtrar quem não é jogador.
-- **Homografia** (calibrar 4 pontos do campo) → posições reais; aí heatmap/distância fazem sentido.
+- ~~**Homografia**~~ — feito (V1, acima). Próximo: mapa de calor e posições médias a partir do CSV.
 - **Câmera tática fixa** → tracking e métricas diretamente aproveitáveis.
 - **Aba de Análise de Vídeo no CapixaStat** consumindo os resultados (vídeo anotado + dados).
 
