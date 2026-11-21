@@ -2097,6 +2097,28 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .cs-ico.amarelo { color:#facc15; fill:#facc15 } .cs-ico.vermelho { color:#ef4444; fill:#ef4444 }
 .kpi-icon .cs-ico, .insight-icon .cs-ico { width:22px; height:22px }
 .podium-medal .cs-ico { width:26px; height:26px }
+
+/* TA: resumo do dossiê */
+.dossie-origem { font-size:12px; color:var(--text-3); margin-bottom:8px; display:flex; gap:8px; align-items:center }
+.dossie-resumo { background:linear-gradient(180deg, rgba(91,149,255,.06), transparent) }
+.dz-chaves ol { margin:6px 0 12px 18px; padding:0; color:var(--text-1); font-size:13.5px; line-height:1.5 } .dz-chaves li { margin-bottom:3px }
+.dz-chaves > b { font-size:13px; color:var(--text-1); display:flex; gap:8px; align-items:center }
+.dz-sub { font-size:11px; font-weight:400; color:var(--text-3) }
+.dz-grid { display:grid; grid-template-columns:1.3fr 1fr 1fr 1.2fr; gap:12px }
+.dz-grid > div, .dz-lances { background:rgba(255,255,255,.03); border:1px solid var(--border); border-radius:8px; padding:8px 10px; display:flex; flex-direction:column; gap:3px; font-size:12px; color:var(--text-2) }
+.dz-grid small, .dz-lances small { font-size:10.5px; text-transform:uppercase; letter-spacing:.4px; color:var(--text-3); margin-top:2px }
+.dz-grid b { color:var(--text-1); font-size:12.5px }
+.dz-jogo { display:flex; gap:6px; align-items:center; font-size:12px }
+.dz-res { font-style:normal; font-weight:800; font-size:10px; width:16px; height:16px; border-radius:4px; display:inline-flex; align-items:center; justify-content:center; color:#fff }
+.dz-res.V { background:#16a34a } .dz-res.E { background:#64748b } .dz-res.D { background:#dc2626 }
+.dz-vazio { color:var(--text-3); font-style:italic }
+.dz-lances { margin-top:10px; flex-direction:row; flex-wrap:wrap; align-items:center }
+.dz-lances small { width:100% }
+.dz-lance { background:rgba(91,149,255,.12); color:var(--text-1); border-radius:6px; padding:2px 8px } .dz-lance i { color:var(--text-3); font-style:normal; font-size:11px }
+.dz-fonte { margin-top:8px; font-size:11px; color:var(--text-3); display:flex; gap:8px; align-items:center }
+.dz-est { font-weight:600 !important }
+.ds-perfil { margin:8px 0 10px; font-size:12.5px; color:var(--text-2) } .ds-perfil small { color:var(--text-3) }
+.ds-perfil-row { display:grid; grid-template-columns:repeat(5, 1fr); gap:8px; margin-top:6px } .ds-perfil-row label { display:grid; gap:3px; font-size:11.5px; color:var(--text-3) }
 </style>
 </head>
 <body>
@@ -15434,8 +15456,9 @@ function _tacChatGemini(question) {
   var _ano = new Date().getFullYear();
   var _web = _tacWebSearch();
   var sys = 'IDIOMA: responda SEMPRE e EXCLUSIVAMENTE em portugues do Brasil, em qualquer situacao, mesmo que a pergunta, os dados do contexto ou nomes estejam em outro idioma. NUNCA responda em ingles ou espanhol.\n\n' +
+    'REGRA 0 - ANCORAGEM NOS DADOS (mais importante que todas): use SOMENTE numeros que estao no CONTEXTO; nunca invente estatistica, placar, escalacao ou noticia. Os campos estilo, mentalidade, pressao e bloco dos times sao PERFIS DE REFERENCIA NAO VERIFICADOS: trate como hipotese e diga isso quando usar. Classificacao, gols, cartoes e elencos sao DADOS REAIS. Ao final de toda resposta escreva uma linha "Dados usados:" listando quais dados do contexto voce usou. Se nao houver dado para responder, diga claramente que o sistema nao tem esse dado.\n\n' +
     'IDENTIDADE: voce e o auxiliar tecnico de IA do CapixaStat, plataforma web de analise do futebol capixaba. Fala em portugues do Brasil com o treinador de um time do Campeonato Capixaba. Tom direto, pratico e didatico. MEU TIME (no contexto abaixo) e o clube que ELE comanda - trate-o sempre como o time dele.\n\n' +
-    'A PLATAFORMA: telas Dashboard, Vitrine de Jogadores, Cadastrar Atleta, Perfil do Atleta (mapa de calor e metricas fisicas por visao computacional YOLOv8), Partidas, Estatisticas, Ranking, Comparativo, Formacao, Meu Time e Taticas. Voce esta na tela Taticas, com as abas Com bola (saida de bola, circulacao, progressao, criacao), Sem bola (altura do bloco, linha, compacidade, marcacao, pressao), Transicao ofensiva (intencao, apoio) e Transicao defensiva (reacao, cobertura), e a escalacao com funcoes por posicao (APD, ATR, PIN, PCR, MCN, VCN, ZCO, LOF etc.). Voce conhece e sabe explicar todas essas opcoes.\n\n' +
+    'A PLATAFORMA: telas Dashboard, Vitrine de Jogadores, Cadastrar Atleta, Perfil do Atleta (numeros por 90 min, radar e percentis), Partidas, Estatisticas, Ranking, Comparativo, Formacao, Meu Time e Taticas. Voce esta na tela Taticas, com as abas Com bola (saida de bola, circulacao, progressao, criacao), Sem bola (altura do bloco, linha, compacidade, marcacao, pressao), Transicao ofensiva (intencao, apoio) e Transicao defensiva (reacao, cobertura), e a escalacao com funcoes por posicao (APD, ATR, PIN, PCR, MCN, VCN, ZCO, LOF etc.). Voce conhece e sabe explicar todas essas opcoes.\n\n' +
     'DADOS NO CONTEXTO ABAIXO: todos os times capixabas cadastrados (tecnico, formacao, estilo, mentalidade, pressao, bloco, competicoes), seus elencos completos com posicao e nota, e as classificacoes de todas as competicoes - incluindo os adversarios de fora do ES que disputam a Copa Verde, a Serie D e a Copa do Brasil. Esses sao os times e jogadores CADASTRADOS no sistema.\n\n' +
     (_web
       ? ('REGRA 1 - BUSCA NA WEB ATIVA, SEMPRE DADOS ATUAIS (vale para QUALQUER time ou jogador): voce TEM a ferramenta Google Search disponivel. Hoje e ' + _hoje + ' (temporada ' + _ano + ') e seu conhecimento interno esta DEFASADO - um jogador que voce lembra num clube pode ter saido ha anos e o tecnico pode ter mudado. ANTES de citar qualquer tecnico, elenco, formacao, resultado ou momento de um time, voce DEVE OBRIGATORIAMENTE acionar a busca (ex.: \'<time> tecnico atual ' + _ano + '\', \'<time> escalacao ultima partida\', \'<time> elenco ' + _ano + '\'). NUNCA afirme nomes pela memoria - se nao buscou, nao cite. Mesmo para times famosos voce DEVE buscar. Busque de forma silenciosa - nao narre que \'vai buscar\' nem diga que e \'o primeiro passo\'; apenas pesquise e ja apresente os nomes verificados. Para jogador pouco conhecido (Serie D, Copa Verde, base), consulte sites de estatistica (oGol, Sofascore, FlashScore, Transfermarkt, Globo Esporte, Wikipedia) com variacoes do nome. NUNCA use \'no geral\', \'provavelmente\' ou \'historico do clube\' nem trate um time/jogador real como \'hipotetico\'.\n\n')
@@ -15449,7 +15472,7 @@ function _tacChatGemini(question) {
   var ctx = _tacLeagueContext() + '\n\n=========================\nMEU TIME (configuracao atual que estou montando):\n' + _tacChatContext();
   var prev = _tacChatHistory.slice(0, -1).map(function(m) { return { role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.text }] }; });
   prev.push({ role: 'user', parts: [{ text: ctx + '\n\nPERGUNTA DO TREINADOR: ' + question }] });
-  var _reqBody = { system_instruction: { parts: [{ text: sys }] }, contents: prev, generationConfig: { temperature: 0.7, maxOutputTokens: 8192 } };
+  var _reqBody = { system_instruction: { parts: [{ text: sys }] }, contents: prev, generationConfig: { temperature: 0.3, maxOutputTokens: 8192 } };
   if (_web) _reqBody.tools = [{ google_search: {} }];
   var body = JSON.stringify(_reqBody);
   var models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.5-flash-lite', 'gemini-flash-latest'];
@@ -15608,7 +15631,7 @@ function _ensureTacChat() {
       '<input type="password" id="tac-ai-key" placeholder="Cole sua chave aqui" autocomplete="off">' +
       '<div class="row"><button type="button" class="tac-ai-save-key" id="tac-ai-save-key">Salvar</button><button type="button" class="tac-ai-clear-key" id="tac-ai-clear-key">Remover</button></div>' +
       '<div class="tac-ai-hint">Pegue uma chave gratuita em <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com/app/apikey</a>. A chave fica salva apenas neste navegador e nunca sai dele a não ser para o Gemini.</div>' +
-      '<label class="tac-ai-web-toggle" style="display:flex;align-items:center;gap:8px;margin-top:10px;font-weight:600;"><input type="checkbox" id="tac-ai-web"> Busca na web (requer chave paga)</label>' +
+      '<label class="tac-ai-web-toggle" style="display:flex;align-items:center;gap:8px;margin-top:10px;font-weight:600;"><input type="checkbox" id="tac-ai-web"> Busca na web (não recomendado: pode trazer dados errados; requer chave paga)</label>' +
       '<div class="tac-ai-hint">Desligado (padrão): o auxiliar analisa apenas os times e jogadores cadastrados no sistema (capixabas, Série D e Copa Verde) — confiável e sem limites. Ligado: tenta buscar dados atuais de qualquer time na web, mas exige uma chave do Gemini com faturamento ativo; sem isso a busca falha em silêncio e ele responde de memória (pode errar).</div>' +
     '</div>' +
     '<div class="tac-ai-msgs" id="tac-ai-msgs"></div>' +
@@ -15692,7 +15715,7 @@ function _dossieCampaign(name) {
   };
 }
 function _dossieGamePlan(name) {
-  var c = CLUBS[name] || {}; var t = c.taticas || {};
+  var t = _dossiePerfil(name);
   var camp = _dossieCampaign(name);
   var parts = [];
   if (t.tecnico || t.estilo) {
@@ -15711,6 +15734,7 @@ function _dossieGamePlan(name) {
   if (!explore.length) explore.push('equilibre posse e segurança, ataque o lado mais fraco e proteja as transições');
   parts.push('ONDE EXPLORAR: ' + explore.join('; ') + '.');
   parts.push('POSTURA RECOMENDADA: ' + _tacScoutTip(t));
+  parts.push('BASE DESTE PLANO: campanha e gols = dados reais da competição; estilo, mentalidade e pressão = ' + (t._origem === 'comissao' ? 'perfil informado pela comissão.' : 'perfil de referência NÃO verificado — confirme no vídeo antes de usar.'));
   return parts.join('\n\n');
 }
 
@@ -15735,9 +15759,88 @@ function _dossieTimingHtml(name) {
   return h;
 }
 
+
+// ══════════════════════════════════════════════════════════════════
+// TA2/TA3/TA4: resumo do Dossiê — números reais, 3 chaves do jogo e lances da biblioteca
+// ══════════════════════════════════════════════════════════════════
+function _dossieJogos(name) {
+  return _getClubAllMatches(name).filter(function (j) { return j.gh != null && j._date; }).sort(function (a, b) { return b._date - a._date; });
+}
+function _dossieNumeros(name) {
+  var u = getCurrentUser(), meu = u ? resolveClube(u.clube) : null;
+  var jogos = _dossieJogos(name), r = { jogos: jogos.length, ult: jogos.slice(0, 5), casa: { j: 0, pts: 0, gp: 0, gc: 0 }, fora: { j: 0, pts: 0, gp: 0, gc: 0 }, h2h: [], meu: meu };
+  jogos.forEach(function (j) {
+    var emCasa = j.home === name, gp = emCasa ? j.gh : j.ga, gc = emCasa ? j.ga : j.gh, o = emCasa ? r.casa : r.fora;
+    o.j++; o.gp += gp; o.gc += gc; o.pts += gp > gc ? 3 : gp === gc ? 1 : 0;
+    if (meu && (j.home === meu || j.away === meu)) r.h2h.push(j);
+  });
+  try { var e = computeElo(); r.elo = e.R[name] != null ? Math.round(e.R[name]) : null; r.eloMeu = meu && e.R[meu] != null ? Math.round(e.R[meu]) : null; } catch (x) {}
+  try { if (CLUBS[name]) { var st = clubStyleStats(name), todos = Object.keys(CLUBS).map(clubStyleStats); r.estilo = {};
+    ESTILO_EIXOS.forEach(function (ax) { if (st[ax.k] == null) return; var vals = todos.map(function (x) { return x[ax.k]; }).filter(function (v) { return v != null; }); var pc = _percentile(vals, st[ax.k]); r.estilo[ax.k] = { v: st[ax.k], p: ax.inv ? 100 - pc : pc }; }); } } catch (x) {}
+  try { r.timing = clubTiming(name); } catch (x) {}
+  r.pendurados = Object.values(PLAYERS).filter(function (p) { return p.clube === name && (p.cartoes || 0) >= 3; }).map(function (p) { return p.nome + ' (' + p.cartoes + ')'; });
+  return r;
+}
+var _FX15 = ["0–15'", "16–30'", "31–45'", "46–60'", "61–75'", "76–90'"];
+function _dossieChaves(name, N) {
+  var k = [], t = N.timing, est = N.estilo || {};
+  if (t && t.comEventos) {
+    var mc = Math.max.apply(null, t.contra), ms = Math.max.apply(null, t.pro);
+    if (mc > 0) k.push({ peso: mc, txt: 'Sofrem mais gols entre ' + _FX15[t.contra.indexOf(mc)] + ' (' + mc + ' de ' + t.contra.reduce(function (a, b) { return a + b; }, 0) + '): acelere e pressione nesse período.' });
+    if (ms > 0) k.push({ peso: ms * .9, txt: 'Marcam mais entre ' + _FX15[t.pro.indexOf(ms)] + ': redobre a concentração e a organização defensiva nessa faixa.' });
+  }
+  if (est.posse && est.posse.p >= 70) k.push({ peso: 4, txt: 'Gostam da bola (posse ' + est.posse.v.toFixed(0) + '%, P' + est.posse.p + ' do estado): pressione a saída de bola e feche o meio.' });
+  if (est.posse && est.posse.p <= 30) k.push({ peso: 4, txt: 'Cedem a posse (' + est.posse.v.toFixed(0) + '%): prepare o ataque posicional e proteja-se do contra-ataque.' });
+  if (est.fin && est.fin.p >= 75) k.push({ peso: 3.5, txt: 'Finalizam muito (' + est.fin.v.toFixed(1) + ' por jogo, P' + est.fin.p + '): bloqueie a entrada da área e os chutes de fora.' });
+  if (est.gc && est.gc.p <= 30) k.push({ peso: 3.5, txt: 'Defesa vulnerável (' + est.gc.v.toFixed(1) + ' gols sofridos por jogo): ataque o espaço e finalize mais.' });
+  if (est.disc && est.disc.p <= 30) k.push({ peso: 2.5, txt: 'Time faltoso (' + est.disc.v.toFixed(1) + ' cartões por jogo): conduza a bola, provoque faltas e capriche nas bolas paradas.' });
+  var cs = N.casa, fo = N.fora;
+  if (cs.j >= 3 && fo.j >= 3) { var pc = cs.pts / cs.j, pf = fo.pts / fo.j; if (Math.abs(pc - pf) >= .6) k.push({ peso: 3, txt: (pc > pf ? 'Bem mais fortes em casa' : 'Rendem mais fora de casa') + ' (' + pc.toFixed(1) + ' × ' + pf.toFixed(1) + ' pontos por jogo).' }); }
+  if (N.elo != null && N.eloMeu != null) { var d = N.elo - N.eloMeu; if (Math.abs(d) >= 30) k.push({ peso: 2.8, txt: d > 0 ? 'Adversário mais forte no Elo (' + N.elo + ' × ' + N.eloMeu + '): priorize compactação e transições.' : 'Seu time é favorito no Elo (' + N.eloMeu + ' × ' + N.elo + '): assuma o jogo, com cuidado com o contra-ataque.' }); }
+  if (N.pendurados.length) k.push({ peso: 2, txt: 'Com 3 ou mais cartões na temporada: ' + N.pendurados.slice(0, 3).join(', ') + ' — provoque o duelo.' });
+  return k.sort(function (a, b) { return b.peso - a.peso; }).slice(0, 3).map(function (x) { return x.txt; });
+}
+function _dossieLances(name) {
+  var alvo = _mNorm(name);
+  return simSavedAll().map(function (l, i) { return { l: l, i: i }; }).filter(function (o) {
+    return (o.l.tags || []).some(function (t) { return _mNorm(t).indexOf(alvo) >= 0 || alvo.indexOf(_mNorm(t)) >= 0 && _mNorm(t).length > 3; }) || _mNorm(o.l.partida || '').indexOf(alvo) >= 0;
+  });
+}
+function _dossieResumoHtml(name) {
+  var N = _dossieNumeros(name), nota = dsNotesAll()[name] || {};
+  var chavesCom = (nota.chaves || '').split('\n').map(function (x) { return x.trim(); }).filter(Boolean).slice(0, 5);
+  var chaves = chavesCom.length ? chavesCom : _dossieChaves(name, N);
+  var dot = function (j) { var emCasa = j.home === name, gp = emCasa ? j.gh : j.ga, gc = emCasa ? j.ga : j.gh, r = gp > gc ? 'V' : gp < gc ? 'D' : 'E';
+    return '<span class="dz-jogo"><i class="dz-res ' + r + '">' + r + '</i>' + gp + '–' + gc + ' ' + (emCasa ? 'x ' + j.away : '@ ' + j.home) + '</span>'; };
+  var lin = function (o) { return o.j ? o.j + ' j · ' + (o.pts / o.j).toFixed(1) + ' pts/j · ' + o.gp + '–' + o.gc : '—'; };
+  var lances = _dossieLances(name);
+  var h = '<div class="dossie-sec dossie-resumo"><h4>Resumo para a preleção</h4>' +
+    '<div class="dz-chaves"><b>' + (chavesCom.length ? '3 chaves do jogo <span class="cs-src real">Comissão</span>' : '3 chaves do jogo <span class="dz-sub">sugeridas a partir dos dados reais — edite nas anotações</span>') + '</b><ol>' +
+      (chaves.length ? chaves.map(function (c) { return '<li>' + csEsc(c) + '</li>'; }).join('') : '<li>Poucos dados deste adversário na base — use as anotações do estudo.</li>') + '</ol></div>' +
+    '<div class="dz-grid">' +
+      '<div><small>Últimos jogos</small>' + (N.ult.length ? N.ult.map(dot).join('') : '<span class="dz-vazio">sem jogos na base</span>') + '</div>' +
+      '<div><small>Em casa</small><b>' + lin(N.casa) + '</b><small>Fora</small><b>' + lin(N.fora) + '</b></div>' +
+      '<div><small>Força (Elo)</small><b>' + (N.elo != null ? name + ' ' + N.elo : '—') + '</b>' + (N.eloMeu != null ? '<b>' + N.meu + ' ' + N.eloMeu + '</b>' : '') +
+        (N.estilo ? '<small>Estilo (percentil no ES)</small><b class="dz-est">' + ['gp', 'gc', 'posse', 'fin'].filter(function (k) { return N.estilo[k]; }).map(function (k) { var ax = ESTILO_EIXOS.filter(function (a) { return a.k === k; })[0]; return ax.l.split(' (')[0].replace('/jogo', '') + ' P' + N.estilo[k].p; }).join(' · ') + '</b>' : '') + '</div>' +
+      '<div><small>Confronto direto</small>' + (N.h2h.length ? N.h2h.slice(0, 3).map(function (j) { return '<span class="dz-jogo">' + j.home + ' ' + j.gh + '–' + j.ga + ' ' + j.away + '</span>'; }).join('') : '<span class="dz-vazio">sem jogos entre os dois na base</span>') +
+        '<small>3+ cartões na temporada</small><b>' + (N.pendurados.length ? N.pendurados.slice(0, 4).join(', ') : 'nenhum') + '</b></div>' +
+    '</div>' +
+    '<div class="dz-lances"><small>Lances para a preleção</small>' + (lances.length ? lances.map(function (o) { return '<span class="dz-lance">' + csEsc(o.l.nome) + ' <i>' + o.l.frames.length + ' quadros</i></span>'; }).join('') + '<span class="dz-sub">abra em Estúdio Tático › Lance animado</span>'
+      : '<span class="dz-vazio">nenhum lance salvo com este adversário — no Estúdio Tático, salve um lance com a tag "' + csEsc(name) + '" ou ligue-o a uma partida contra ele</span>') + '</div>' +
+    '<div class="dz-fonte">Números: placares e eventos oficiais (' + N.jogos + ' jogos na base), Elo e percentis calculados pelo CapixaStat <span class="cs-src real">Dado real</span></div></div>';
+  return h;
+}
+
+function _dossiePerfil(name) {
+  var c = CLUBS[name] || {}, base = c.taticas || {}, n = (dsNotesAll()[name] || {}).perfil || null;
+  var temComissao = n && Object.keys(n).some(function (k) { return n[k]; });
+  var t = {}; ['tecnico', 'formacao', 'estilo', 'mentalidade', 'pressao', 'blocoDefensivo'].forEach(function (k) { t[k] = (temComissao && n[k]) || base[k] || ''; });
+  t._origem = temComissao ? 'comissao' : (base.estilo ? 'padrao' : 'nenhum');
+  return t;
+}
 function _dossieBuildReport(name) {
   var c = CLUBS[name] || null;
-  var t = (c && c.taticas) || {};
+  var t = _dossiePerfil(name);
   var camp = _dossieCampaign(name);
   var roster = Object.values(PLAYERS).filter(function(p) { return p && p.clube === name; })
     .sort(function(a, b) { return (b.score || 0) - (a.score || 0); });
@@ -15755,9 +15858,11 @@ function _dossieBuildReport(name) {
     '</div>';
 
   // Como o time joga
+  html += _dossieResumoHtml(name); // TA2/TA3/TA4
   html += '<div class="dossie-sec"><h4>Como o time joga</h4>';
-  if (c && (t.tecnico || t.estilo)) {
-    html += '<div class="dossie-kv">' +
+  if (t.tecnico || t.estilo) {
+    html += '<div class="dossie-origem">' + (t._origem === 'comissao' ? '<span class="cs-src real">Informado pela comissão</span> perfil preenchido nas anotações do estudo (observação própria).' : '<span class="cs-src est">Não verificado</span> perfil de referência do sistema, sem fonte de dados — confirme assistindo aos jogos e corrija nas anotações do estudo.') + '</div>' +
+      '<div class="dossie-kv">' +
       '<span>Técnico: <b>' + (t.tecnico || '?') + '</b></span>' +
       '<span>Formação: <b>' + (t.formacao || '?') + '</b></span>' +
       '<span>Estilo: <b>' + (t.estilo || '?') + '</b></span>' +
@@ -15840,25 +15945,34 @@ function _dossieAskAI(name) {
 }
 
 // ── X2: anotações do estudo do adversário (ficam no Dossiê e entram no PDF) ──
-var DS_CAMPOS = [['ofensiva', 'Fase ofensiva', 'Como ataca: estrutura, saída de bola, por onde progride'], ['defensiva', 'Fase defensiva', 'Altura do bloco, pressão, como recompõe'],
-  ['fortes', 'Pontos fortes', 'O que precisamos neutralizar'], ['fracos', 'Pontos fracos', 'Onde podemos explorar'], ['jogadores', 'Jogadores-chave', 'Quem decide e como marcar']];
+var DS_CAMPOS = [['ofensiva', 'Construção (1ª e 2ª fase)', 'Como sai jogando: goleiro, zagueiros, volantes; por onde progride'], ['ultimo', 'Último terço', 'Como cria chances: cruzamentos, infiltrações, chutes de fora'],
+  ['transof', 'Transição ofensiva', 'O que faz ao recuperar a bola: contra-ataque, quem acelera'], ['transdef', 'Transição defensiva', 'Reação à perda: pressiona ou recua'],
+  ['defensiva', 'Organização defensiva', 'Altura do bloco, pressão, compactação'], ['bolaparada', 'Bolas paradas', 'Escanteios, faltas e laterais — a favor e contra'],
+  ['fortes', 'Forças', 'O que precisamos neutralizar'], ['fracos', 'Fraquezas', 'Onde podemos explorar'],
+  ['oportunidades', 'Oportunidades', 'Situações do jogo que nos favorecem (SWOT)'], ['ameacas', 'Ameaças', 'O que pode nos ferir (SWOT)'],
+  ['jogadores', 'Jogadores-chave', 'Quem decide e como marcar'], ['chaves', '3 chaves do jogo (da comissão)', 'Uma por linha — substituem as chaves sugeridas no resumo']];
+var DS_PERFIL = [['formacao', 'Formação', ['', '4-4-2', '4-3-3', '4-2-3-1', '3-5-2', '3-4-3', '5-3-2', '4-1-4-1']], ['estilo', 'Estilo', ['', 'Posse de Bola', 'Transição Rápida', 'Jogo Direto', 'Jogo Físico', 'Organização Defensiva']],
+  ['mentalidade', 'Mentalidade', ['', 'Ofensiva', 'Equilibrada', 'Cautelosa', 'Defensiva']], ['pressao', 'Pressão', ['', 'Alta', 'Média', 'Baixa']], ['blocoDefensivo', 'Bloco', ['', 'Alto', 'Médio', 'Baixo']]];
 function dsNotesAll() { try { return JSON.parse(localStorage.getItem('capixastat_v5_anotacoes') || '{}'); } catch (e) { return {}; } }
 function dsNotesRender(time) {
   var holder = document.getElementById('dossie-report-holder'); if (!holder) return;
   var n = dsNotesAll()[time] || {};
   var report = document.getElementById('dossie-report');
-  var temAlgo = DS_CAMPOS.some(function (c) { return n[c[0]]; });
+  var temAlgo = DS_CAMPOS.some(function (c) { return n[c[0]] && c[0] !== 'chaves'; });
   if (report && temAlgo) {
-    report.insertAdjacentHTML('beforeend', '<div class="dossie-sec"><h4>Anotações do estudo — comissão técnica</h4>' + DS_CAMPOS.filter(function (c) { return n[c[0]]; }).map(function (c) {
+    report.insertAdjacentHTML('beforeend', '<div class="dossie-sec"><h4>Anotações do estudo — comissão técnica</h4>' + DS_CAMPOS.filter(function (c) { return n[c[0]] && c[0] !== 'chaves'; }).map(function (c) {
       return '<p><b>' + c[1] + ':</b> ' + csEsc(n[c[0]]) + '</p>'; }).join('') + (n.atualizado ? '<p style="opacity:.7;font-size:12px">Atualizado em ' + new Date(n.atualizado).toLocaleString('pt-BR') + (n.autor ? ' por ' + csEsc(n.autor) : '') + '</p>' : '') + '</div>');
   }
   holder.insertAdjacentHTML('beforeend', '<div class="ds-notes"><div class="card-title" style="margin-top:14px">Anotações do estudo <span>salvas por adversário · aparecem no dossiê e no PDF</span></div>' +
+    '<div class="ds-perfil"><b>Perfil tático observado</b> <small>preencha só o que a comissão confirmou no vídeo — substitui o perfil de referência</small><div class="ds-perfil-row">' +
+      DS_PERFIL.map(function (f) { var v = (n.perfil || {})[f[0]] || ''; return '<label>' + f[1] + '<select id="dsp-' + f[0] + '" class="form-select">' + f[2].map(function (o) { return '<option value="' + o + '"' + (o === v ? ' selected' : '') + '>' + (o || '—') + '</option>'; }).join('') + '</select></label>'; }).join('') + '</div></div>' +
     '<div class="ds-grid">' + DS_CAMPOS.map(function (c) { return '<label>' + c[1] + '<textarea id="ds-' + c[0] + '" class="form-textarea" rows="2" maxlength="500" placeholder="' + c[2] + '">' + csEsc(n[c[0]] || '') + '</textarea></label>'; }).join('') + '</div>' +
     '<button class="dossie-btn" onclick="dsNotesSave(\'' + time.replace(/'/g, "\\'") + '\')">Salvar anotações</button></div>');
 }
 function dsNotesSave(time) {
   var all = dsNotesAll(), u = getCurrentUser() || {}, n = { atualizado: new Date().toISOString(), autor: u.nome || '' };
   DS_CAMPOS.forEach(function (c) { n[c[0]] = (document.getElementById('ds-' + c[0]).value || '').trim(); });
+  n.perfil = {}; DS_PERFIL.forEach(function (f) { var el = document.getElementById('dsp-' + f[0]); if (el && el.value) n.perfil[f[0]] = el.value; });
   all[time] = n;
   try { localStorage.setItem('capixastat_v5_anotacoes', JSON.stringify(all)); } catch (e) {}
   csToast('Anotações sobre ' + time + ' salvas'); _dossieGenerate();

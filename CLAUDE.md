@@ -531,6 +531,24 @@ item, testar sem erro no console, atualizar este arquivo).
   0 emojis renderizados. Sobraram só ★ em comentários do CSS e ✓ num `console.log` (não aparecem para o usuário).
   As exportações (PNG, PDF, vídeo) não tinham emojis.
 
+- **R2-4 Táticas:** avaliação + pesquisa + proposta em **`docs/PROPOSTA_TATICAS.md`** (TA1–TA10 com prioridade e
+  dificuldade e fontes). Implementado (alta + TA6):
+  - **TA1** perfil tático do adversário (estilo, mentalidade, pressão, bloco) marcado **"Não verificado"** (rótulos fixos
+    do sistema, sem fonte) ou **"Informado pela comissão"** quando preenchido nas anotações (`_dossiePerfil`, `DS_PERFIL`);
+    o plano de jogo diz em que se baseia.
+  - **TA2/TA3** **Resumo para a preleção** no topo do Dossiê (`_dossieResumoHtml`, `_dossieNumeros`, `_dossieChaves`):
+    3 chaves do jogo sugeridas por regras sobre dados reais (faixas de 15', estilo em percentis, casa × fora, Elo,
+    cartões) ou as da comissão (campo "3 chaves do jogo"); últimos 5 jogos com placar, casa × fora, Elo dos dois times,
+    estilo em percentis, confronto direto, atletas com 3+ cartões.
+  - **TA4** lances da biblioteca com tag do adversário ou ligados a uma partida contra ele aparecem no Dossiê (`_dossieLances`).
+  - **TA5** Auxiliar Tático ancorado: REGRA 0 no prompt (só números do contexto, perfis = hipótese, linha "Dados usados"
+    no fim), temperatura 0,3, busca na web marcada "não recomendado"; descrição falsa da plataforma (mapa de calor por
+    YOLOv8 no Perfil) corrigida no prompt.
+  - **TA6** anotações por **fases do jogo** (construção, último terço, transições, organização defensiva, bolas paradas)
+    + **SWOT** (forças, fraquezas, oportunidades, ameaças).
+  Ficaram para Trabalhos futuros: TA7 (dossiê em slides), TA8 (IA redatora), TA9 (escalação provável), TA10 (bolas
+  paradas com dados). O Auxiliar com IA **não foi testado com chave real do Gemini** (sem chave aqui).
+
 ## Trabalhos futuros
 O que ficou de fora ou só parcialmente feito, em ordem de valor:
 - **Visão computacional em vídeo real:** V1/V2/V3 foram testados com dados sintéticos e um YOLO falso (sem GPU nem
