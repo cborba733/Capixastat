@@ -1641,6 +1641,27 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .ov-legend { margin-top:8px; font-size:11px; color:var(--text-3); display:flex; gap:6px; align-items:center; flex-wrap:wrap }
 .cs-est-banner { display:flex; gap:10px; align-items:center; padding:9px 12px; margin-bottom:14px; border-radius:10px;
   border:1px dashed var(--warn); background:color-mix(in srgb, var(--warn) 7%, transparent); font-size:12.5px; color:var(--text-2) }
+
+/* P1: linha do tempo da partida (lista única; lado indicado por faixa de cor + sigla do time) */
+.tl2-row { display:grid; grid-template-columns:44px 18px minmax(0,1fr) auto; align-items:center; gap:7px; padding:6px 6px 6px 8px;
+  border-bottom:1px solid var(--border); border-left:3px solid var(--data-1) }
+.tl2-row.away { border-left-color:var(--data-2) }
+.tl2-team { font-size:10px; font-weight:800; letter-spacing:.4px; color:var(--text-3) }
+.tl2-min { text-align:center; font-family:var(--font-mono); font-size:12px; font-weight:700; color:var(--text-2); background:var(--bg-raised); border-radius:999px; padding:2px 0 }
+.tl2-body { display:flex; align-items:center; gap:7px; font-size:13px; color:var(--text-1); min-width:0; flex-wrap:wrap }
+.tl2-name { font-weight:600; min-width:0; overflow-wrap:anywhere }
+.tl2-body.goal .tl2-name { font-weight:800 }
+.tl2-score { font-family:var(--font-mono); font-size:12px; font-weight:800; padding:1px 7px; border-radius:6px; background:var(--brand-dim); color:var(--brand); flex-shrink:0 }
+.tl2-kind { font-size:11px; color:var(--text-3) }
+.tl2-in { color:var(--ok); font-weight:600 } .tl2-out { color:var(--text-3); font-weight:400 }
+.tl2-ico { font-size:14px; flex-shrink:0; text-align:center } .tl2-ico.sub { color:var(--brand); font-weight:800 }
+.tl2-card { display:inline-block; width:10px; height:14px; border-radius:2px; flex-shrink:0; vertical-align:middle; justify-self:center }
+.tl2-card.yellow { background:#facc15 } .tl2-card.red { background:#ef4444 }
+.tl2-sep { display:flex; align-items:center; gap:10px; margin:8px 0; font-size:11px; font-weight:700; letter-spacing:.6px; text-transform:uppercase; color:var(--text-3) }
+.tl2-sep::before, .tl2-sep::after { content:''; flex:1; height:1px; background:var(--border-md) }
+.tl2-legend { display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-top:10px; font-size:11px; color:var(--text-3) }
+.tl2-legend > span { display:inline-flex; align-items:center; gap:4px }
+.tl2-empty { color:var(--text-3); font-size:12.5px; text-align:center; padding:20px }
 </style>
 </head>
 <body>
@@ -9846,19 +9867,8 @@ function openMatch(id) {
   drawPitch('pitch-home', false);
   drawPitch('pitch-away', true);
 
-  // 4. TIMELINE EVENTS
-  let eventsHtml = '';
-  // Deterministic goals generator
-  for(let i=0;i<m.gHome;i++) {
-    let min = Math.floor(Math.sin(m.id+i+99)*45 + 45);
-    eventsHtml += `<div class="fm-event"><div class="fm-e-min">${min}'</div><div class="fm-e-icon">⚽</div><div class="fm-e-name" style="color:#ef4444">${m.home} (Atacante)</div></div>`;
-  }
-  for(let i=0;i<m.gAway;i++) {
-    let min = Math.floor(Math.sin(m.id+i+88)*45 + 45);
-    eventsHtml += `<div class="fm-event"><div class="fm-e-min">${min}'</div><div class="fm-e-icon">⚽</div><div class="fm-e-name" style="color:#3b82f6">${m.away} (Atacante)</div></div>`;
-  }
-  eventsHtml += `<div class="fm-event"><div class="fm-e-min">22'</div><div class="fm-e-icon">🟨</div><div class="fm-e-name" style="color:#ef4444">${m.home} (Zagueiro)</div></div>`;
-  document.getElementById('md-events-list').innerHTML = eventsHtml || '<div style="font-size:12px;color:rgba(255,255,255,0.4)">Sem eventos relevantes</div>';
+  // 4. TIMELINE EVENTS — P1: a v4 gerava gols/cartões fictícios aqui; removido (só mostramos eventos reais)
+  document.getElementById('md-events-list').innerHTML = '<div class="tl2-empty">Partida cadastrada manualmente: eventos minuto a minuto ainda não registrados.</div>';
 
   // 5. MOMENTUM CHART
   setTimeout(() => {
@@ -9964,47 +9974,47 @@ function openJogoDetail(cacheKey, idx) {
     '</div>';
   document.getElementById('md-header').style.position = '';
 
+  // P1: linha do tempo redesenhada — ordem por minuto, intervalo, placar parcial, ícone + texto
   var tlHtml = '';
   if (rawInc && rawInc.length) {
-    // Dados reais do SofaScore
-    rawInc.forEach(function(ev) {
-      var side = ev.isHome ? 'home' : 'away';
-      var minStr = ev.time + (ev.addedTime ? "'+<sup>" + ev.addedTime + "</sup>" : "'");
-
-      var icon, label;
-      if (ev.type === 'goal') {
-        icon  = ev.ownGoal ? '<span title="Gol contra" style="font-size:14px">⚽</span>' : ev.penalty ? '<span title="Pênalti" style="font-size:14px">🥅</span>' : '<span style="font-size:14px">⚽</span>';
-        label = '<span style="font-size:11px;font-weight:600">' + ev.player + '</span>' +
-                '<span style="font-size:10px;color:var(--text-3);margin-left:4px">' + ev.scoreH + '–' + ev.scoreA + '</span>';
-      } else if (ev.type === 'card') {
-        icon  = ev.cardType === 'yellow' ? '🟨' : ev.cardType === 'yellowRed' ? '<span style="font-size:12px">🟨🟥</span>' : '🟥';
-        label = '<span style="font-size:11px">' + ev.player + '</span>';
-      } else if (ev.type === 'substitution') {
-        icon  = '<span style="font-size:12px;color:#22c55e">▲</span><span style="font-size:12px;color:#ef4444">▼</span>';
-        label = '<span style="font-size:11px;color:#4ade80">' + ev.playerIn + '</span>' +
-                '<span style="font-size:10px;color:var(--text-3)"> ← ' + ev.playerOut + '</span>';
-      } else {
-        return;
+    var evs = rawInc.filter(function (ev) { return ev.type === 'goal' || ev.type === 'card' || ev.type === 'substitution'; })
+      .slice().sort(function (a, b) { return (a.time - b.time) || ((a.addedTime || 0) - (b.addedTime || 0)); });
+    var htDone = false;
+    evs.forEach(function (ev) {
+      if (!htDone && ev.time > 45) {
+        htDone = true;
+        tlHtml += '<div class="tl2-sep"><span>Intervalo</span></div>';
       }
-
-      var dotCls = 'md-event-dot ' + (side === 'home' ? 'home' : 'away');
-      var homeContent = side === 'home'
-        ? '<div class="md-event-home-side">' + label + ' ' + icon + '</div>'
-        : '<div></div>';
-      var awayContent = side === 'away'
-        ? '<div class="md-event-away-side">' + icon + ' ' + label + '</div>'
-        : '<div></div>';
-
-      tlHtml += '<div class="md-event">' +
-        homeContent +
-        '<div class="md-event-center"><div class="' + dotCls + '"></div><div class="md-event-min">' + minStr + '</div></div>' +
-        awayContent +
-        '</div>';
+      var side = ev.isHome ? 'home' : 'away';
+      var minStr = ev.time + "'" + (ev.addedTime ? '+' + ev.addedTime : '');
+      var icon, label, kind;
+      if (ev.type === 'goal') {
+        kind = 'goal';
+        var tag = ev.ownGoal ? ' (contra)' : (ev.penalty ? ' (pênalti)' : '');
+        icon = '<span class="tl2-ico goal" aria-hidden="true">⚽</span>';
+        label = '<span class="tl2-name">' + ev.player + tag + '</span><span class="tl2-score">' + ev.scoreH + '–' + ev.scoreA + '</span>';
+      } else if (ev.type === 'card') {
+        kind = ev.cardType === 'yellow' ? 'yellow' : 'red';
+        var cardTxt = ev.cardType === 'yellow' ? 'Amarelo' : (ev.cardType === 'yellowRed' ? '2º amarelo' : 'Vermelho');
+        icon = '<span class="tl2-card ' + kind + '" aria-hidden="true"></span>';
+        label = '<span class="tl2-name">' + ev.player + '</span><span class="tl2-kind">' + cardTxt + '</span>';
+      } else {
+        kind = 'sub';
+        icon = '<span class="tl2-ico sub" aria-hidden="true">⇄</span>';
+        label = '<span class="tl2-name"><span class="tl2-in">▲ ' + ev.playerIn + '</span> <span class="tl2-out">▼ ' + ev.playerOut + '</span></span>';
+      }
+      var team = side === 'home' ? j.home : j.away;
+      var sig = team.replace(/[^A-Za-zÀ-ú ]/g, '').split(' ').filter(Boolean).map(function (w) { return w[0]; }).join('').slice(0, 3).toUpperCase();
+      tlHtml += '<div class="tl2-row ' + side + '" title="' + team + '">' +
+        '<div class="tl2-min">' + minStr + '</div>' + icon +
+        '<div class="tl2-body ' + kind + '">' + label + '</div>' +
+        '<span class="tl2-team">' + sig + '</span></div>';
     });
-    if (!tlHtml) tlHtml = '<div style="color:var(--text-3);font-size:12px;text-align:center;padding:20px">Sem eventos registrados</div>';
+    if (tlHtml) tlHtml += '<div class="tl2-sep end"><span>Fim · ' + j.gh + '–' + j.ga + '</span></div>' +
+      '<div class="tl2-legend"><span><i style="display:inline-block;width:10px;height:10px;background:var(--data-1);border-radius:2px"></i> ' + j.home + '</span><span><i style="display:inline-block;width:10px;height:10px;background:var(--data-2);border-radius:2px"></i> ' + j.away + '</span><span><span class="tl2-ico goal">⚽</span> gol</span><span><span class="tl2-card yellow"></span> amarelo</span><span><span class="tl2-card red"></span> vermelho</span><span><span class="tl2-ico sub">⇄</span> substituição</span><span class="cs-src real">Dado real</span></div>';
+    if (!tlHtml) tlHtml = '<div class="tl2-empty">Sem eventos registrados</div>';
   } else {
-    // Fallback: sem dados de incidentes
-    tlHtml = '<div style="color:var(--text-3);font-size:12px;text-align:center;padding:20px">Eventos não disponíveis para esta partida</div>';
+    tlHtml = '<div class="tl2-empty">Eventos não disponíveis para esta partida na fonte de dados.</div>';
   }
   document.getElementById('md-events-list').innerHTML = tlHtml;
 
