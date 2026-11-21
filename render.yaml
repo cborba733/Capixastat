@@ -1,0 +1,19 @@
+# B1: publicação da API no Render (https://render.com) — plano gratuito.
+# No painel do Render: New > Blueprint > aponte para este repositório.
+# Depois preencha as variáveis marcadas com sync:false (DATABASE_URL do Supabase, JWT_SECRET).
+services:
+  - type: web
+    name: capixastat
+    runtime: node
+    rootDir: backend
+    buildCommand: npm ci --omit=dev
+    startCommand: node server.js
+    healthCheckPath: /api/health
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false

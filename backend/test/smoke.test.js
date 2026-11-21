@@ -54,3 +54,19 @@ test('B4: bem-estar calcula o índice de Hooper', async () => {
   assert.equal(r.body.registro.hooper, 16);
   assert.equal((await req('GET', '/api/registros/xyz', null, token)).status, 404);
 });
+
+test('B1: health e documentos do usuário', async () => {
+  const h = await req('GET', '/api/health');
+  assert.equal(h.status, 200);
+  assert.equal(h.body.banco, 'memoria');
+  assert.equal((await req('PUT', '/api/dados/taticas', { dados: { a: 1 } })).status, 401);
+  assert.equal((await req('PUT', '/api/dados/xyz', { dados: 1 }, token)).status, 404);
+  const c = await req('PUT', '/api/dados/taticas', { dados: { formacao: '4-3-3' } }, token);
+  assert.equal(c.status, 201, JSON.stringify(c.body));
+  const u = await req('PUT', '/api/dados/taticas', { dados: { formacao: '4-4-2' } }, token);
+  assert.equal(u.status, 200);
+  const g = await req('GET', '/api/dados/taticas', null, token);
+  assert.equal(g.body.dados.formacao, '4-4-2');
+  const l = await req('GET', '/api/dados', null, token);
+  assert.equal(l.body.documentos.length, 1);
+});

@@ -72,3 +72,13 @@ CREATE TABLE IF NOT EXISTS registros_bemestar (
   criado_por INTEGER,
   criado_em  TIMESTAMP DEFAULT NOW()
 );
+
+-- ═══ v5 · B1: documentos do usuário (o que antes ficava só no navegador) ═══
+-- Táticas salvas, telestrações, fotos enviadas, filtros salvos… guardados como JSON por usuário.
+CREATE TABLE IF NOT EXISTS documentos (
+  usuario_id    INTEGER NOT NULL,
+  chave         VARCHAR(60) NOT NULL,
+  dados         JSONB,
+  atualizado_em TIMESTAMP DEFAULT NOW(),
+  PRIMARY KEY (usuario_id, chave)
+);

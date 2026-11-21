@@ -1748,6 +1748,10 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .p90-trk { height:8px; background:var(--border-md); border-radius:5px; overflow:hidden; display:block }
 .p90-fil { display:block; height:100%; border-radius:5px } .p90-fil.ok { background:var(--ok) } .p90-fil.warn { background:var(--warn) } .p90-fil.danger { background:var(--danger) }
 .p90-pct { font-family:var(--font-mono); font-size:12px; font-weight:700; color:var(--text-2); text-align:right }
+
+/* B1: indicador de nuvem */
+.cs-cloud { font-size:11px; margin:0 0 10px; color:var(--text-3) }
+.cs-cloud.ok { color:var(--ok) } .cs-cloud.pend { color:var(--warn) } .cs-cloud.off { color:var(--danger) }
 </style>
 </head>
 <body>
@@ -1923,6 +1927,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 
       <div class="sidebar-bottom">
         <a class="sidebar-guia-link" onclick="goTo('guia')">Guia visual do sistema</a>
+        <div id="cs-cloud" class="cs-cloud local" role="status" title="Situação da sincronização com a API">● Modo local</div>
         <div class="user-chip">
           <div class="user-avatar">RP</div>
           <div>
@@ -2914,7 +2919,13 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 <script>
 // ── BANCO DE DADOS (localStorage) ────────────
 // ── Backend API ──────────────────────────────
-const API_URL = 'https://capixastat.onrender.com';
+// B1: endereço da API — localhost em desenvolvimento, Render em produção.
+// Para apontar para outro servidor: localStorage.setItem('capixastat_api', 'https://minha-api')
+const API_URL = (function () {
+  try { var o = localStorage.getItem('capixastat_api'); if (o) return o.replace(/\/$/, ''); } catch (e) {}
+  var h = location.hostname;
+  return (h === 'localhost' || h === '127.0.0.1') ? 'http://localhost:3001' : 'https://capixastat.onrender.com';
+})();
 
 function getToken() {
   return localStorage.getItem('capixastat_token');
@@ -3108,6 +3119,7 @@ function enterApp() {
   try { renderDashTopRow(); renderDashAlerts(); } catch (e) { console.warn('D1/D2', e); }
   setTimeout(function () { try { applyMetricChips(); } catch (e) {} }, 300);
   csSyncPull().then(function () { try { renderDashAlerts(); } catch (e) {} });
+  csCloudPull();
 }
 
 // ── Atualizar KPIs com dados reais ───────────
@@ -3196,6 +3208,65 @@ function csClubPlayers() {
   return Object.values(PLAYERS).filter(function (p) { return !c || p.clube === c; }).sort(function (a, b) { return a.nome.localeCompare(b.nome); });
 }
 
+
+
+// ══════════════════════════════════════════════════════════════════
+// B1: nuvem — o que antes ficava só no navegador vai para o banco (/api/dados/:chave)
+// Qualquer gravação no localStorage destas chaves agenda o envio (1,5 s depois da última mudança).
+// Ao entrar, baixa o que estiver mais novo no servidor. Sem login real, tudo continua só local.
+// ══════════════════════════════════════════════════════════════════
+var CS_CLOUD_KEYS = { capixastat_taticas: 'taticas', capixastat_taticas_presets: 'taticas_presets', capixastat_tel: 'telestracao', capixastat_userphotos: 'fotos', capixastat_v5_filtros: 'filtros' };
+var _csCloudTimers = {}, _csCloudPulling = false;
+function csCloudStamps() { try { return JSON.parse(localStorage.getItem('capixastat_v5_stamps') || '{}'); } catch (e) { return {}; } }
+function csCloudSetStamp(chave, t) { var s = csCloudStamps(); s[chave] = t; try { Storage.prototype._csOrigSet.call(localStorage, 'capixastat_v5_stamps', JSON.stringify(s)); } catch (e) {} }
+function csSetCloudStatus(st, txt) {
+  var el = document.getElementById('cs-cloud'); if (!el) return;
+  el.className = 'cs-cloud ' + st; el.textContent = txt;
+}
+(function () {
+  if (Storage.prototype._csOrigSet) return;
+  var orig = Storage.prototype.setItem;
+  Storage.prototype._csOrigSet = orig;
+  Storage.prototype.setItem = function (k, v) {
+    orig.apply(this, arguments);
+    try { if (this === window.localStorage && CS_CLOUD_KEYS[k] && !_csCloudPulling) csCloudSchedule(k); } catch (e) {}
+  };
+})();
+function csCloudSchedule(k) {
+  if (typeof csBackendOn !== 'function' || !csBackendOn()) return;
+  clearTimeout(_csCloudTimers[k]);
+  csSetCloudStatus('pend', '● Salvando na nuvem…');
+  _csCloudTimers[k] = setTimeout(function () {
+    var raw = localStorage.getItem(k), dados = null;
+    try { dados = raw ? JSON.parse(raw) : null; } catch (e) { dados = raw; }
+    apiCall('/api/dados/' + CS_CLOUD_KEYS[k], { method: 'PUT', body: JSON.stringify({ dados: dados }) })
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+      .then(function (j) { csCloudSetStamp(CS_CLOUD_KEYS[k], j.atualizado_em); csSetCloudStatus('ok', '● Sincronizado'); })
+      .catch(function () { csSetCloudStatus('off', '● Offline — salvo só neste navegador'); });
+  }, 1500);
+}
+async function csCloudPull() {
+  if (typeof csBackendOn !== 'function' || !csBackendOn()) { csSetCloudStatus('local', '● Modo local (sem login na API)'); return; }
+  try {
+    var r = await apiCall('/api/dados');
+    if (!r.ok) throw r.status;
+    var docs = (await r.json()).documentos || [], stamps = csCloudStamps();
+    var porChave = {}; Object.keys(CS_CLOUD_KEYS).forEach(function (k) { porChave[CS_CLOUD_KEYS[k]] = k; });
+    for (var i = 0; i < docs.length; i++) {
+      var d = docs[i], lk = porChave[d.chave];
+      if (!lk || (stamps[d.chave] && new Date(stamps[d.chave]) >= new Date(d.atualizado_em))) continue;
+      var g = await apiCall('/api/dados/' + d.chave);
+      if (!g.ok) continue;
+      var doc = await g.json();
+      _csCloudPulling = true;
+      try { localStorage.setItem(lk, typeof doc.dados === 'string' ? doc.dados : JSON.stringify(doc.dados)); } finally { _csCloudPulling = false; }
+      csCloudSetStamp(d.chave, d.atualizado_em);
+    }
+    csSetCloudStatus('ok', '● Sincronizado com a API');
+  } catch (e) {
+    csSetCloudStatus('off', '● API offline — dados só neste navegador');
+  }
+}
 
 // ── B4: sincronização dos registros com o backend (/api/registros/:tipo) ──
 // Só sincroniza com login real (token emitido pela API). Sem conexão, o dado fica no navegador.
