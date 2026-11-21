@@ -1565,6 +1565,53 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .ext-tab:hover { color:var(--text-1); }
 .ext-pane { display:none; }
 .ext-pane.active { display:block; }
+
+/* ═══════════════════════════════════════════
+   I4: GUIA DE COMPONENTES (camada comum a todas as telas)
+   Documentado na tela "Guia visual" (screen-guia).
+═══════════════════════════════════════════ */
+:root { --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:24px; --space-6:32px;
+        --radius-sm:6px; --fs-xs:11px; --fs-sm:12px; --fs-md:14px; --fs-lg:16px; }
+/* Chip "Métrica": explica o que o gráfico mede e de onde vem o dado (D3) */
+.cs-metric { display:flex; gap:8px; align-items:flex-start; margin-top:12px; padding:8px 10px; border-radius:8px;
+  background:var(--bg-raised); border:1px solid var(--border); font-size:var(--fs-sm); color:var(--text-2); line-height:1.45 }
+.cs-metric-tag { flex-shrink:0; font-size:10px; font-weight:800; letter-spacing:.6px; text-transform:uppercase; color:var(--brand);
+  border:1px solid var(--brand-glow); border-radius:5px; padding:1px 6px; background:var(--brand-dim) }
+/* Status com ícone + texto — nunca só cor (R5) */
+.cs-status { display:inline-flex; align-items:center; gap:5px; font-size:var(--fs-sm); font-weight:600; padding:2px 9px;
+  border-radius:999px; border:1px solid currentColor; line-height:1.5; white-space:nowrap }
+.cs-status::before { font-weight:900; font-size:11px; line-height:1 }
+.cs-status.ok     { color:var(--ok);     background:color-mix(in srgb, var(--ok) 12%, transparent) }
+.cs-status.warn   { color:var(--warn);   background:color-mix(in srgb, var(--warn) 12%, transparent) }
+.cs-status.danger { color:var(--danger); background:color-mix(in srgb, var(--danger) 12%, transparent) }
+.cs-status.info   { color:var(--brand);  background:var(--brand-dim) }
+.cs-status.ok::before { content:'\2713' } .cs-status.warn::before { content:'!' }
+.cs-status.danger::before { content:'\2715' } .cs-status.info::before { content:'i' }
+/* Selo de confiabilidade do dado (A4): real = sólido, estimado = pontilhado */
+.cs-src { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:700; letter-spacing:.4px; text-transform:uppercase;
+  padding:1px 7px; border-radius:5px; vertical-align:middle; white-space:nowrap }
+.cs-src.real { color:var(--ok); border:1px solid color-mix(in srgb, var(--ok) 45%, transparent) }
+.cs-src.est  { color:var(--warn); border:1px dashed var(--warn) }
+.cs-est-val  { text-decoration:underline dotted var(--warn); text-underline-offset:3px }
+/* Bloco de seção padrão (L2): título + ações */
+.cs-section-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:22px 0 12px }
+.cs-section-head h2 { font-family:var(--font-display); font-size:15px; font-weight:700; color:var(--text-1); margin:0 }
+.cs-section-head p { margin:2px 0 0; font-size:var(--fs-sm); color:var(--text-3) }
+/* Badges de posição legíveis no tema claro */
+.light .badge-atk { background:rgba(185,28,28,.08); color:#b91c1c }
+.light .badge-def { background:rgba(3,105,161,.08); color:#0369a1 }
+.light .badge-mid { background:rgba(21,128,61,.08); color:#15803d }
+.light .badge-gk  { background:rgba(109,40,217,.08); color:#6d28d9 }
+.light .badge-new { background:rgba(180,83,9,.08); color:#b45309 }
+.light .badge-ds  { background:rgba(109,40,217,.06); color:#6d28d9 }
+/* Guia visual */
+.guia-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px }
+.guia-sw { display:flex; flex-wrap:wrap; gap:8px }
+.guia-sw span { display:flex; flex-direction:column; gap:4px; font-size:11px; color:var(--text-2); width:72px }
+.guia-sw i { display:block; height:34px; border-radius:8px; border:1px solid var(--border-md) }
+.guia-row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:8px 0 }
+.sidebar-guia-link { display:block; margin:0 0 10px; font-size:11px; color:var(--text-3); cursor:pointer; text-decoration:underline; text-underline-offset:3px }
+.sidebar-guia-link:hover { color:var(--brand) }
 </style>
 </head>
 <body>
@@ -1739,6 +1786,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
       </div>
 
       <div class="sidebar-bottom">
+        <a class="sidebar-guia-link" onclick="goTo('guia')">Guia visual do sistema</a>
         <div class="user-chip">
           <div class="user-avatar">RP</div>
           <div>
@@ -2547,6 +2595,38 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
         .tel-workspace:-webkit-full-screen{background:#070b14;padding:12px;height:100vh;box-sizing:border-box}
         .tel-workspace.tel-max{position:fixed;inset:0;z-index:9999;width:100vw;height:100vh;background:#070b14;padding:12px;box-sizing:border-box}
       </style>
+      <!-- ══ I4: GUIA VISUAL (documentação dos componentes) ══ -->
+      <div id="screen-guia" class="screen">
+        <div class="topbar">
+          <div class="topbar-left"><h1>Guia visual</h1><p>Cores, tipografia e componentes padrão do CapixaStat</p></div>
+        </div>
+        <div class="content">
+          <div class="guia-grid">
+            <div class="card"><div class="card-title">Cor de marca (moldura)</div>
+              <div class="guia-sw"><span><i style="background:var(--brand)"></i>--brand</span><span><i style="background:var(--brand-fill)"></i>--brand-fill</span><span><i style="background:var(--accent)"></i>--accent</span></div>
+              <div class="cs-metric"><b class="cs-metric-tag">Regra</b><span>Azul (bandeira do ES) só em menu, botões, abas, foco e links. Rosa só em destaques pontuais.</span></div></div>
+            <div class="card"><div class="card-title">Cores de status</div>
+              <div class="guia-row"><span class="cs-status ok">Disponível</span><span class="cs-status warn">Precaução</span><span class="cs-status danger">Lesionado</span><span class="cs-status info">Informação</span></div>
+              <div class="cs-metric"><b class="cs-metric-tag">Regra</b><span>Verde, âmbar e vermelho só indicam estado. Sempre com ícone e texto, nunca só a cor.</span></div></div>
+            <div class="card"><div class="card-title">Paleta de dados</div>
+              <div class="guia-sw"><span><i style="background:var(--data-1)"></i>data-1</span><span><i style="background:var(--data-2)"></i>data-2</span><span><i style="background:var(--data-3)"></i>data-3</span><span><i style="background:var(--data-4)"></i>data-4</span><span><i style="background:var(--data-5)"></i>data-5</span><span><i style="background:var(--data-6)"></i>data-6</span></div>
+              <div class="guia-sw" style="margin-top:8px"><span style="width:150px"><i style="background:linear-gradient(90deg,var(--seq-0),var(--seq-1))"></i>sequencial (intensidade)</span><span style="width:150px"><i style="background:linear-gradient(90deg,var(--div-neg),var(--div-mid),var(--div-pos))"></i>divergente (vs. média)</span></div></div>
+            <div class="card"><div class="card-title">Tipografia</div>
+              <div style="font-family:var(--font-display);font-size:22px;font-weight:700">Títulos — Space Grotesk</div>
+              <div style="font-size:14px;margin:6px 0">Texto — DM Sans 14px (mínimo 12px em rótulos)</div>
+              <div style="font-family:var(--font-mono);font-size:14px">Números — JetBrains Mono 0,41 · 87%</div></div>
+            <div class="card"><div class="card-title">Botões e badges</div>
+              <div class="guia-row"><button class="btn btn-primary btn-sm">Ação principal</button><button class="btn btn-ghost btn-sm">Ação secundária</button></div>
+              <div class="guia-row"><span class="badge badge-atk">ATA</span><span class="badge badge-mid">MEI</span><span class="badge badge-def">DEF</span><span class="badge badge-gk">GOL</span><span class="badge badge-season">Série A · 2026</span></div></div>
+            <div class="card"><div class="card-title">Confiabilidade do dado</div>
+              <div class="guia-row"><span class="cs-src real">Dado real</span><span class="cs-src est">Estimado</span><span class="cs-est-val">72 (estimado)</span></div>
+              <div class="cs-metric"><b class="cs-metric-tag">Métrica</b><span>Todo gráfico termina com este chip: o que mede, como é calculado e se o dado é real ou estimado.</span></div></div>
+            <div class="card"><div class="card-title">KPI</div>
+              <div class="kpi-label">Partidas registradas</div><div class="kpi-value" style="font-size:28px">39</div><div class="kpi-delta up">&#9650; 3 na última rodada</div></div>
+          </div>
+        </div>
+      </div>
+
       <div id="screen-telestrador" class="screen">
         <div class="topbar">
           <div class="topbar-left"><h1>Quadro Tático</h1><p>Telestração e análise de lances</p></div>
