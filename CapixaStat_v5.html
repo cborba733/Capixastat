@@ -1740,6 +1740,14 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .st-ico.st-yc { width:10px; height:14px; border-radius:2px; background:#facc15 }
 .light .cs-table th { background:#eef2f7 }
 .vf-view { display:inline-flex; border:1px solid var(--border-md); border-radius:9px; overflow:hidden }
+
+/* A3: por 90 */
+.p90-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:10px 24px; margin-bottom:8px }
+.p90-row { display:grid; grid-template-columns:150px 56px 1fr 40px; align-items:center; gap:10px; font-size:13px }
+.p90-l { color:var(--text-2) } .p90-v { font-family:var(--font-mono); text-align:right; color:var(--text-1) }
+.p90-trk { height:8px; background:var(--border-md); border-radius:5px; overflow:hidden; display:block }
+.p90-fil { display:block; height:100%; border-radius:5px } .p90-fil.ok { background:var(--ok) } .p90-fil.warn { background:var(--warn) } .p90-fil.danger { background:var(--danger) }
+.p90-pct { font-family:var(--font-mono); font-size:12px; font-weight:700; color:var(--text-2); text-align:right }
 </style>
 </head>
 <body>
@@ -2328,6 +2336,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
                 <p class="chart-insight" id="insight-pizza"></p>
               </div>
             </div>
+            <!-- A3: números por 90 minutos e percentil contra a mesma posição -->
+            <div class="card" id="p-per90" style="margin-bottom:16px"></div>
             <div class="grid-2-eq">
               <div class="card" id="p-indicators">
                 <div class="card-title">Indicadores de desempenho</div>
@@ -11090,6 +11100,59 @@ function renderVitrineJogadores() {
   if (VF_STATE.scope === 'elenco') html += '<div class="player-card vf-more-card" onclick="goTo(\'cadastro-jogador\')"><div style="font-size:22px">+</div><div>Cadastrar novo atleta</div></div>';
   grid.innerHTML = html;
 }
+
+
+// ── A3: estatística por 90 minutos (corte mínimo de 270 min) e percentil vs. mesma posição ──
+var MIN_MINUTOS_90 = 270;
+function per90(a) {
+  if (!a || !(a.minutos >= MIN_MINUTOS_90)) return { gols: null, ast: null, ga: null, cart: null };
+  var k = 90 / a.minutos;
+  return { gols: a.gols * k, ast: a.assists * k, ga: (a.gols + a.assists) * k, cart: ((a.amarelos || 0) + (a.vermelhos || 0)) * k };
+}
+var _per90Cache = {};
+function per90Peers(group) {
+  if (_per90Cache[group]) return _per90Cache[group];
+  var arr = Object.values(PLAYERS).filter(function (x) { return _posGroup(x) === group; })
+    .map(function (x) { var a = playerAgg(x); return { id: x.id, a: a, v: per90(a) }; })
+    .filter(function (x) { return x.v.gols !== null; });
+  _per90Cache[group] = arr;
+  return arr;
+}
+function renderPer90Card(p) {
+  var el = document.getElementById('p-per90');
+  if (!el || !p) return;
+  var a = playerAgg(p), v = per90(a);
+  var peers = per90Peers(_posGroup(p));
+  var head = '<div class="card-title">Por 90 minutos <span>vs. ' + peers.length + ' jogadores da mesma posição com ' + MIN_MINUTOS_90 + '+ min</span></div>';
+  if (v.gols === null) {
+    el.innerHTML = head + '<div class="cs-est-banner" style="margin:0"><span class="cs-src est">Amostra pequena</span><span>' + p.nome + ' tem ' + (a.minutos || 0) + ' minutos registrados. Números por 90 só aparecem a partir de ' + MIN_MINUTOS_90 + ' min, para não distorcer a comparação.</span></div>';
+    return;
+  }
+  var linhas = [
+    { k: 'gols', l: 'Gols por 90', inv: false }, { k: 'ast', l: 'Assistências por 90', inv: false },
+    { k: 'ga', l: 'Gols + assist. por 90', inv: false }, { k: 'cart', l: 'Cartões por 90', inv: true }
+  ];
+  var rows = linhas.map(function (L) {
+    var vals = peers.map(function (x) { return x.v[L.k]; });
+    var pct = _percentile(vals, v[L.k]);
+    if (L.inv) pct = 100 - pct;
+    var cls = pct >= 67 ? 'ok' : pct >= 34 ? 'warn' : 'danger';
+    return '<div class="p90-row"><span class="p90-l">' + L.l + '</span><b class="p90-v">' + v[L.k].toFixed(2) + '</b>' +
+      '<span class="p90-trk" role="img" aria-label="Percentil ' + pct + '"><span class="p90-fil ' + cls + '" style="width:' + pct + '%"></span></span>' +
+      '<span class="p90-pct">P' + pct + '</span></div>';
+  }).join('');
+  el.innerHTML = head + '<div class="p90-grid">' + rows + '</div>' +
+    '<div class="dash-sub" style="text-align:left">' + a.minutos + ' minutos em ' + a.jogos + ' jogos · ' + (a.minutos / Math.max(1, a.jogos)).toFixed(0) + ' min por jogo</div>' +
+    '<div class="cs-metric"><b class="cs-metric-tag">Métrica</b><span>Valor ÷ minutos × 90, só para quem tem ' + MIN_MINUTOS_90 + '+ minutos. P = percentil: P80 significa melhor que 80% dos jogadores da mesma posição (em cartões, menos é melhor). <span class="cs-src real">Dado real</span></span></div>';
+}
+(function () {
+  var _orig = showPlayer;
+  showPlayer = function (id) {
+    var r = _orig.apply(this, arguments);
+    try { renderPer90Card(PLAYERS[id]); } catch (e) { console.warn('A3', e); }
+    return r;
+  };
+})();
 
 function goTo(screenId, navEl) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
