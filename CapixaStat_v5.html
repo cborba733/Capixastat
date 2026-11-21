@@ -1662,6 +1662,24 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .tl2-legend { display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-top:10px; font-size:11px; color:var(--text-3) }
 .tl2-legend > span { display:inline-flex; align-items:center; gap:4px }
 .tl2-empty { color:var(--text-3); font-size:12.5px; text-align:center; padding:20px }
+
+/* F1/F2: registro diário */
+.rg-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px }
+@media (max-width: 980px) { .rg-grid { grid-template-columns:1fr } }
+.rg-form { display:grid; grid-template-columns:1fr 1fr; gap:10px 12px; margin-bottom:10px }
+.rg-form label { display:flex; flex-direction:column; gap:5px; font-size:12px; font-weight:600; color:var(--text-2) }
+.rg-form .rg-wide { grid-column:1 / -1 }
+.rg-form input[type=range] { width:100%; accent-color:var(--brand) }
+.rg-check { flex-direction:row !important; align-items:center; gap:8px !important; font-weight:500 !important }
+.rg-sl small { font-weight:400; color:var(--text-3); font-size:11px }
+.rg-result { font-size:14px; color:var(--text-2); margin:4px 0 10px; display:flex; align-items:center; gap:8px; flex-wrap:wrap }
+.rg-result b { font-family:var(--font-mono); font-size:20px; color:var(--text-1) }
+.rg-elenco { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:6px }
+.rg-pl { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:6px 8px; border-radius:8px; background:var(--bg-raised); font-size:13px }
+#cs-toast { position:fixed; left:50%; bottom:24px; transform:translate(-50%, 20px); opacity:0; pointer-events:none; z-index:9999;
+  background:var(--bg-overlay); color:var(--text-1); border:1px solid var(--border-md); border-radius:10px; padding:10px 16px; font-size:13px; font-weight:600;
+  box-shadow:0 8px 30px rgba(0,0,0,.35); transition:all .25s ease }
+#cs-toast.show { opacity:1; transform:translate(-50%, 0) }
 </style>
 </head>
 <body>
@@ -2499,12 +2517,14 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
             <button class="form-tab active" onclick="switchFormTab('microciclo',this)">📅 Microciclo</button>
             <button class="form-tab" onclick="switchFormTab('sessoes',this)">📋 Sessões</button>
             <button class="form-tab" onclick="switchFormTab('carga',this)">📊 Carga &amp; Intensidade</button>
+            <button class="form-tab" onclick="switchFormTab('registro',this)">📝 Registro diário</button>
             <button class="form-tab" onclick="switchFormTab('fisico',this)">🏃 Evolução Física</button>
             <button class="form-tab" onclick="switchFormTab('antropometria',this)">🫀 Antropometria</button>
           </div>
           <div class="form-tab-panel active" id="ftab-microciclo"></div>
           <div class="form-tab-panel" id="ftab-sessoes"></div>
           <div class="form-tab-panel" id="ftab-carga"></div>
+          <div class="form-tab-panel" id="ftab-registro"></div>
           <div class="form-tab-panel" id="ftab-fisico"></div>
           <div class="form-tab-panel" id="ftab-antropometria"></div>
         </div>
@@ -3049,6 +3069,166 @@ function applyMetricChips() {
     chip.innerHTML = metricChipHtml(METRIC_NOTES[id]);
     box.appendChild(chip);
   });
+}
+
+
+// ══════════════════════════════════════════════════════════════════
+// CSStore — armazenamento dos registros da v5 (localStorage). O backend (B4/B1)
+// recebe uma cópia quando há login real (csSyncPush/csSyncDelete, se existirem).
+// ══════════════════════════════════════════════════════════════════
+var CSStore = {
+  key: function (col) { return 'capixastat_v5_' + col; },
+  all: function (col) { try { return JSON.parse(localStorage.getItem(this.key(col)) || '[]'); } catch (e) { return []; } },
+  save: function (col, arr) { try { localStorage.setItem(this.key(col), JSON.stringify(arr)); } catch (e) {} },
+  add: function (col, rec) {
+    var a = this.all(col);
+    rec.id = rec.id || (Date.now().toString(36) + Math.random().toString(36).slice(2, 6));
+    rec.criadoEm = rec.criadoEm || new Date().toISOString();
+    a.push(rec); this.save(col, a);
+    if (typeof csSyncPush === 'function') { try { csSyncPush(col, rec); } catch (e) {} }
+    return rec;
+  },
+  remove: function (col, id) {
+    this.save(col, this.all(col).filter(function (r) { return r.id !== id; }));
+    if (typeof csSyncDelete === 'function') { try { csSyncDelete(col, id); } catch (e) {} }
+  }
+};
+function csToday() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function csDaysAgo(isoDate) { var d = new Date(isoDate + 'T12:00:00'); var t = new Date(); t.setHours(12, 0, 0, 0); return Math.round((t - d) / 86400000); }
+function csFmtDate(isoDate) { var p = isoDate.split('-'); return p[2] + '/' + p[1]; }
+function csClubPlayers() {
+  var u = getCurrentUser(); var c = u ? resolveClube(u.clube) : null;
+  return Object.values(PLAYERS).filter(function (p) { return !c || p.clube === c; }).sort(function (a, b) { return a.nome.localeCompare(b.nome); });
+}
+
+// ── F1: carga interna por sRPE (Foster): carga (UA) = RPE (0–10) × minutos ──
+var RPE_LABELS = ['Repouso', 'Muito, muito fácil', 'Fácil', 'Moderado', 'Um pouco difícil', 'Difícil', 'Difícil +', 'Muito difícil', 'Muito difícil +', 'Quase máximo', 'Máximo'];
+function srpeEntries(atletaId) { return CSStore.all('srpe').filter(function (r) { return !atletaId || r.atletaId === atletaId; }); }
+function realWeeklyLoads(atletaId) {
+  // 4 janelas de 7 dias terminando hoje: [semana -3, -2, -1, atual]
+  var wk = [0, 0, 0, 0];
+  srpeEntries(atletaId).forEach(function (r) {
+    var d = csDaysAgo(r.data); if (d < 0 || d > 27) return;
+    wk[3 - Math.floor(d / 7)] += r.carga;
+  });
+  return wk;
+}
+function hasRealLoadData() {
+  var ids = {}; csClubPlayers().forEach(function (p) { ids[p.id] = 1; });
+  return srpeEntries().some(function (r) { return ids[r.atletaId] && csDaysAgo(r.data) <= 27; });
+}
+
+// ── F2: bem-estar (índice de Hooper): sono, fadiga, estresse, dor muscular (1 = muito bom … 7 = muito ruim) ──
+function wellnessEntries(atletaId) { return CSStore.all('bemestar').filter(function (r) { return !atletaId || r.atletaId === atletaId; }); }
+function hooperClass(h) { return h >= 20 ? 'danger' : (h >= 14 ? 'warn' : 'ok'); }
+function wellnessStatusFor(atletaId) {
+  var ult = wellnessEntries(atletaId).filter(function (r) { return csDaysAgo(r.data) <= 2; })
+    .sort(function (a, b) { return a.data < b.data ? 1 : -1; })[0];
+  if (!ult) return null;
+  var st = ult.lesao ? 'lesion' : (ult.hooper >= 20 ? 'restricao' : 'ok');
+  return { status: st, est: false, fonte: 'bem-estar ' + csFmtDate(ult.data), hooper: ult.hooper };
+}
+
+function renderRegistroDiario() {
+  var panel = document.getElementById('ftab-registro');
+  if (!panel) return;
+  var players = csClubPlayers();
+  var opts = players.map(function (p) { return '<option value="' + p.id + '">' + p.nome + ' · ' + p.pos + '</option>'; }).join('');
+  var hoje = csToday();
+  function slider(id, label, help) {
+    return '<label class="rg-sl"><span>' + label + ' <b id="' + id + '-v">3</b></span>' +
+      '<input type="range" id="' + id + '" min="1" max="7" value="3" oninput="rgUpdateWell()" aria-label="' + label + ' (1 = muito bom, 7 = muito ruim)">' +
+      '<small>' + help + '</small></label>';
+  }
+  panel.innerHTML =
+    '<div class="rg-grid">' +
+      '<div class="card"><div class="card-title">Carga da sessão — sRPE <span>depois do treino/jogo</span></div>' +
+        '<div class="rg-form">' +
+          '<label>Atleta<select id="rg-s-atleta" class="form-select">' + opts + '</select></label>' +
+          '<label>Data<input type="date" id="rg-s-data" class="form-input" value="' + hoje + '" max="' + hoje + '"></label>' +
+          '<label>Tipo<select id="rg-s-tipo" class="form-select"><option>Treino</option><option>Jogo</option><option>Recuperação</option></select></label>' +
+          '<label>Duração (min)<input type="number" id="rg-s-min" class="form-input" min="1" max="200" value="90" oninput="rgUpdateSrpe()"></label>' +
+          '<label class="rg-wide">Esforço percebido (RPE 0–10): <b id="rg-s-rpe-v">5 · Difícil</b>' +
+            '<input type="range" id="rg-s-rpe" min="0" max="10" value="5" oninput="rgUpdateSrpe()" aria-label="Esforço percebido de 0 a 10"></label>' +
+        '</div>' +
+        '<div class="rg-result">Carga da sessão: <b id="rg-s-carga">450</b> UA <small>(RPE × minutos)</small></div>' +
+        '<button class="btn btn-primary btn-sm" onclick="rgSaveSrpe()">Registrar carga</button>' +
+        '<div class="cs-metric"><b class="cs-metric-tag">Métrica</b><span>sRPE (Foster, 2001): o atleta dá uma nota de 0 a 10 para a sessão inteira ~30 min após o fim; multiplicada pelos minutos vira a carga interna em unidades arbitrárias (UA). Alimenta o ACWR da aba Carga.</span></div>' +
+      '</div>' +
+      '<div class="card"><div class="card-title">Bem-estar — índice de Hooper <span>antes do treino</span></div>' +
+        '<div class="rg-form">' +
+          '<label>Atleta<select id="rg-w-atleta" class="form-select">' + opts + '</select></label>' +
+          '<label>Data<input type="date" id="rg-w-data" class="form-input" value="' + hoje + '" max="' + hoje + '"></label>' +
+          slider('rg-w-sono', 'Qualidade do sono', '1 = dormiu muito bem · 7 = muito mal') +
+          slider('rg-w-fadiga', 'Fadiga', '1 = descansado · 7 = exausto') +
+          slider('rg-w-estresse', 'Estresse', '1 = tranquilo · 7 = muito estressado') +
+          slider('rg-w-dor', 'Dor muscular', '1 = sem dor · 7 = muita dor') +
+          '<label class="rg-wide rg-check"><input type="checkbox" id="rg-w-lesao" onchange="rgUpdateWell()"> Dor ou lesão que impede treinar normalmente</label>' +
+        '</div>' +
+        '<div class="rg-result">Índice: <b id="rg-w-hooper">12</b> / 28 <span id="rg-w-status"></span></div>' +
+        '<button class="btn btn-primary btn-sm" onclick="rgSaveWell()">Registrar bem-estar</button>' +
+        '<div class="cs-metric"><b class="cs-metric-tag">Métrica</b><span>Índice de Hooper = soma das 4 notas (4 a 28; maior = pior). Até 13: liberado · 14–19: atenção · 20+: treino restrito. Marcar lesão coloca o atleta como lesionado. Substitui o status estimado em Alertas e Carga.</span></div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="card" style="margin-top:14px"><div class="card-title">Situação do elenco hoje <span>último bem-estar (até 2 dias)</span></div><div id="rg-elenco" class="rg-elenco"></div></div>' +
+    '<div class="card" style="margin-top:14px"><div class="card-title">Registros recentes</div><div id="rg-lista"></div></div>';
+  rgUpdateSrpe(); rgUpdateWell(); rgRenderLists();
+}
+function rgUpdateSrpe() {
+  var r = +document.getElementById('rg-s-rpe').value, m = +document.getElementById('rg-s-min').value || 0;
+  document.getElementById('rg-s-rpe-v').textContent = r + ' · ' + RPE_LABELS[r];
+  document.getElementById('rg-s-carga').textContent = r * m;
+}
+function rgHooperNow() {
+  return ['sono', 'fadiga', 'estresse', 'dor'].reduce(function (s, k) {
+    var v = +document.getElementById('rg-w-' + k).value; document.getElementById('rg-w-' + k + '-v').textContent = v; return s + v;
+  }, 0);
+}
+function rgUpdateWell() {
+  var h = rgHooperNow(), les = document.getElementById('rg-w-lesao').checked;
+  document.getElementById('rg-w-hooper').textContent = h;
+  var c = les ? 'danger' : hooperClass(h);
+  document.getElementById('rg-w-status').innerHTML = '<span class="cs-status ' + c + '">' + (les ? 'Lesionado' : c === 'ok' ? 'Liberado' : c === 'warn' ? 'Atenção' : 'Treino restrito') + '</span>';
+}
+function rgSaveSrpe() {
+  var r = +document.getElementById('rg-s-rpe').value, m = +document.getElementById('rg-s-min').value;
+  var data = document.getElementById('rg-s-data').value;
+  if (!m || m < 1 || m > 200 || !data) { alert('Informe a data e a duração (1 a 200 minutos).'); return; }
+  CSStore.add('srpe', { atletaId: document.getElementById('rg-s-atleta').value, data: data, tipo: document.getElementById('rg-s-tipo').value, minutos: m, rpe: r, carga: r * m });
+  rgRenderLists(); csToast('Carga registrada');
+}
+function rgSaveWell() {
+  var data = document.getElementById('rg-w-data').value;
+  if (!data) { alert('Informe a data.'); return; }
+  var rec = { atletaId: document.getElementById('rg-w-atleta').value, data: data, lesao: document.getElementById('rg-w-lesao').checked };
+  ['sono', 'fadiga', 'estresse', 'dor'].forEach(function (k) { rec[k] = +document.getElementById('rg-w-' + k).value; });
+  rec.hooper = rec.sono + rec.fadiga + rec.estresse + rec.dor;
+  CSStore.add('bemestar', rec);
+  rgRenderLists(); csToast('Bem-estar registrado');
+}
+function rgDelete(col, id) { if (confirm('Excluir este registro?')) { CSStore.remove(col, id); rgRenderLists(); } }
+function rgRenderLists() {
+  var elenco = document.getElementById('rg-elenco'), lista = document.getElementById('rg-lista');
+  if (!elenco || !lista) return;
+  elenco.innerHTML = csClubPlayers().map(function (p) {
+    var w = wellnessStatusFor(p.id);
+    var chip = !w ? '<span class="cs-status info" style="opacity:.7">sem registro</span>'
+      : '<span class="cs-status ' + (w.status === 'lesion' ? 'danger' : w.status === 'restricao' ? 'danger' : hooperClass(w.hooper)) + '">' + (w.status === 'lesion' ? 'Lesionado' : 'Hooper ' + w.hooper) + '</span>';
+    return '<div class="rg-pl"><span>' + p.nome + '</span>' + chip + '</div>';
+  }).join('');
+  var nome = function (id) { return (PLAYERS[id] && PLAYERS[id].nome) || id; };
+  var recs = srpeEntries().map(function (r) { return { col: 'srpe', r: r, txt: 'sRPE ' + r.rpe + ' × ' + r.minutos + ' min = <b>' + r.carga + ' UA</b> (' + r.tipo + ')' }; })
+    .concat(wellnessEntries().map(function (r) { return { col: 'bemestar', r: r, txt: 'Bem-estar: Hooper <b>' + r.hooper + '</b>' + (r.lesao ? ' · <b style="color:var(--danger)">lesão</b>' : '') }; }))
+    .sort(function (a, b) { return a.r.criadoEm < b.r.criadoEm ? 1 : -1; }).slice(0, 15);
+  lista.innerHTML = recs.length ? '<table class="data-table"><thead><tr><th>Data</th><th>Atleta</th><th>Registro</th><th></th></tr></thead><tbody>' +
+    recs.map(function (x) { return '<tr><td>' + csFmtDate(x.r.data) + '</td><td>' + nome(x.r.atletaId) + '</td><td>' + x.txt + '</td><td><button class="btn btn-ghost btn-sm" onclick="rgDelete(\'' + x.col + '\',\'' + x.r.id + '\')" aria-label="Excluir registro">Excluir</button></td></tr>'; }).join('') +
+    '</tbody></table>' : '<div class="tl2-empty">Nenhum registro ainda. Use os formulários acima após cada sessão.</div>';
+}
+function csToast(msg) {
+  var t = document.getElementById('cs-toast');
+  if (!t) { t = document.createElement('div'); t.id = 'cs-toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
+  t.textContent = msg; t.className = 'show';
+  clearTimeout(t._h); t._h = setTimeout(function () { t.className = ''; }, 2200);
 }
 
 // ── Condição física do atleta (fonte única usada por Formação, Alertas e Elenco) ──
@@ -10817,6 +10997,7 @@ function switchFormTab(name, btn) {
   else if (name === 'carga')        renderCarga();
   else if (name === 'fisico')       renderFisico();
   else if (name === 'antropometria') renderAntropometria();
+  else if (name === 'registro')     renderRegistroDiario();
   setTimeout(function () { try { applyMetricChips(); applyFormEstBanner(name); } catch (e) {} }, 300);
 }
 
@@ -11026,7 +11207,11 @@ function _weeklyLoads(p) {
   return wk; // [4 semanas; índice 3 = semana atual]
 }
 function computeACWR(p) {
-  const wk = _weeklyLoads(p);
+  // F1: se houver sRPE real com histórico (semanas anteriores > 0), usa dado real; senão, o modelo da v4 (estimado)
+  const realWk = (typeof realWeeklyLoads === 'function') ? realWeeklyLoads(p.id) : [0,0,0,0];
+  const realChronic = (realWk[0] + realWk[1] + realWk[2]) / 3;
+  const isReal = realChronic > 0 && realWk[3] > 0;
+  const wk = isReal ? realWk : _weeklyLoads(p);
   const acute = wk[3];                                  // carga aguda (semana atual)
   const chronic = (wk[0] + wk[1] + wk[2]) / 3;          // carga crônica (3 semanas anteriores)
   const ratio = chronic > 0 ? acute / chronic : 0;
@@ -11035,7 +11220,7 @@ function computeACWR(p) {
   else if (ratio <= 1.3) { zone = 'Ideal'; cls = 'acwr-ok'; }
   else if (ratio <= 1.5) { zone = 'Alerta'; cls = 'acwr-warn'; }
   else { zone = 'Risco'; cls = 'acwr-high'; }
-  return { acute, chronic: Math.round(chronic), ratio: +ratio.toFixed(2), zone, cls, wk };
+  return { acute, chronic: Math.round(chronic), ratio: +ratio.toFixed(2), zone, cls, wk, est: !isReal };
 }
 
 function renderCarga() {

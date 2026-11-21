@@ -138,7 +138,7 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
   HTML/git) — se precisar de cadastro, pedir ao Caio. Mínimo aceitável: 1 fonte + 1 competição.
 
 ### Status dos itens (✅ feito · ⏳ em andamento · ⬜ pendente)
-**Alta:** ✅ R1 · ✅ I1 · ✅ L1 · ✅ I4 · ✅ D1 · ✅ D2 · ✅ D3 · ✅ A4 · ✅ P1 · ⬜ F1 · ⬜ F2 · ⬜ T1 · ⬜ B4 ·
+**Alta:** ✅ R1 · ✅ I1 · ✅ L1 · ✅ I4 · ✅ D1 · ✅ D2 · ✅ D3 · ✅ A4 · ✅ P1 · ✅ F1 · ✅ F2 · ⬜ T1 · ⬜ B4 ·
 ⬜ A1 · ⬜ A2 · ⬜ A3 · ⬜ B1 · ⬜ B2 · ⬜ B3 · ⬜ L2 · ⬜ R2 · ⬜ R3 · ⬜ V1 · ⬜ X1 · ⬜ P2
 **Dados externos:** ⬜ pesquisa de fontes · ⬜ integração (rotina + banco + fonte/data na tela)
 **Média:** ⬜ A5 · ⬜ A7 · ⬜ A8 · ⬜ P4 · ⬜ P5 · ⬜ F3 · ⬜ F4 · ⬜ T2 · ⬜ T3 · ⬜ X2 · ⬜ Q2 · ⬜ B6 · ⬜ V5 ·
@@ -189,6 +189,14 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
   separador "Intervalo"/"Fim", placar parcial nos gols, cartão desenhado + texto, substituição ▲/▼, faixa de
   cor (`--data-1` mandante / `--data-2` visitante) + sigla do time, legenda e selo "Dado real". Classes `.tl2-*`.
   **Removido** o gerador de gols/cartões fictícios da tela antiga de partida (v4 inventava eventos).
+
+- **F1/F2 (um commit só — mesma tela):** Formação › aba **Registro diário** (`renderRegistroDiario`).
+  F1 sRPE (RPE 0–10 × minutos = UA) → `realWeeklyLoads(id)`; `computeACWR` usa o real quando há carga na
+  semana atual e nas 3 anteriores (`est:false`), senão o modelo da v4 (`est:true`). F2 bem-estar Hooper
+  (sono, fadiga, estresse, dor 1–7; soma 4–28; ≥14 atenção, ≥20 restrito; checkbox lesão) →
+  `wellnessStatusFor(id)` (últimos 2 dias) alimenta `playerCondition`. Armazenamento **`CSStore`**
+  (localStorage `capixastat_v5_<coleção>`; coleções `srpe`, `bemestar`) com ganchos `csSyncPush/csSyncDelete`
+  para o backend (B4). Aviso flutuante: `csToast(msg)`.
 
 ## Trabalhos futuros
 _(preencher na revisão de segunda-feira com o que não der tempo)_
