@@ -139,7 +139,7 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 
 ### Status dos itens (✅ feito · ⏳ em andamento · ⬜ pendente)
 **Alta:** ✅ R1 · ✅ I1 · ✅ L1 · ✅ I4 · ✅ D1 · ✅ D2 · ✅ D3 · ✅ A4 · ✅ P1 · ✅ F1 · ✅ F2 · ✅ T1 · ✅ B4 ·
-✅ A1 · ✅ A2 · ✅ A3 · ✅ B1 · ✅ B2 · ✅ B3 · ✅ L2 · ✅ R2 · ✅ R3 · ✅ V1 · ✅ X1 · ⬜ P2
+✅ A1 · ✅ A2 · ✅ A3 · ✅ B1 · ✅ B2 · ✅ B3 · ✅ L2 · ✅ R2 · ✅ R3 · ✅ V1 · ✅ X1 · ✅ P2
 **Dados externos:** ⬜ pesquisa de fontes · ⬜ integração (rotina + banco + fonte/data na tela)
 **Média:** ⬜ A5 · ⬜ A7 · ⬜ A8 · ⬜ P4 · ⬜ P5 · ⬜ F3 · ⬜ F4 · ⬜ T2 · ⬜ T3 · ⬜ X2 · ⬜ Q2 · ⬜ B6 · ⬜ V5 ·
 ⬜ I2 · ⬜ I3 · ⬜ M2 · ⬜ M4 · ⬜ R5 · ⬜ D4 · ⬜ A6 · ⬜ A9 · ⬜ P3 · ⬜ F5 · ⬜ T4 · ⬜ X3 · ⬜ Q1 · ⬜ B5 ·
@@ -266,6 +266,12 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
   `PONTOS_CAMPO` FIFA 105×68, calibração interativa com 4 cliques no OpenCV → `calib.json`) +
   `example_tracking.py --calib` grava `posicoes.csv` em metros. 7 testes (`python -m unittest test_homografia.py`).
   Testado num venv local com numpy 2.5 / OpenCV 5.1 (a máquina não tem numpy instalado globalmente).
+
+- **P2:** nova tela **Scout ao Vivo** (`screen-scout`, menu Clube): escolhe partida (jogos do clube ou "jogo-treino"),
+  atleta, tipo (`SC_TIPOS`: finalização, passe-chave, drible, desarme, interceptação, falta, cartão) e resultado,
+  e **clica no campo** (x,y 0–100). Relógio 1º/2º tempo ou minuto manual, Ctrl+Z desfaz, lista + resumo por
+  atleta (`csTable`), Exportar CSV. Salva em `CSStore('eventos')` → sincroniza com `/api/eventos` (B3).
+  Só `eventos:write` marca. Chave da partida: `compId|mandante|visitante|data`.
 
 ## Trabalhos futuros
 _(preencher na revisão de segunda-feira com o que não der tempo)_
