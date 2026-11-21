@@ -518,6 +518,12 @@ item, testar sem erro no console, atualizar este arquivo).
   no card e na janela; "Abrir" leva à aba Lance animado). **Análise de Vídeo** com selo "Exp." no menu e aviso
   "Experimental" (testado só com dados sintéticos). Sugestões do assistente (L4) com os nomes novos.
 
+- **R2-2 GitHub:** remoto `origin` = https://github.com/cborba733/Capixastat (branch `main`). O GitHub tinha 34 commits
+  do projeto original e o git local começou de uma cópia baixada; o conteúdo do GitHub já estava todo no local, então
+  os históricos foram unidos com `git merge -s ours --allow-unrelated-histories` (mantém os arquivos locais e preserva
+  o histórico do GitHub) e enviados **sem force push**. Inclui `backup/`; `.env` não existe nem é rastreado (`.gitignore`).
+  Existe um PR #1 antigo aberto no GitHub (não mexido). Daqui em diante: `git push` normal ao fim de cada bloco.
+
 ## Trabalhos futuros
 O que ficou de fora ou só parcialmente feito, em ordem de valor:
 - **Visão computacional em vídeo real:** V1/V2/V3 foram testados com dados sintéticos e um YOLO falso (sem GPU nem
