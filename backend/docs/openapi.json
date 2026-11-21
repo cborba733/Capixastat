@@ -1,0 +1,67 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "CapixaStat API",
+    "version": "5.0.0",
+    "description": "API do CapixaStat (Projeto Integrador 3 — FAESA). Autenticação por JWT: envie `Authorization: Bearer <token>` recebido em /api/auth/login. Escrita controlada por perfil (técnico, analista, preparador, médico, scout, diretor, atleta, estudante)."
+  },
+  "servers": [{ "url": "http://localhost:3001" }, { "url": "https://capixastat.onrender.com" }],
+  "components": {
+    "securitySchemes": { "bearer": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" } },
+    "schemas": {
+      "Erro": { "type": "object", "properties": { "error": { "type": "string" } } },
+      "Srpe": { "type": "object", "required": ["id", "atletaId", "data", "minutos", "rpe"], "properties": {
+        "id": { "type": "string" }, "atletaId": { "type": "string" }, "clube": { "type": "string" }, "data": { "type": "string", "format": "date" },
+        "tipo": { "type": "string" }, "minutos": { "type": "integer", "minimum": 1, "maximum": 300 }, "rpe": { "type": "integer", "minimum": 0, "maximum": 10 } } },
+      "BemEstar": { "type": "object", "required": ["id", "atletaId", "data", "sono", "fadiga", "estresse", "dor"], "properties": {
+        "id": { "type": "string" }, "atletaId": { "type": "string" }, "data": { "type": "string", "format": "date" },
+        "sono": { "type": "integer", "minimum": 1, "maximum": 7 }, "fadiga": { "type": "integer", "minimum": 1, "maximum": 7 },
+        "estresse": { "type": "integer", "minimum": 1, "maximum": 7 }, "dor": { "type": "integer", "minimum": 1, "maximum": 7 }, "lesao": { "type": "boolean" } } },
+      "Evento": { "type": "object", "required": ["id", "partida", "tipo", "minuto", "x", "y"], "properties": {
+        "id": { "type": "string" }, "partida": { "type": "string", "description": "competicao|mandante|visitante|data" }, "clube": { "type": "string" },
+        "atletaId": { "type": "string" }, "tipo": { "type": "string", "enum": ["finalizacao", "passe_chave", "desarme", "interceptacao", "drible", "falta", "cartao"] },
+        "resultado": { "type": "string", "enum": ["gol", "no_alvo", "fora", "bloqueado", "certo", "errado", "amarelo", "vermelho"] },
+        "minuto": { "type": "integer", "minimum": 0, "maximum": 130 }, "x": { "type": "number", "minimum": 0, "maximum": 100 }, "y": { "type": "number", "minimum": 0, "maximum": 100 } } }
+    }
+  },
+  "paths": {
+    "/api/ping": { "get": { "summary": "Servidor online", "responses": { "200": { "description": "ok" } } } },
+    "/api/health": { "get": { "summary": "Saúde do serviço e do banco", "responses": { "200": { "description": "ok" }, "503": { "description": "banco indisponível" } } } },
+    "/api/auth/register": { "post": { "summary": "Cadastro de usuário", "description": "funcao ∈ Técnico, Analista de Desempenho, Preparador Físico, Médico / Fisioterapeuta, Scout, Diretor, Atleta, Estudante. Atleta exige atleta_id.",
+      "requestBody": { "content": { "application/json": { "schema": { "type": "object", "required": ["nome", "email", "senha", "clube", "funcao"], "properties": {
+        "nome": { "type": "string" }, "email": { "type": "string" }, "senha": { "type": "string", "minLength": 6 }, "clube": { "type": "string" }, "funcao": { "type": "string" }, "atleta_id": { "type": "string" } } } } } },
+      "responses": { "201": { "description": "criado" }, "400": { "description": "dados inválidos" }, "409": { "description": "e-mail já cadastrado" } } } },
+    "/api/auth/login": { "post": { "summary": "Login (devolve token JWT, papel e atleta_id)", "responses": { "200": { "description": "ok" }, "401": { "description": "credenciais inválidas" } } } },
+    "/api/auth/me": { "get": { "summary": "Usuário logado", "security": [{ "bearer": [] }], "responses": { "200": { "description": "ok" } } } },
+    "/api/players": {
+      "get": { "summary": "Lista atletas (?clube=)", "responses": { "200": { "description": "ok" } } },
+      "post": { "summary": "Cadastra atleta (técnico, analista, scout, diretor)", "security": [{ "bearer": [] }], "responses": { "201": { "description": "criado" }, "400": { "description": "inválido" }, "403": { "description": "sem permissão" } } } },
+    "/api/players/{id}": { "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }],
+      "get": { "summary": "Um atleta", "responses": { "200": { "description": "ok" }, "404": { "description": "não encontrado" } } },
+      "put": { "summary": "Atualiza atleta", "security": [{ "bearer": [] }], "responses": { "200": { "description": "ok" } } },
+      "delete": { "summary": "Remove atleta", "security": [{ "bearer": [] }], "responses": { "200": { "description": "ok" } } } },
+    "/api/matches": { "get": { "summary": "Lista partidas", "responses": { "200": { "description": "ok" } } },
+      "post": { "summary": "Registra partida (técnico, analista)", "security": [{ "bearer": [] }], "responses": { "201": { "description": "criada" } } } },
+    "/api/registros/srpe": {
+      "get": { "summary": "Cargas sRPE (?clube=)", "security": [{ "bearer": [] }], "responses": { "200": { "description": "ok" } } },
+      "post": { "summary": "Registra carga sRPE (carga = rpe × minutos)", "security": [{ "bearer": [] }],
+        "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Srpe" } } } },
+        "responses": { "201": { "description": "criado" }, "400": { "description": "inválido", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Erro" } } } }, "403": { "description": "sem permissão" } } } },
+    "/api/registros/bemestar": {
+      "get": { "summary": "Questionários de bem-estar (?clube=)", "security": [{ "bearer": [] }], "responses": { "200": { "description": "ok" } } },
+      "post": { "summary": "Registra bem-estar (índice de Hooper = soma das 4 notas)", "security": [{ "bearer": [] }],
+        "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BemEstar" } } } },
+        "responses": { "201": { "description": "criado" }, "400": { "description": "inválido" }, "403": { "description": "sem permissão / atleta registrando outro atleta" } } } },
+    "/api/eventos": {
+      "get": { "summary": "Eventos de jogo (?partida= ou ?clube=)", "security": [{ "bearer": [] }], "responses": { "200": { "description": "ok" } } },
+      "post": { "summary": "Marca evento no campo (técnico, analista, scout)", "security": [{ "bearer": [] }],
+        "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Evento" } } } }, "responses": { "201": { "description": "criado" } } } },
+    "/api/dados/{chave}": { "parameters": [{ "name": "chave", "in": "path", "required": true, "schema": { "type": "string", "enum": ["taticas", "taticas_presets", "telestracao", "fotos", "filtros", "lances", "observacao", "anotacoes", "relatorios", "microciclos"] } }],
+      "get": { "summary": "Documento do usuário", "security": [{ "bearer": [] }], "responses": { "200": { "description": "ok" } } },
+      "put": { "summary": "Salva documento { dados }", "security": [{ "bearer": [] }], "responses": { "200": { "description": "atualizado" }, "201": { "description": "criado" } } } },
+    "/api/fontes/status": { "get": { "summary": "Últimas importações de dados externos (procedência — B7)", "responses": { "200": { "description": "ok" } } } },
+    "/api/fontes/partidas": { "get": { "summary": "Jogos importados (?competicao=capixabao|serieD&temporada=2026)", "responses": { "200": { "description": "ok" } } } },
+    "/api/fontes/classificacao": { "get": { "summary": "Classificação (da fonte ou calculada pelos jogos)", "responses": { "200": { "description": "ok" } } } },
+    "/api/fontes/atualizar": { "post": { "summary": "Dispara a importação (técnico, analista, diretor)", "security": [{ "bearer": [] }], "responses": { "202": { "description": "iniciada" }, "409": { "description": "já em andamento" } } } }
+  }
+}

@@ -140,3 +140,18 @@ test('Dados externos: importador TheSportsDB (fonte simulada) grava jogos, class
     assert.equal((await req('GET', '/api/fontes/partidas?competicao=capixabao&temporada=2026')).body.partidas.length, 2);
   } finally { global.fetch = origFetch; }
 });
+
+test('B6: documentação e erros em JSON', async () => {
+  const d = await req('GET', '/api/openapi.json');
+  assert.equal(d.status, 200);
+  assert.equal(d.body.openapi, '3.0.3');
+  assert.ok(Object.keys(d.body.paths).length >= 15);
+  const nf = await req('GET', '/api/nao-existe');
+  assert.equal(nf.status, 404);
+  assert.match(nf.body.error, /Rota não encontrada/);
+  const bad = await fetch(base + '/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{quebrado' });
+  assert.equal(bad.status, 400);
+  assert.equal((await bad.json()).error, 'JSON inválido');
+  // cadastro de atleta exige campos obrigatórios e permissão
+  assert.equal((await req('POST', '/api/players', { nome: 'X' }, token)).status, 403); // preparador não cadastra
+});

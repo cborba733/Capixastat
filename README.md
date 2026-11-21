@@ -96,6 +96,20 @@ API REST em **Node.js + Express** com autenticação via **JWT**, senhas protegi
 **bcrypt** e persistência em banco **PostgreSQL hospedado na nuvem (Supabase)**.
 Rotas para autenticação, jogadores e partidas.
 
+🧪 Backend v5 — como rodar, testar e documentar
+```
+cd backend
+npm install
+npm test                      # 9 testes automáticos (banco em memória, não precisa do Supabase)
+npm start                     # usa DATABASE_URL e JWT_SECRET do .env (copie de .env.example)
+```
+- Documentação interativa da API: `http://localhost:3001/api/docs` (OpenAPI em `/api/openapi.json`)
+- Banco: rode `backend/schema.sql` no Supabase (tabelas de usuários, atletas, partidas, registros de carga e
+  bem-estar, eventos de jogo, documentos do usuário, dados externos e log de importações)
+- Dados externos: com `IMPORT_AUTO=1` o servidor importa o Capixabão (TheSportsDB) ao subir e 1× por dia;
+  manual: `node importar/thesportsdb.js --competicao capixabao --temporada 2026`
+- Publicação: `render.yaml` na raiz (Render → New → Blueprint)
+
 🎥 Exibição em Vídeo
 Vídeo demonstrando o funcionamento e a explicação do projeto:
 

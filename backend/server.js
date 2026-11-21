@@ -36,6 +36,16 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
+// B6: documentação da API (OpenAPI 3) — JSON em /api/openapi.json e tela Swagger em /api/docs
+app.get('/api/openapi.json', (req, res) => res.sendFile(require('path').join(__dirname, 'docs', 'openapi.json')));
+app.get('/api/docs', (req, res) => res.type('html').send(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>CapixaStat API</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui.min.css"></head>
+<body><div id="ui"></div><script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui-bundle.min.js"></script>
+<script>SwaggerUIBundle({ url: '/api/openapi.json', dom_id: '#ui' });</script></body></html>`));
+
+// Rota inexistente → JSON (não HTML)
+app.use('/api', (req, res) => res.status(404).json({ error: 'Rota não encontrada: ' + req.method + ' ' + req.originalUrl }));
+
 // Erro de JSON inválido ou corpo grande demais → resposta clara em vez de HTML
 app.use((err, req, res, next) => {
   if (err && err.type === 'entity.too.large') return res.status(413).json({ error: 'Conteúdo grande demais (máx. 6 MB)' });
