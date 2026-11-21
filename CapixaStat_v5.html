@@ -1962,6 +1962,10 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .at-min { display:flex; gap:10px; align-items:center; font-size:14px; color:var(--text-2) } .at-min .form-input { width:100px }
 .at-send { min-height:46px; font-size:15px }
 @media (max-width: 420px) { .at-sc.rpe-row { grid-template-columns:repeat(6, 1fr) } }
+
+/* T4 */
+.estilo-row { display:grid; grid-template-columns:1fr auto 52px; gap:8px; align-items:center; font-size:12.5px; color:var(--text-2); padding:3px 0; border-bottom:1px solid var(--border) }
+.estilo-row b { font-family:var(--font-mono); color:var(--text-1) } .estilo-row small { text-align:right; font-family:var(--font-mono); color:var(--brand) }
 </style>
 </head>
 <body>
@@ -2899,6 +2903,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
           <!-- P4: quando o time marca e sofre (faixas de 15 min, 1º x 2º tempo) -->
           <div class="card" id="time-timing" style="margin-bottom:14px"></div>
           <!-- T3: ranking Elo dos clubes capixabas -->
+          <!-- T4: estilo do time (radar em percentis entre os clubes capixabas) -->
+          <div class="card" id="time-estilo" style="margin-bottom:14px"></div>
           <div class="card" id="time-elo" style="margin-bottom:14px"></div>
           <div class="cs-section-head"><div><h2>Calendário e competições</h2><p>Jogos do mês, classificação, elenco e forma por competição</p></div></div>
           <!-- Layout principal: calendário + tabs -->
@@ -3526,6 +3532,7 @@ var METRIC_NOTES = {
   chartCargaIntensidade: { real: false,   txt: 'Intensidade física, de recuperação e semanal (0–10) por atleta. Estimada até a comissão registrar sRPE em Formação.' },
   chartFisicoEvolucao:   { real: false,   txt: 'Peso corporal nas últimas 8 avaliações. Simulado até haver aferição real do clube.' },
   chartFlexCadeia:       { real: false,   txt: 'Banco de Wells (cm) por avaliação. Simulado até haver aferição real do clube.' },
+  chartEstilo:           { real: true,    txt: 'Cada eixo é o percentil do clube entre os clubes capixabas (100 = melhor do estado naquele aspecto). Gols vêm de todos os jogos; posse, finalizações, escanteios e cartões só dos jogos com estatística oficial (SofaScore).' },
   chartElo:              { real: true,    txt: 'Elo: todos começam em 1500; a cada jogo o vencedor ganha pontos do perdedor, mais quando vence alguém mais forte, fora de casa ou por goleada (K=20, mando +60). Calculado pelo CapixaStat a partir dos placares reais.' },
   chartTiming:           { real: true,    txt: 'Gols marcados (acima) e sofridos (abaixo) por faixa de 15 minutos, a partir dos incidentes oficiais das partidas. Só entram os jogos com eventos minuto a minuto.' }
 };
@@ -4551,6 +4558,55 @@ function renderTimeElo(c) {
       options: { responsive: true, plugins: { legend: { labels: { color: cc.legend, boxWidth: 12 } } },
         scales: { x: { type: 'linear', title: { display: true, text: 'Jogo nº', color: cc.tick }, ticks: { color: cc.tick }, grid: { color: cc.grid } },
                   y: { ticks: { color: cc.tick }, grid: { color: cc.grid } } } } });
+    try { applyMetricChips(); } catch (x) {}
+  }, 80);
+}
+
+
+// ── T4: perfil de estilo do clube — médias por jogo, em percentil entre os clubes do ES ──
+var ESTILO_EIXOS = [
+  { k: 'gp', l: 'Gols marcados/jogo' }, { k: 'gc', l: 'Gols sofridos/jogo (menos é melhor)', inv: true },
+  { k: 'posse', l: 'Posse média (%)' }, { k: 'fin', l: 'Finalizações/jogo' }, { k: 'prec', l: 'Precisão (% no alvo)' },
+  { k: 'esc', l: 'Escanteios/jogo' }, { k: 'disc', l: 'Disciplina (cartões, menos é melhor)', inv: true }
+];
+function clubStyleStats(clube) {
+  var r = { jogos: 0, comStats: 0, gp: 0, gc: 0, posse: 0, fin: 0, alvo: 0, esc: 0, cart: 0 };
+  ctxFilter(_getClubAllMatches(clube)).forEach(function (j) {
+    if (j.gh == null) return;
+    var casa = j.home === clube, lado = casa ? 'h' : 'a';
+    r.jogos++; r.gp += casa ? j.gh : j.ga; r.gc += casa ? j.ga : j.gh;
+    var s = j.stats; if (!s) return;
+    r.comStats++;
+    if (s.posse) r.posse += +s.posse[lado] || 0;
+    if (s.finalizacoes) r.fin += +s.finalizacoes[lado] || 0;
+    if (s.chutesAlvo) r.alvo += +s.chutesAlvo[lado] || 0;
+    if (s.escanteios) r.esc += +s.escanteios[lado] || 0;
+    r.cart += ((s.amarelos && +s.amarelos[lado]) || 0) + ((s.vermelhos && +s.vermelhos[lado]) || 0) * 2;
+  });
+  var j = Math.max(1, r.jogos), c = Math.max(1, r.comStats);
+  return { jogos: r.jogos, comStats: r.comStats, gp: r.gp / j, gc: r.gc / j,
+    posse: r.comStats ? r.posse / c : null, fin: r.comStats ? r.fin / c : null, prec: r.fin ? r.alvo / r.fin * 100 : null,
+    esc: r.comStats ? r.esc / c : null, disc: r.comStats ? r.cart / c : null };
+}
+function renderTimeEstilo(c) {
+  var el = document.getElementById('time-estilo'); if (!el) return;
+  var todos = {}; Object.keys(CLUBS).forEach(function (t) { todos[t] = clubStyleStats(t); });
+  var me = todos[c.nome];
+  if (!me || !me.jogos) { el.innerHTML = '<div class="card-title">Estilo do time</div><div class="tl2-empty">Sem jogos.</div>'; return; }
+  var pct = ESTILO_EIXOS.map(function (e) {
+    var vals = Object.values(todos).map(function (x) { return x[e.k]; }).filter(function (v) { return v != null && isFinite(v); });
+    if (me[e.k] == null) return null;
+    var p = _percentile(vals, me[e.k]); return e.inv ? 100 - p : p;
+  });
+  var fmt = function (k, v) { return v == null ? '—' : (k === 'posse' || k === 'prec') ? v.toFixed(0) + '%' : v.toFixed(1); };
+  el.innerHTML = '<div class="card-title">Estilo do time <span>percentil entre ' + Object.keys(todos).length + ' clubes capixabas · ' + me.jogos + ' jogos (' + me.comStats + ' com estatística oficial)</span></div>' +
+    '<div class="timing-grid"><div><canvas id="chartEstilo" height="200"></canvas></div><div class="timing-side">' +
+    ESTILO_EIXOS.map(function (e, i) { return '<div class="estilo-row"><span>' + e.l + '</span><b>' + fmt(e.k, me[e.k]) + '</b><small>' + (pct[i] == null ? 'sem dado' : 'P' + pct[i]) + '</small></div>'; }).join('') + '</div></div>';
+  setTimeout(function () {
+    var cc = _chartColors();
+    mkChart('chartEstilo', { type: 'radar',
+      data: { labels: ESTILO_EIXOS.map(function (e) { return e.l.split(' (')[0]; }), datasets: [{ label: c.nome, data: pct.map(function (v) { return v == null ? 0 : v; }), backgroundColor: 'rgba(91,149,255,.22)', borderColor: csData(0), pointBackgroundColor: csData(0), borderWidth: 2 }] },
+      options: { responsive: true, plugins: { legend: { display: false } }, scales: { r: { min: 0, max: 100, ticks: { display: false, stepSize: 25 }, grid: { color: cc.radarGrid }, angleLines: { color: cc.radarAngle }, pointLabels: { color: cc.radarLabels, font: { size: 11 } } } } } });
     try { applyMetricChips(); } catch (x) {}
   }, 80);
 }
@@ -14961,6 +15017,7 @@ function renderTeamScreen() {
   _renderTimeLastNext(c, allMatches);
   try { renderTimeDestaques(c, ctxFilter(allMatches)); } catch (e) { console.warn('T1', e); }
   try { renderTimeTiming(c); } catch (e) { console.warn('P4', e); }
+  try { renderTimeEstilo(c); } catch (e) { console.warn('T4', e); }
   try { renderTimeElo(c); } catch (e) { console.warn('T3', e); }
   _renderTimeCalendar(c, allMatches);
 
