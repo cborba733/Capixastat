@@ -138,7 +138,7 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
   HTML/git) — se precisar de cadastro, pedir ao Caio. Mínimo aceitável: 1 fonte + 1 competição.
 
 ### Status dos itens (✅ feito · ⏳ em andamento · ⬜ pendente)
-**Alta:** ✅ R1 · ✅ I1 · ✅ L1 · ✅ I4 · ✅ D1 · ✅ D2 · ✅ D3 · ✅ A4 · ✅ P1 · ✅ F1 · ✅ F2 · ✅ T1 · ⬜ B4 ·
+**Alta:** ✅ R1 · ✅ I1 · ✅ L1 · ✅ I4 · ✅ D1 · ✅ D2 · ✅ D3 · ✅ A4 · ✅ P1 · ✅ F1 · ✅ F2 · ✅ T1 · ✅ B4 ·
 ⬜ A1 · ⬜ A2 · ⬜ A3 · ⬜ B1 · ⬜ B2 · ⬜ B3 · ⬜ L2 · ⬜ R2 · ⬜ R3 · ⬜ V1 · ⬜ X1 · ⬜ P2
 **Dados externos:** ⬜ pesquisa de fontes · ⬜ integração (rotina + banco + fonte/data na tela)
 **Média:** ⬜ A5 · ⬜ A7 · ⬜ A8 · ⬜ P4 · ⬜ P5 · ⬜ F3 · ⬜ F4 · ⬜ T2 · ⬜ T3 · ⬜ X2 · ⬜ Q2 · ⬜ B6 · ⬜ V5 ·
@@ -201,6 +201,12 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 - **T1:** Meu Time › bloco `#time-destaques` (`renderTimeDestaques`): forma últimos 5 + V/E/D da temporada,
   top 3 artilheiros, assistências e score (clique abre perfil). Classificação ganhou coluna **Forma**
   (`teamFormDots(comp, time)` — últimos 5 jogos do time na competição).
+
+- **B4:** tabelas `registros_srpe` e `registros_bemestar` (fim de `backend/schema.sql` — **rodar no Supabase**),
+  rota `backend/routes/registros.js` (`GET/POST /api/registros/:tipo`, `DELETE /api/registros/:tipo/:id`, JWT,
+  validação). `db.js` aceita **`DB_MEMORY=1`** (pg-mem, banco em memória para testes/dev sem Supabase).
+  `server.js` exporta `app` e só escuta quando executado direto. Testes: `cd backend && npm test`
+  (node:test, 4 testes). Front: `csSyncPush/csSyncDelete/csSyncPull` (só com token real ≠ 'teste-local').
 
 ## Trabalhos futuros
 _(preencher na revisão de segunda-feira com o que não der tempo)_

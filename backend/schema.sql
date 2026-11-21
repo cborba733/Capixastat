@@ -41,3 +41,34 @@ CREATE TABLE IF NOT EXISTS matches (
   penaltis  JSONB,
   criado_em TIMESTAMP DEFAULT NOW()
 );
+
+-- ═══ v5 · B4: registros diários da comissão (dado real de carga e bem-estar) ═══
+-- sRPE (Foster): carga da sessão = RPE (0–10) × minutos, em unidades arbitrárias (UA)
+CREATE TABLE IF NOT EXISTS registros_srpe (
+  id         VARCHAR(40) PRIMARY KEY,
+  atleta_id  VARCHAR(50) NOT NULL,
+  clube      VARCHAR(100),
+  data       DATE NOT NULL,
+  tipo       VARCHAR(30),
+  minutos    INTEGER NOT NULL,
+  rpe        INTEGER NOT NULL,
+  carga      INTEGER NOT NULL,
+  criado_por INTEGER,
+  criado_em  TIMESTAMP DEFAULT NOW()
+);
+
+-- Bem-estar (índice de Hooper): sono, fadiga, estresse e dor de 1 (muito bom) a 7 (muito ruim)
+CREATE TABLE IF NOT EXISTS registros_bemestar (
+  id         VARCHAR(40) PRIMARY KEY,
+  atleta_id  VARCHAR(50) NOT NULL,
+  clube      VARCHAR(100),
+  data       DATE NOT NULL,
+  sono       INTEGER NOT NULL,
+  fadiga     INTEGER NOT NULL,
+  estresse   INTEGER NOT NULL,
+  dor        INTEGER NOT NULL,
+  lesao      BOOLEAN DEFAULT FALSE,
+  hooper     INTEGER NOT NULL,
+  criado_por INTEGER,
+  criado_em  TIMESTAMP DEFAULT NOW()
+);

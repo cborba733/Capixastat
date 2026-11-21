@@ -3032,6 +3032,7 @@ function enterApp() {
   loadApiPlayers();
   try { renderDashTopRow(); renderDashAlerts(); } catch (e) { console.warn('D1/D2', e); }
   setTimeout(function () { try { applyMetricChips(); } catch (e) {} }, 300);
+  csSyncPull().then(function () { try { renderDashAlerts(); } catch (e) {} });
 }
 
 // ── Atualizar KPIs com dados reais ───────────
@@ -3118,6 +3119,44 @@ function csFmtDate(isoDate) { var p = isoDate.split('-'); return p[2] + '/' + p[
 function csClubPlayers() {
   var u = getCurrentUser(); var c = u ? resolveClube(u.clube) : null;
   return Object.values(PLAYERS).filter(function (p) { return !c || p.clube === c; }).sort(function (a, b) { return a.nome.localeCompare(b.nome); });
+}
+
+
+// ── B4: sincronização dos registros com o backend (/api/registros/:tipo) ──
+// Só sincroniza com login real (token emitido pela API). Sem conexão, o dado fica no navegador.
+var CS_SYNC_COLS = { srpe: true, bemestar: true };
+function csBackendOn() { var t = getToken(); return !!t && t !== 'teste-local'; }
+function csSyncPush(col, rec) {
+  if (!csBackendOn() || !CS_SYNC_COLS[col]) return;
+  var u = getCurrentUser();
+  apiCall('/api/registros/' + col, { method: 'POST', body: JSON.stringify(Object.assign({ clube: u ? resolveClube(u.clube) : null }, rec)) })
+    .then(function (r) { if (!r.ok && r.status !== 409) console.warn('sync', col, r.status); })
+    .catch(function () { /* offline: fica só no navegador */ });
+}
+function csSyncDelete(col, id) {
+  if (!csBackendOn() || !CS_SYNC_COLS[col]) return;
+  apiCall('/api/registros/' + col + '/' + encodeURIComponent(id), { method: 'DELETE' }).catch(function () {});
+}
+async function csSyncPull() {
+  if (!csBackendOn()) return;
+  var u = getCurrentUser(); var clube = u ? resolveClube(u.clube) : '';
+  for (var col in CS_SYNC_COLS) {
+    try {
+      var r = await apiCall('/api/registros/' + col + '?clube=' + encodeURIComponent(clube || ''));
+      if (!r.ok) continue;
+      var rows = (await r.json()).registros || [];
+      var local = CSStore.all(col), ids = {};
+      local.forEach(function (x) { ids[x.id] = 1; });
+      rows.forEach(function (x) {
+        if (ids[x.id]) return;
+        var rec = { id: x.id, atletaId: x.atleta_id, data: String(x.data).slice(0, 10), criadoEm: x.criado_em };
+        if (col === 'srpe') Object.assign(rec, { tipo: x.tipo, minutos: x.minutos, rpe: x.rpe, carga: x.carga });
+        else Object.assign(rec, { sono: x.sono, fadiga: x.fadiga, estresse: x.estresse, dor: x.dor, lesao: !!x.lesao, hooper: x.hooper });
+        local.push(rec);
+      });
+      CSStore.save(col, local);
+    } catch (e) { /* sem conexão com a API */ }
+  }
 }
 
 // ── F1: carga interna por sRPE (Foster): carga (UA) = RPE (0–10) × minutos ──
