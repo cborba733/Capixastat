@@ -138,7 +138,7 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
   HTML/git) — se precisar de cadastro, pedir ao Caio. Mínimo aceitável: 1 fonte + 1 competição.
 
 ### Status dos itens (✅ feito · ⏳ em andamento · ⬜ pendente)
-**Alta:** ✅ R1 · ✅ I1 · ⬜ L1 · ⬜ I4 · ⬜ D1 · ⬜ D2 · ⬜ D3 · ⬜ A4 · ⬜ P1 · ⬜ F1 · ⬜ F2 · ⬜ T1 · ⬜ B4 ·
+**Alta:** ✅ R1 · ✅ I1 · ✅ L1 · ⬜ I4 · ⬜ D1 · ⬜ D2 · ⬜ D3 · ⬜ A4 · ⬜ P1 · ⬜ F1 · ⬜ F2 · ⬜ T1 · ⬜ B4 ·
 ⬜ A1 · ⬜ A2 · ⬜ A3 · ⬜ B1 · ⬜ B2 · ⬜ B3 · ⬜ L2 · ⬜ R2 · ⬜ R3 · ⬜ V1 · ⬜ X1 · ⬜ P2
 **Dados externos:** ⬜ pesquisa de fontes · ⬜ integração (rotina + banco + fonte/data na tela)
 **Média:** ⬜ A5 · ⬜ A7 · ⬜ A8 · ⬜ P4 · ⬜ P5 · ⬜ F3 · ⬜ F4 · ⬜ T2 · ⬜ T3 · ⬜ X2 · ⬜ Q2 · ⬜ B6 · ⬜ V5 ·
@@ -156,6 +156,11 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
   (`--ok/--warn/--danger`). Paleta de dados `--data-1..6`, sequencial `--seq-*`, divergente `--div-*`.
   Rosa da bandeira em `--accent` (uso pontual). Helpers JS: `csVar()`, `csData(i)`, `csStatus(kind)`.
   O verde que aparece no conteúdo gerado por JS continua significando "positivo/vitória".
+
+- **L1:** menu em 3 grupos por tarefa — Clube (Visão Geral, Meu Time, Partidas) · Jogadores (Vitrine,
+  Perfil, Ranking, Comparativo, Estatísticas) · Preparação (Formação, Táticas, Quadro Tático). "Cadastrar
+  Atleta" saiu do menu (botão na Vitrine). `goTo(id)` agora acende o item sozinho; `NAV_PARENT` mapeia
+  telas-filhas (cadastro-jogador → jogadores).
 
 ## Trabalhos futuros
 _(preencher na revisão de segunda-feira com o que não der tempo)_
