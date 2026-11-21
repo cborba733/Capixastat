@@ -70,3 +70,23 @@ test('B1: health e documentos do usuário', async () => {
   const l = await req('GET', '/api/dados', null, token);
   assert.equal(l.body.documentos.length, 1);
 });
+
+test('B2: perfis de acesso (diretor, atleta)', async () => {
+  // função inválida é recusada
+  assert.equal((await req('POST', '/api/auth/register', { nome: 'X', email: 'x@t.com', senha: 'senha123', clube: 'Rio Branco ES', funcao: 'Rei' })).status, 400);
+  // diretor: lê, mas não registra carga
+  await req('POST', '/api/auth/register', { nome: 'Dir', email: 'dir@t.com', senha: 'senha123', clube: 'Rio Branco ES', funcao: 'Diretor' });
+  const d = await req('POST', '/api/auth/login', { email: 'dir@t.com', senha: 'senha123' });
+  assert.equal(d.body.user.papel, 'diretor');
+  assert.equal((await req('GET', '/api/registros/srpe', null, d.body.token)).status, 200);
+  assert.equal((await req('POST', '/api/registros/srpe', { id: 'd1', atletaId: 'rb_edu', data: '2026-11-20', minutos: 60, rpe: 5 }, d.body.token)).status, 403);
+  // atleta: precisa do vínculo e só registra o próprio bem-estar
+  assert.equal((await req('POST', '/api/auth/register', { nome: 'Edu', email: 'edu@t.com', senha: 'senha123', clube: 'Rio Branco ES', funcao: 'Atleta' })).status, 400);
+  await req('POST', '/api/auth/register', { nome: 'Edu', email: 'edu@t.com', senha: 'senha123', clube: 'Rio Branco ES', funcao: 'Atleta', atleta_id: 'rb_edu' });
+  const a = await req('POST', '/api/auth/login', { email: 'edu@t.com', senha: 'senha123' });
+  assert.equal(a.body.user.atleta_id, 'rb_edu');
+  const wb = { data: '2026-11-20', sono: 2, fadiga: 2, estresse: 2, dor: 2 };
+  assert.equal((await req('POST', '/api/registros/bemestar', Object.assign({ id: 'a1', atletaId: 'rb_edu' }, wb), a.body.token)).status, 201);
+  assert.equal((await req('POST', '/api/registros/bemestar', Object.assign({ id: 'a2', atletaId: 'rb_outro' }, wb), a.body.token)).status, 403);
+  assert.equal((await req('POST', '/api/registros/srpe', { id: 'a3', atletaId: 'rb_edu', data: '2026-11-20', minutos: 60, rpe: 5 }, a.body.token)).status, 403);
+});

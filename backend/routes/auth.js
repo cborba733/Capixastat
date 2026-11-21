@@ -3,15 +3,20 @@ const bcrypt   = require('bcrypt');
 const jwt      = require('jsonwebtoken');
 const db       = require('../db');
 const authMid  = require('../middleware/auth');
+const { papelDe, PAPEIS } = require('../middleware/permissao'); // B2
 
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
-  const { nome, email, senha, clube, funcao } = req.body;
+  const { nome, email, senha, clube, funcao, atleta_id } = req.body;
 
   if (!nome || !email || !senha || !clube || !funcao)
     return res.status(400).json({ error: 'Preencha todos os campos' });
   if (senha.length < 6)
     return res.status(400).json({ error: 'Senha deve ter pelo menos 6 caracteres' });
+  if (!PAPEIS[funcao])
+    return res.status(400).json({ error: 'Função inválida. Use: ' + Object.keys(PAPEIS).join(', ') });
+  if (funcao === 'Atleta' && !atleta_id)
+    return res.status(400).json({ error: 'Atleta precisa escolher o próprio cadastro (atleta_id)' });
 
   try {
     const exists = await db.query('SELECT id FROM users WHERE email = $1', [email]);
@@ -20,8 +25,8 @@ router.post('/register', async (req, res) => {
 
     const hash = await bcrypt.hash(senha, 10);
     const result = await db.query(
-      'INSERT INTO users (nome, email, senha_hash, clube, funcao) VALUES ($1,$2,$3,$4,$5) RETURNING id, nome, email, clube, funcao, criado_em',
-      [nome, email, hash, clube, funcao]
+      'INSERT INTO users (nome, email, senha_hash, clube, funcao, atleta_id) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id, nome, email, clube, funcao, atleta_id, criado_em',
+      [nome, email, hash, clube, funcao, funcao === 'Atleta' ? atleta_id : null]
     );
     res.status(201).json({ user: result.rows[0] });
   } catch (e) {
@@ -55,7 +60,8 @@ router.post('/login', async (req, res) => {
 
     res.json({
       token,
-      user: { id: user.id, nome: user.nome, email: user.email, clube: user.clube, funcao: user.funcao }
+      user: { id: user.id, nome: user.nome, email: user.email, clube: user.clube, funcao: user.funcao,
+              papel: papelDe(user.funcao), atleta_id: user.atleta_id || null }
     });
   } catch (e) {
     console.error(e);

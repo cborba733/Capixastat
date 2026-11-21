@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
   senha_hash VARCHAR(255) NOT NULL,
   clube      VARCHAR(100),
   funcao     VARCHAR(100),
+  atleta_id  VARCHAR(50),   -- B2: preenchido quando a função é "Atleta" (vincula ao cadastro do jogador)
   criado_em  TIMESTAMP DEFAULT NOW()
 );
 
@@ -82,3 +83,6 @@ CREATE TABLE IF NOT EXISTS documentos (
   atualizado_em TIMESTAMP DEFAULT NOW(),
   PRIMARY KEY (usuario_id, chave)
 );
+
+-- ═══ v5 · B2: bancos já existentes (criados antes da v5) ganham a coluna atleta_id ═══
+ALTER TABLE users ADD COLUMN IF NOT EXISTS atleta_id VARCHAR(50);

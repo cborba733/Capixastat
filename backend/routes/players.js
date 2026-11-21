@@ -1,6 +1,7 @@
 const router  = require('express').Router();
 const db      = require('../db');
 const authMid = require('../middleware/auth');
+const { permitir } = require('../middleware/permissao'); // B2
 
 // GET /api/players  — lista todos os jogadores
 router.get('/', async (req, res) => {
@@ -33,7 +34,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/players  — cadastra novo jogador (requer login)
-router.post('/', authMid, async (req, res) => {
+router.post('/', authMid, permitir('players:write'), async (req, res) => {
   const { id, nome, clube, pos, badge_class, idade, altura, peso, pe, cidade, score, iniciais, dados } = req.body;
 
   if (!id || !nome || !clube || !pos)
@@ -58,7 +59,7 @@ router.post('/', authMid, async (req, res) => {
 });
 
 // PUT /api/players/:id  — atualiza jogador (requer login)
-router.put('/:id', authMid, async (req, res) => {
+router.put('/:id', authMid, permitir('players:write'), async (req, res) => {
   const { nome, clube, pos, badge_class, idade, altura, peso, pe, cidade, score, iniciais, dados } = req.body;
 
   try {
@@ -78,7 +79,7 @@ router.put('/:id', authMid, async (req, res) => {
 });
 
 // DELETE /api/players/:id  — remove jogador (requer login)
-router.delete('/:id', authMid, async (req, res) => {
+router.delete('/:id', authMid, permitir('players:write'), async (req, res) => {
   try {
     const result = await db.query('DELETE FROM players WHERE id = $1 RETURNING id', [req.params.id]);
     if (!result.rows.length)

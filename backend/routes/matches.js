@@ -1,6 +1,7 @@
 const router  = require('express').Router();
 const db      = require('../db');
 const authMid = require('../middleware/auth');
+const { permitir } = require('../middleware/permissao'); // B2
 
 // GET /api/matches  — lista partidas (filtrável por comp_id ou time)
 router.get('/', async (req, res) => {
@@ -41,7 +42,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/matches  — registra nova partida (requer login)
-router.post('/', authMid, async (req, res) => {
+router.post('/', authMid, permitir('matches:write'), async (req, res) => {
   const { comp_id, home, away, gh, ga, data, fase, hora, stats, penaltis } = req.body;
 
   if (!comp_id || !home || !away)
@@ -63,7 +64,7 @@ router.post('/', authMid, async (req, res) => {
 });
 
 // PUT /api/matches/:id  — atualiza partida (requer login)
-router.put('/:id', authMid, async (req, res) => {
+router.put('/:id', authMid, permitir('matches:write'), async (req, res) => {
   const { gh, ga, stats, penaltis, fase, hora } = req.body;
   try {
     const result = await db.query(

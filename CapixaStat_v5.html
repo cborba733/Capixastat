@@ -1814,7 +1814,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
       </div>
       <div class="form-group" style="margin-top:10px">
         <label class="form-label">Clube / Instituição</label>
-        <select id="reg-clube" class="form-select">
+        <select id="reg-clube" class="form-select" onchange="regAtletaToggle()">
           <option value="">Selecione seu clube</option>
           <option>Porto Vitória</option>
           <option>Serra FC</option>
@@ -1832,15 +1832,22 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
       </div>
       <div class="form-group" style="margin-top:10px">
         <label class="form-label">Função</label>
-        <select id="reg-funcao" class="form-select">
+        <select id="reg-funcao" class="form-select" onchange="regAtletaToggle()">
           <option value="">Selecione sua função</option>
           <option>Técnico</option>
           <option>Analista de Desempenho</option>
           <option>Preparador Físico</option>
+          <option>Médico / Fisioterapeuta</option>
           <option>Scout</option>
           <option>Diretor</option>
+          <option>Atleta</option>
           <option>Estudante</option>
         </select>
+      </div>
+      <div class="form-group" id="reg-atleta-wrap" style="margin-top:10px;display:none">
+        <label class="form-label" for="reg-atleta">Quem é você no elenco?</label>
+        <select id="reg-atleta" class="form-select"><option value="">Escolha o clube primeiro</option></select>
+        <small style="color:var(--text-3);font-size:11px">Atletas só registram o próprio bem-estar.</small>
       </div>
       <div class="form-group" style="margin-top:10px">
         <label class="form-label">E-mail</label>
@@ -3061,6 +3068,8 @@ async function handleRegister() {
   };
 
   if (!nome || !clube || !funcao || !email || !senha) return showErr('Preencha todos os campos para continuar.');
+  const atleta_id = funcao === 'Atleta' ? (document.getElementById('reg-atleta').value || '') : null;
+  if (funcao === 'Atleta' && !atleta_id) return showErr('Escolha o seu nome no elenco.');
   if (senha.length < 6) return showErr('A senha deve ter pelo menos 6 caracteres.');
   if (senha !== senha2) return showErr('As senhas não coincidem. Verifique e tente novamente.');
 
@@ -3070,7 +3079,7 @@ async function handleRegister() {
   try {
     const res = await apiCall('/api/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ nome, email, senha, clube, funcao })
+      body: JSON.stringify({ nome, email, senha, clube, funcao, atleta_id })
     });
     const data = await res.json();
 
@@ -3107,6 +3116,7 @@ function updateSidebarUser(user) {
   if (avatarEl) avatarEl.textContent = initials;
   if (nameEl) nameEl.textContent = user.nome;
   if (roleEl) roleEl.textContent = user.funcao + ' · ' + user.clube;
+  try { applyPermissions(); } catch (e) {}
 }
 
 // ── Entrar no App ────────────────────────────
@@ -3118,6 +3128,7 @@ function enterApp() {
   loadApiPlayers();
   try { renderDashTopRow(); renderDashAlerts(); } catch (e) { console.warn('D1/D2', e); }
   setTimeout(function () { try { applyMetricChips(); } catch (e) {} }, 300);
+  try { applyPermissions(); } catch (e) {}
   csSyncPull().then(function () { try { renderDashAlerts(); } catch (e) {} });
   csCloudPull();
 }
@@ -3209,6 +3220,42 @@ function csClubPlayers() {
 }
 
 
+
+
+// ══════════════════════════════════════════════════════════════════
+// B2: perfis de acesso (espelho de backend/middleware/permissao.js)
+// ══════════════════════════════════════════════════════════════════
+var CS_PAPEIS = { 'Técnico': 'tecnico', 'Analista de Desempenho': 'analista', 'Preparador Físico': 'preparador', 'Médico / Fisioterapeuta': 'medico',
+  'Scout': 'scout', 'Diretor': 'diretor', 'Atleta': 'atleta', 'Estudante': 'estudante' };
+var CS_PERMS = {
+  'registros:srpe':     ['tecnico', 'analista', 'preparador', 'medico'],
+  'registros:bemestar': ['tecnico', 'analista', 'preparador', 'medico', 'atleta'],
+  'players:write':      ['tecnico', 'analista', 'scout', 'diretor'],
+  'matches:write':      ['tecnico', 'analista'],
+  'eventos:write':      ['tecnico', 'analista', 'scout']
+};
+function csPapel() { var u = getCurrentUser(); if (!u) return 'estudante'; return u.papel || CS_PAPEIS[u.funcao] || 'estudante'; }
+function csPode(perm) { return (CS_PERMS[perm] || []).indexOf(csPapel()) !== -1; }
+function csSemPermissao(texto) {
+  return '<div class="cs-est-banner" style="border-style:solid;border-color:var(--border-md)"><span class="cs-status info">Somente leitura</span><span>' + texto + ' Seu perfil: <b>' + csPapel() + '</b>.</span></div>';
+}
+// Esconde botões de ação que o perfil não pode usar
+function applyPermissions() {
+  var podeAtleta = csPode('players:write'), podePartida = csPode('matches:write');
+  document.querySelectorAll('[onclick*="cadastro-jogador"]').forEach(function (b) { if (b.closest('.nav-item')) return; b.style.display = podeAtleta ? '' : 'none'; });
+  document.querySelectorAll('button').forEach(function (b) { if (/Nova Partida/.test(b.textContent)) b.style.display = podePartida ? '' : 'none'; });
+}
+function regAtletaToggle() {
+  var f = document.getElementById('reg-funcao').value, wrap = document.getElementById('reg-atleta-wrap');
+  if (!wrap) return;
+  wrap.style.display = f === 'Atleta' ? 'block' : 'none';
+  if (f !== 'Atleta') return;
+  var clube = resolveClube(document.getElementById('reg-clube').value || '');
+  var sel = document.getElementById('reg-atleta');
+  var arr = Object.values(PLAYERS).filter(function (p) { return p.clube === clube; }).sort(function (a, b) { return a.nome.localeCompare(b.nome); });
+  sel.innerHTML = arr.length ? '<option value="">Selecione seu nome</option>' + arr.map(function (p) { return '<option value="' + p.id + '">' + p.nome + ' · ' + p.pos + '</option>'; }).join('')
+    : '<option value="">Escolha o clube primeiro</option>';
+}
 
 // ══════════════════════════════════════════════════════════════════
 // B1: nuvem — o que antes ficava só no navegador vai para o banco (/api/dados/:chave)
@@ -3337,7 +3384,11 @@ function renderRegistroDiario() {
   var panel = document.getElementById('ftab-registro');
   if (!panel) return;
   var players = csClubPlayers();
+  var u = getCurrentUser() || {};
+  var ehAtleta = csPapel() === 'atleta';
+  var playersW = ehAtleta ? players.filter(function (p) { return p.id === u.atleta_id; }) : players;
   var opts = players.map(function (p) { return '<option value="' + p.id + '">' + p.nome + ' · ' + p.pos + '</option>'; }).join('');
+  var optsW = playersW.map(function (p) { return '<option value="' + p.id + '">' + p.nome + ' · ' + p.pos + '</option>'; }).join('');
   var hoje = csToday();
   function slider(id, label, help) {
     return '<label class="rg-sl"><span>' + label + ' <b id="' + id + '-v">3</b></span>' +
@@ -3361,7 +3412,7 @@ function renderRegistroDiario() {
       '</div>' +
       '<div class="card"><div class="card-title">Bem-estar — índice de Hooper <span>antes do treino</span></div>' +
         '<div class="rg-form">' +
-          '<label>Atleta<select id="rg-w-atleta" class="form-select">' + opts + '</select></label>' +
+          '<label>Atleta<select id="rg-w-atleta" class="form-select"' + (ehAtleta ? ' disabled' : '') + '>' + optsW + '</select></label>' +
           '<label>Data<input type="date" id="rg-w-data" class="form-input" value="' + hoje + '" max="' + hoje + '"></label>' +
           slider('rg-w-sono', 'Qualidade do sono', '1 = dormiu muito bem · 7 = muito mal') +
           slider('rg-w-fadiga', 'Fadiga', '1 = descansado · 7 = exausto') +
@@ -3377,6 +3428,10 @@ function renderRegistroDiario() {
     '<div class="card" style="margin-top:14px"><div class="card-title">Situação do elenco hoje <span>último bem-estar (até 2 dias)</span></div><div id="rg-elenco" class="rg-elenco"></div></div>' +
     '<div class="card" style="margin-top:14px"><div class="card-title">Registros recentes</div><div id="rg-lista"></div></div>';
   rgUpdateSrpe(); rgUpdateWell(); rgRenderLists();
+  // B2: formulários bloqueados conforme o perfil
+  var cards = panel.querySelectorAll('.rg-grid > .card');
+  if (!csPode('registros:srpe') && cards[0]) cards[0].innerHTML = '<div class="card-title">Carga da sessão — sRPE</div>' + csSemPermissao('Registrar carga é tarefa da comissão técnica.');
+  if (!csPode('registros:bemestar') && cards[1]) cards[1].innerHTML = '<div class="card-title">Bem-estar — índice de Hooper</div>' + csSemPermissao('Registrar bem-estar é tarefa da comissão ou do próprio atleta.');
 }
 function rgUpdateSrpe() {
   var r = +document.getElementById('rg-s-rpe').value, m = +document.getElementById('rg-s-min').value || 0;
@@ -3410,7 +3465,10 @@ function rgSaveWell() {
   CSStore.add('bemestar', rec);
   rgRenderLists(); csToast('Bem-estar registrado');
 }
-function rgDelete(col, id) { if (confirm('Excluir este registro?')) { CSStore.remove(col, id); rgRenderLists(); } }
+function rgDelete(col, id) {
+  if (!csPode('registros:' + col)) { csToast('Seu perfil não pode excluir este registro'); return; }
+  if (confirm('Excluir este registro?')) { CSStore.remove(col, id); rgRenderLists(); }
+}
 function rgRenderLists() {
   var elenco = document.getElementById('rg-elenco'), lista = document.getElementById('rg-lista');
   if (!elenco || !lista) return;

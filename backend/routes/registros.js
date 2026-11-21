@@ -6,6 +6,7 @@
 const router  = require('express').Router();
 const db      = require('../db');
 const authMid = require('../middleware/auth');
+const { permitir } = require('../middleware/permissao'); // B2
 
 const TABELAS = { srpe: 'registros_srpe', bemestar: 'registros_bemestar' };
 const DATA_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -47,11 +48,16 @@ router.get('/:tipo', authMid, async (req, res) => {
   }
 });
 
-router.post('/:tipo', authMid, async (req, res) => {
+const tipoValido = (req, res, next) => (TABELAS[req.params.tipo] ? next() : res.status(404).json({ error: 'Tipo de registro desconhecido. Use srpe ou bemestar.' }));
+
+router.post('/:tipo', authMid, tipoValido, permitir((req) => 'registros:' + req.params.tipo), async (req, res) => {
   const t = tabela(req, res); if (!t) return;
   const b = req.body;
   const erro = validar(req.params.tipo, b);
   if (erro) return res.status(400).json({ error: erro });
+  // B2: atleta só registra o próprio bem-estar
+  if (req.papel === 'atleta' && b.atletaId !== req.atletaId)
+    return res.status(403).json({ error: 'Atleta só pode registrar o próprio bem-estar.' });
   try {
     let r;
     if (req.params.tipo === 'srpe') {
@@ -76,7 +82,7 @@ router.post('/:tipo', authMid, async (req, res) => {
   }
 });
 
-router.delete('/:tipo/:id', authMid, async (req, res) => {
+router.delete('/:tipo/:id', authMid, tipoValido, permitir((req) => 'registros:' + req.params.tipo), async (req, res) => {
   const t = tabela(req, res); if (!t) return;
   try {
     const r = await db.query(`DELETE FROM ${t} WHERE id = $1 RETURNING id`, [req.params.id]);
