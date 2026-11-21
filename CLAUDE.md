@@ -141,7 +141,7 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 **Alta:** ✅ R1 · ✅ I1 · ✅ L1 · ✅ I4 · ✅ D1 · ✅ D2 · ✅ D3 · ✅ A4 · ✅ P1 · ✅ F1 · ✅ F2 · ✅ T1 · ✅ B4 ·
 ✅ A1 · ✅ A2 · ✅ A3 · ✅ B1 · ✅ B2 · ✅ B3 · ✅ L2 · ✅ R2 · ✅ R3 · ✅ V1 · ✅ X1 · ✅ P2
 **Dados externos:** ✅ pesquisa de fontes · ✅ integração TheSportsDB (rotina + banco + fonte/data na tela)
-**Média:** ✅ A5 · ✅ A7 · ✅ A8 · ✅ P4 · ✅ P5 · ✅ F3 · ✅ F4 · ✅ T2 · ✅ T3 · ✅ X2 · ✅ Q2 · ✅ B6 · ⬜ V5 ·
+**Média:** ✅ A5 · ✅ A7 · ✅ A8 · ✅ P4 · ✅ P5 · ✅ F3 · ✅ F4 · ✅ T2 · ✅ T3 · ✅ X2 · ✅ Q2 · ✅ B6 · ✅ V5 ·
 ⬜ I2 · ⬜ I3 · ⬜ M2 · ⬜ M4 · ⬜ R5 · ⬜ D4 · ⬜ A6 · ⬜ A9 · ⬜ P3 · ⬜ F5 · ⬜ T4 · ⬜ X3 · ⬜ Q1 · ⬜ B5 ·
 ⬜ V2 · ⬜ V4 · ⬜ L3 · ⬜ M1 · ⬜ R4 · ⬜ Q3 · ⬜ V3
 **Baixa:** ⬜ A10 · ⬜ X4 · ⬜ Q4 · ⬜ V6 · ⬜ M3 · ⬜ P6 · ⬜ F6 · ✅ B7 · ⬜ L4
@@ -335,6 +335,10 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 
 - **B6:** OpenAPI 3 em `backend/docs/openapi.json`, Swagger em `/api/docs` (swagger-ui via cdnjs), 404 da API em JSON,
   JSON inválido → 400 claro; seção "Backend v5" no README. 9 testes.
+
+- **V5:** `analise-python/xg_statsbomb.py` (treinar com StatsBomb Open Data / aplicar ao CSV do Scout ao Vivo), regressão
+  logística própria em numpy com distância (m) e ângulo (rad). `xg_modelo.json`: b0=-2.540, b_dist=-0.0495, b_ang=1.525
+  (794 chutes, corr. 0,78 com xG StatsBomb, soma xG = gols). `mapa_chutes.png`. Cache de download no .gitignore.
 
 ### ONDE PAROU (21/11, madrugada — limite de uso)
 Próximos itens Média, nesta ordem: P5, F3, F4, T2, T3, X2, Q2, B6, V5, I2, I3, M2, M4, R5 (dif. baixa); depois D4, A6,

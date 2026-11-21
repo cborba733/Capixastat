@@ -1,0 +1,12 @@
+{
+  "b0": -2.5402568647729646,
+  "b_dist": -0.049505790299826616,
+  "b_ang": 1.52481654956256,
+  "n_chutes": 794,
+  "n_gols": 62,
+  "fonte": "StatsBomb Open Data (Copa do Mundo 2018)",
+  "variaveis": "dist (m) e ang (rad) até o centro do gol",
+  "soma_xg": 62.0,
+  "brier": 0.0662,
+  "correlacao_com_xg_statsbomb": 0.781
+}

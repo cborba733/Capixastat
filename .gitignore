@@ -37,3 +37,6 @@ poc-cv/__pycache__/
 
 # Configuração local do Claude Code
 .claude/
+
+# Cache de downloads do StatsBomb (analise-python)
+analise-python/cache_statsbomb/
