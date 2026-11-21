@@ -139,7 +139,7 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 
 ### Status dos itens (✅ feito · ⏳ em andamento · ⬜ pendente)
 **Alta:** ✅ R1 · ✅ I1 · ✅ L1 · ✅ I4 · ✅ D1 · ✅ D2 · ✅ D3 · ✅ A4 · ✅ P1 · ✅ F1 · ✅ F2 · ✅ T1 · ✅ B4 ·
-✅ A1 · ✅ A2 · ✅ A3 · ✅ B1 · ✅ B2 · ⬜ B3 · ⬜ L2 · ⬜ R2 · ⬜ R3 · ⬜ V1 · ⬜ X1 · ⬜ P2
+✅ A1 · ✅ A2 · ✅ A3 · ✅ B1 · ✅ B2 · ✅ B3 · ⬜ L2 · ⬜ R2 · ⬜ R3 · ⬜ V1 · ⬜ X1 · ⬜ P2
 **Dados externos:** ⬜ pesquisa de fontes · ⬜ integração (rotina + banco + fonte/data na tela)
 **Média:** ⬜ A5 · ⬜ A7 · ⬜ A8 · ⬜ P4 · ⬜ P5 · ⬜ F3 · ⬜ F4 · ⬜ T2 · ⬜ T3 · ⬜ X2 · ⬜ Q2 · ⬜ B6 · ⬜ V5 ·
 ⬜ I2 · ⬜ I3 · ⬜ M2 · ⬜ M4 · ⬜ R5 · ⬜ D4 · ⬜ A6 · ⬜ A9 · ⬜ P3 · ⬜ F5 · ⬜ T4 · ⬜ X3 · ⬜ Q1 · ⬜ B5 ·
@@ -238,6 +238,11 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
   vinculado; atleta só registra o próprio bem-estar). `users.atleta_id` (+ `ALTER TABLE ... IF NOT EXISTS`).
   Login devolve `papel` e `atleta_id`. Front: `CS_PAPEIS`/`CS_PERMS` (espelho), `csPapel()`, `csPode(perm)`,
   `applyPermissions()` (esconde botões), Registro diário em modo leitura conforme o papel. 6 testes no backend.
+
+- **B3:** tabela `eventos_jogo` (partida, clube, atleta_id, tipo, resultado, minuto, x, y — 0–100, x=comprimento
+  com 100 = gol atacado) + rota `backend/routes/eventos.js` (`GET ?partida=|?clube=`, POST, DELETE; escrita só
+  para `eventos:write` = técnico/analista/scout). Front: `CS_SYNC_COLS` mapeia coleção → rota (srpe, bemestar,
+  eventos). 7 testes no backend.
 
 ## Trabalhos futuros
 _(preencher na revisão de segunda-feira com o que não der tempo)_

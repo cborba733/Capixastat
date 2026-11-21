@@ -90,3 +90,18 @@ test('B2: perfis de acesso (diretor, atleta)', async () => {
   assert.equal((await req('POST', '/api/registros/bemestar', Object.assign({ id: 'a2', atletaId: 'rb_outro' }, wb), a.body.token)).status, 403);
   assert.equal((await req('POST', '/api/registros/srpe', { id: 'a3', atletaId: 'rb_edu', data: '2026-11-20', minutos: 60, rpe: 5 }, a.body.token)).status, 403);
 });
+
+test('B3: eventos de jogo', async () => {
+  const ev = { id: 'e1', partida: 'serieD|Rio Branco ES|Uberlândia EC|27/06', clube: 'Rio Branco ES', atletaId: 'rb_edu', tipo: 'finalizacao', resultado: 'no_alvo', minuto: 33, x: 88, y: 45 };
+  // o usuário de teste é Preparador Físico → não marca eventos (permissão vem antes da validação)
+  assert.equal((await req('POST', '/api/eventos', ev, token)).status, 403);
+  await req('POST', '/api/auth/register', { nome: 'An', email: 'an@t.com', senha: 'senha123', clube: 'Rio Branco ES', funcao: 'Analista de Desempenho' });
+  const an = (await req('POST', '/api/auth/login', { email: 'an@t.com', senha: 'senha123' })).body.token;
+  assert.equal((await req('POST', '/api/eventos', Object.assign({}, ev, { x: 140 }), an)).status, 400);
+  assert.equal((await req('POST', '/api/eventos', Object.assign({}, ev, { tipo: 'voleio' }), an)).status, 400);
+  assert.equal((await req('POST', '/api/eventos', ev, an)).status, 201);
+  const l = await req('GET', '/api/eventos?partida=' + encodeURIComponent(ev.partida), null, an);
+  assert.equal(l.body.eventos.length, 1);
+  assert.equal(l.body.eventos[0].x, 88);
+  assert.equal((await req('DELETE', '/api/eventos/e1', null, an)).status, 200);
+});

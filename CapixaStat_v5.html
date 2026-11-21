@@ -3317,33 +3317,35 @@ async function csCloudPull() {
 
 // ── B4: sincronização dos registros com o backend (/api/registros/:tipo) ──
 // Só sincroniza com login real (token emitido pela API). Sem conexão, o dado fica no navegador.
-var CS_SYNC_COLS = { srpe: true, bemestar: true };
+// B3: coleção → rota da API
+var CS_SYNC_COLS = { srpe: '/api/registros/srpe', bemestar: '/api/registros/bemestar', eventos: '/api/eventos' };
 function csBackendOn() { var t = getToken(); return !!t && t !== 'teste-local'; }
 function csSyncPush(col, rec) {
   if (!csBackendOn() || !CS_SYNC_COLS[col]) return;
   var u = getCurrentUser();
-  apiCall('/api/registros/' + col, { method: 'POST', body: JSON.stringify(Object.assign({ clube: u ? resolveClube(u.clube) : null }, rec)) })
+  apiCall(CS_SYNC_COLS[col], { method: 'POST', body: JSON.stringify(Object.assign({ clube: u ? resolveClube(u.clube) : null }, rec)) })
     .then(function (r) { if (!r.ok && r.status !== 409) console.warn('sync', col, r.status); })
     .catch(function () { /* offline: fica só no navegador */ });
 }
 function csSyncDelete(col, id) {
   if (!csBackendOn() || !CS_SYNC_COLS[col]) return;
-  apiCall('/api/registros/' + col + '/' + encodeURIComponent(id), { method: 'DELETE' }).catch(function () {});
+  apiCall(CS_SYNC_COLS[col] + '/' + encodeURIComponent(id), { method: 'DELETE' }).catch(function () {});
 }
 async function csSyncPull() {
   if (!csBackendOn()) return;
   var u = getCurrentUser(); var clube = u ? resolveClube(u.clube) : '';
   for (var col in CS_SYNC_COLS) {
     try {
-      var r = await apiCall('/api/registros/' + col + '?clube=' + encodeURIComponent(clube || ''));
+      var r = await apiCall(CS_SYNC_COLS[col] + '?clube=' + encodeURIComponent(clube || ''));
       if (!r.ok) continue;
-      var rows = (await r.json()).registros || [];
+      var js = await r.json(); var rows = js.registros || js.eventos || [];
       var local = CSStore.all(col), ids = {};
       local.forEach(function (x) { ids[x.id] = 1; });
       rows.forEach(function (x) {
         if (ids[x.id]) return;
         var rec = { id: x.id, atletaId: x.atleta_id, data: String(x.data).slice(0, 10), criadoEm: x.criado_em };
         if (col === 'srpe') Object.assign(rec, { tipo: x.tipo, minutos: x.minutos, rpe: x.rpe, carga: x.carga });
+        else if (col === 'eventos') Object.assign(rec, { partida: x.partida, clube: x.clube, tipo: x.tipo, resultado: x.resultado, minuto: x.minuto, x: +x.x, y: +x.y });
         else Object.assign(rec, { sono: x.sono, fadiga: x.fadiga, estresse: x.estresse, dor: x.dor, lesao: !!x.lesao, hooper: x.hooper });
         local.push(rec);
       });

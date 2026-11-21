@@ -86,3 +86,20 @@ CREATE TABLE IF NOT EXISTS documentos (
 
 -- ═══ v5 · B2: bancos já existentes (criados antes da v5) ganham a coluna atleta_id ═══
 ALTER TABLE users ADD COLUMN IF NOT EXISTS atleta_id VARCHAR(50);
+
+-- ═══ v5 · B3: eventos de jogo (formato inspirado no StatsBomb Open Data) ═══
+-- Cada linha é uma ação marcada no campo: quem, o quê, quando e onde.
+-- Coordenadas x, y de 0 a 100: x = comprimento (0 = gol defendido, 100 = gol atacado), y = largura.
+CREATE TABLE IF NOT EXISTS eventos_jogo (
+  id         VARCHAR(40) PRIMARY KEY,
+  partida    VARCHAR(200) NOT NULL,   -- chave da partida: competicao|mandante|visitante|data
+  clube      VARCHAR(100),
+  atleta_id  VARCHAR(50),
+  tipo       VARCHAR(30) NOT NULL,    -- finalizacao, passe_chave, desarme, interceptacao, drible, falta, cartao
+  resultado  VARCHAR(30),             -- gol, no_alvo, fora, bloqueado, certo, errado
+  minuto     INTEGER NOT NULL,
+  x          REAL NOT NULL,
+  y          REAL NOT NULL,
+  criado_por INTEGER,
+  criado_em  TIMESTAMP DEFAULT NOW()
+);

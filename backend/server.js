@@ -18,6 +18,7 @@ app.use('/api/players', require('./routes/players'));
 app.use('/api/matches', require('./routes/matches'));
 app.use('/api/registros', require('./routes/registros')); // B4
 app.use('/api/dados',     require('./routes/dados'));     // B1
+app.use('/api/eventos',   require('./routes/eventos'));   // B3
 
 // Rota de teste — confirma que o servidor está online
 app.get('/api/ping', (req, res) => {
