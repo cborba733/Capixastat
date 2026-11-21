@@ -1714,6 +1714,32 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .vf-saved .form-select { width:auto; min-width:170px }
 .vf-more-card { border-style:dashed !important; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; cursor:pointer; color:var(--text-3); font-size:13px; min-height:160px }
 .pcs-min { margin-top:8px; font-size:11px; color:var(--text-3); text-align:center }
+
+/* A2: tabela padrão */
+.cs-table-wrap { overflow:auto; max-height:70vh; border:1px solid var(--border); border-radius:10px; position:relative }
+.cs-table { width:100%; border-collapse:separate; border-spacing:0; font-size:13px }
+.cs-table th { position:sticky; top:0; z-index:2; background:var(--bg-raised); color:var(--text-2); font-size:12px; font-weight:700; text-align:left;
+  padding:9px 10px; border-bottom:1px solid var(--border-md); white-space:nowrap; user-select:none }
+.cs-table th.sortable { cursor:pointer } .cs-table th.sortable:hover, .cs-table th.sortable:focus-visible { color:var(--brand) }
+.cs-table td { padding:8px 10px; border-bottom:1px solid var(--border); color:var(--text-1); white-space:nowrap; background:var(--bg-surface) }
+.cs-table .num { text-align:right; font-variant-numeric:tabular-nums; font-family:var(--font-mono) }
+.cs-table .sticky { position:sticky; left:0; z-index:1 }
+.cs-table th.sticky { z-index:3 }
+.cs-table-wrap.scrolled-x .sticky { box-shadow:6px 0 8px -6px rgba(0,0,0,.45) }
+.cs-table-wrap.scrolled-y thead th { box-shadow:0 6px 8px -6px rgba(0,0,0,.45) }
+.cs-table tbody tr.clickable { cursor:pointer }
+.cs-table tbody tr:hover td { background:var(--bg-raised) }
+.cs-table tbody tr:focus-visible td { outline:2px solid var(--brand); outline-offset:-2px }
+.cs-abbr { font-size:9px; color:var(--text-3); margin-left:2px }
+.cs-dash { color:var(--text-3) }
+.cs-empty-cell { text-align:center !important; padding:20px !important; color:var(--text-3) !important; white-space:normal !important }
+.cs-pname { display:inline-flex; align-items:center; gap:6px; font-weight:600 }
+.st-icos { display:inline-flex; gap:3px }
+.st-ico { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:4px; font-size:11px; font-weight:900; line-height:1 }
+.st-ico.danger { background:var(--danger); color:#fff } .st-ico.warn { background:var(--warn); color:#111 }
+.st-ico.st-yc { width:10px; height:14px; border-radius:2px; background:#facc15 }
+.light .cs-table th { background:#eef2f7 }
+.vf-view { display:inline-flex; border:1px solid var(--border-md); border-radius:9px; overflow:hidden }
 </style>
 </head>
 <body>
@@ -2050,6 +2076,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
             <select id="vf-comp" class="form-select" onchange="renderVitrineJogadores()" aria-label="Competição"></select>
             <select id="vitrine-ordem" class="form-select" onchange="renderVitrineJogadores()" aria-label="Ordenar"><option value="score_desc">Ordenar: Score ↓</option><option value="gols_desc">Gols ↓</option><option value="assists_desc">Assistências ↓</option><option value="min_desc">Minutos ↓</option><option value="idade_asc">Idade ↑</option><option value="nome_asc">Nome A–Z</option></select>
             <button class="btn btn-ghost btn-sm" id="vf-more-btn" onclick="vfToggleMore()" aria-expanded="false">Mais filtros ▾</button>
+            <div class="vf-view" role="group" aria-label="Visualização"><button id="vf-view-cards" class="vf-seg active" onclick="vfSetView('cards')">Cards</button><button id="vf-view-tabela" class="vf-seg" onclick="vfSetView('tabela')">Tabela</button></div>
           </div>
           <div class="vf-more" id="vf-more" hidden>
             <label>Clube<select id="vf-clube" class="form-select" onchange="renderVitrineJogadores()"></select></label>
@@ -2486,13 +2513,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
               <div class="card"><div class="card-title">Distribuição de gols por posição</div><canvas id="chartDonut" height="160"></canvas><p class="chart-insight" id="insight-donut"></p></div>
             </div>
             <div class="card">
-              <div class="card-title">Ranking completo de jogadores <span>Clique para ordenar · Camp. Capixaba 2026</span></div>
-              <table class="data-table">
-                <thead><tr><th>#</th><th>Atleta</th><th>Clube</th><th>Pos.</th><th>Jogos</th><th>Gols</th><th>Assist.</th><th>G/90</th><th>Score ↓</th></tr></thead>
-                <tbody id="estat-ranking-tbody">
-                  <!-- Rendered dynamically -->
-                </tbody>
-              </table>
+              <div class="card-title">Ranking de jogadores <span>Clique no cabeçalho para ordenar · top 50 pelos filtros</span></div>
+              <div id="estat-ranking-table"></div>
             </div>
           </div>
         </div>
@@ -10636,9 +10658,31 @@ function renderEstatRankings() {
     return html;
   }
 
-  const estatBody = document.getElementById('estat-ranking-tbody');
-  
-  if (estatBody) estatBody.innerHTML = makeRows(playersArr.slice(0, 5));
+  // A2: tabela padrão (ordenável, nome fixo, números à direita, cores por faixa, status junto ao nome)
+  const estatBox = document.getElementById('estat-ranking-table');
+  if (estatBox) {
+    const rows = playersArr.map(function (p, i) {
+      const a = playerAgg(p); const p90 = (typeof per90 === 'function') ? per90(a) : {};
+      return { _p: p, rank: i + 1, nome: p.nome, clube: p.clube, pos: p.pos, jogos: a.jogos, min: a.minutos || null,
+        gols: p.pos === 'Goleiro' ? null : a.gols, ast: p.pos === 'Goleiro' ? null : a.assists,
+        g90: p.pos === 'Goleiro' ? null : p90.gols, score: +p.score };
+    });
+    const f2 = function (v) { return v == null ? '<span class="cs-dash">—</span>' : v.toFixed(2); };
+    csTable(estatBox, [
+      { key: 'rank', label: '#', num: true, title: 'Posição pelo score' },
+      { key: 'nome', label: 'Atleta', sticky: true, fmt: function (v, r) { return csPlayerNameCell(r._p); } },
+      { key: 'clube', label: 'Clube' },
+      { key: 'pos', label: 'Pos.', title: 'Posição principal' },
+      { key: 'jogos', label: 'J', title: 'Jogos disputados', num: true },
+      { key: 'min', label: 'Min', title: 'Minutos jogados', num: true },
+      { key: 'gols', label: 'G', title: 'Gols', num: true },
+      { key: 'ast', label: 'A', title: 'Assistências', num: true },
+      { key: 'g90', label: 'G/90', title: 'Gols por 90 minutos (só com 270+ min)', num: true, fmt: f2, range: [0, 0.6] },
+      { key: 'score', label: 'Score', title: 'Score geral CapixaStat (0–100)', num: true, range: [50, 90], fmt: function (v) { return v.toFixed(1); } }
+    ], rows, { id: 'estat', sortKey: 'score', rowLimit: 50, label: 'Ranking de jogadores',
+      empty: 'Nenhum jogador encontrado para estes filtros.',
+      rowClick: function (r) { window._profileExplicit = true; showPlayer(r._p.id); goTo('perfil'); } });
+  }
 }
 
 function aplicarFiltrosEstat() { renderEstatRankings(); }
@@ -10789,6 +10833,87 @@ function renderRankingScreen() {
   }
 }
 
+
+// ══════════════════════════════════════════════════════════════════
+// A2: componente único de tabela (csTable)
+//  cols: [{ key, label, title (dica da abreviação), num (alinha à direita), fmt(v,row),
+//           range: [min,max] para colorir (vermelho→verde), sticky (coluna fixa), sortable (padrão true) }]
+//  opts: { id (guarda a ordenação), rowClick(row), sortKey, sortDir, empty, rowLimit }
+// ══════════════════════════════════════════════════════════════════
+var CS_TABLE_SORT = {};
+function csTable(container, cols, rows, opts) {
+  opts = opts || {};
+  var id = opts.id || 'tbl';
+  var st = CS_TABLE_SORT[id] || { key: opts.sortKey, dir: opts.sortDir || 'desc' };
+  CS_TABLE_SORT[id] = st;
+  var data = rows.slice();
+  if (st.key) {
+    var col = cols.filter(function (c) { return c.key === st.key; })[0] || {};
+    var getv = col.sortVal || function (r) { return r[st.key]; };
+    data.sort(function (a, b) {
+      var x = getv(a), y = getv(b);
+      if (x == null || x === '') return 1; if (y == null || y === '') return -1;
+      var c = (typeof x === 'number' && typeof y === 'number') ? x - y : String(x).localeCompare(String(y), 'pt');
+      return st.dir === 'asc' ? c : -c;
+    });
+  }
+  if (opts.rowLimit) data = data.slice(0, opts.rowLimit);
+  var head = cols.map(function (c, i) {
+    var sorted = st.key === c.key;
+    var aria = sorted ? (st.dir === 'asc' ? 'ascending' : 'descending') : 'none';
+    var arrow = sorted ? (st.dir === 'asc' ? ' ▲' : ' ▼') : '';
+    var canSort = c.sortable !== false;
+    return '<th scope="col" class="' + (c.num ? 'num ' : '') + (c.sticky ? 'sticky ' : '') + (canSort ? 'sortable' : '') + '"' +
+      (c.title ? ' title="' + c.title + '"' : '') + ' aria-sort="' + aria + '"' +
+      (canSort ? ' tabindex="0" data-k="' + c.key + '"' : '') + '>' + c.label + (c.title ? '<sup class="cs-abbr">?</sup>' : '') + arrow + '</th>';
+  }).join('');
+  function cellColor(c, v) {
+    if (!c.range || typeof v !== 'number') return '';
+    var t = Math.max(0, Math.min(1, (v - c.range[0]) / ((c.range[1] - c.range[0]) || 1)));
+    var cor = t < 0.34 ? 'var(--div-neg)' : (t < 0.67 ? 'var(--warn)' : 'var(--div-pos)');
+    return ' style="color:' + cor + '"';
+  }
+  var body = data.map(function (r, ri) {
+    return '<tr data-i="' + ri + '"' + (opts.rowClick ? ' class="clickable" tabindex="0"' : '') + '>' + cols.map(function (c) {
+      var v = r[c.key];
+      var txt = c.fmt ? c.fmt(v, r, ri) : (v == null || v === '' ? '<span class="cs-dash">—</span>' : v);
+      return '<td class="' + (c.num ? 'num ' : '') + (c.sticky ? 'sticky' : '') + '"' + cellColor(c, v) + '>' + txt + '</td>';
+    }).join('') + '</tr>';
+  }).join('');
+  if (!data.length) body = '<tr><td colspan="' + cols.length + '" class="cs-empty-cell">' + (opts.empty || 'Nenhum registro.') + '</td></tr>';
+  container.innerHTML = '<div class="cs-table-wrap" role="region" aria-label="' + (opts.label || 'Tabela') + '" tabindex="0"><table class="cs-table"><thead><tr>' + head + '</tr></thead><tbody>' + body + '</tbody></table></div>';
+  var wrap = container.querySelector('.cs-table-wrap');
+  wrap.addEventListener('scroll', function () { wrap.classList.toggle('scrolled-x', wrap.scrollLeft > 2); wrap.classList.toggle('scrolled-y', wrap.scrollTop > 2); });
+  container.querySelectorAll('th.sortable').forEach(function (th) {
+    var go = function () {
+      var k = th.getAttribute('data-k');
+      if (st.key === k) st.dir = st.dir === 'asc' ? 'desc' : 'asc'; else { st.key = k; st.dir = 'desc'; }
+      csTable(container, cols, rows, opts);
+    };
+    th.addEventListener('click', go);
+    th.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+  });
+  if (opts.rowClick) container.querySelectorAll('tbody tr.clickable').forEach(function (tr) {
+    var fn = function () { opts.rowClick(data[+tr.getAttribute('data-i')]); };
+    tr.addEventListener('click', fn);
+    tr.addEventListener('keydown', function (e) { if (e.key === 'Enter') fn(); });
+  });
+}
+
+// Ícones de status ao lado do nome (signifiers): lesão, treino restrito, cartões
+function playerStatusIcons(p) {
+  var out = '';
+  var c = (typeof playerCondition === 'function') ? playerCondition(p) : null;
+  var origem = c && c.est ? ' (estimado)' : ' (registro real)';
+  if (c && c.status === 'lesion') out += '<span class="st-ico danger" title="Lesionado' + origem + '" aria-label="Lesionado">✚</span>';
+  else if (c && c.status === 'restricao') out += '<span class="st-ico warn" title="Treino restrito' + origem + '" aria-label="Treino restrito">!</span>';
+  if ((p.cartoes || 0) >= 3) out += '<span class="st-ico st-yc" title="' + p.cartoes + ' cartões na temporada" aria-label="' + p.cartoes + ' cartões"></span>';
+  return out ? '<span class="st-icos">' + out + '</span>' : '';
+}
+function csPlayerNameCell(p) {
+  return '<span class="cs-pname">' + p.nome + playerStatusIcons(p) + '</span>';
+}
+
 // ── Estatísticas agregadas por competição (stats.<comp>.{jogos,gols,assists,amarelos,vermelhos,minutos}) ──
 // Competições do recorte capixaba (as demais chaves de `stats` vêm da carreira em outras ligas)
 var COMP_LABELS = { capixabao: 'Capixabão', copaEs: 'Copa ES', serieD: 'Série D', copaVerde: 'Copa Verde', c_copa_do_brasil: 'Copa do Brasil' };
@@ -10895,6 +11020,40 @@ function vfFilteredPlayers() {
   arr.sort(cmp);
   return { arr: arr, clubeNome: clubeNome, comp: comp };
 }
+
+var VF_VIEW = 'cards';
+function vfSetView(v) {
+  VF_VIEW = v;
+  document.getElementById('vf-view-cards').classList.toggle('active', v === 'cards');
+  document.getElementById('vf-view-tabela').classList.toggle('active', v === 'tabela');
+  renderVitrineJogadores();
+}
+function renderVitrineTabela(arr, grid) {
+  grid.className = '';
+  var rows = arr.map(function (p) {
+    var a = p._agg || playerAgg(p);
+    var p90 = (typeof per90 === 'function') ? per90(a) : {};
+    return { _p: p, nome: p.nome, clube: p.clube, pos: p.pos, idade: p.idade || null, jogos: a.jogos, min: a.minutos || null,
+      gols: a.gols, ast: a.assists, g90: p90.gols, ga90: p90.ga, cart: (a.amarelos || 0) + (a.vermelhos || 0) || (+p.cartoes || 0), score: Math.round(p.score) };
+  });
+  var f2 = function (v) { return v == null ? '<span class="cs-dash" title="Menos de 270 min — amostra pequena">—</span>' : v.toFixed(2); };
+  csTable(grid, [
+    { key: 'nome', label: 'Atleta', sticky: true, fmt: function (v, r) { return csPlayerNameCell(r._p); } },
+    { key: 'clube', label: 'Clube' },
+    { key: 'pos', label: 'Pos.', title: 'Posição principal' },
+    { key: 'idade', label: 'Id.', title: 'Idade', num: true },
+    { key: 'jogos', label: 'J', title: 'Jogos disputados', num: true },
+    { key: 'min', label: 'Min', title: 'Minutos jogados', num: true },
+    { key: 'gols', label: 'G', title: 'Gols', num: true },
+    { key: 'ast', label: 'A', title: 'Assistências', num: true },
+    { key: 'g90', label: 'G/90', title: 'Gols por 90 minutos (só com 270+ min)', num: true, fmt: f2, range: [0, 0.6] },
+    { key: 'ga90', label: 'G+A/90', title: 'Gols + assistências por 90 minutos (só com 270+ min)', num: true, fmt: f2, range: [0, 0.8] },
+    { key: 'cart', label: 'Cart.', title: 'Cartões (amarelos + vermelhos)', num: true },
+    { key: 'score', label: 'Score', title: 'Score geral CapixaStat (0–100)', num: true, range: [50, 90] }
+  ], rows, { id: 'vitrine', sortKey: 'score', label: 'Tabela de atletas', empty: 'Nenhum atleta com esses filtros.',
+    rowClick: function (r) { window._profileExplicit = true; showPlayer(r._p.id); } });
+}
+
 function renderVitrineJogadores() {
   vfInitSelects();
   var r = vfFilteredPlayers(), arr = r.arr;
