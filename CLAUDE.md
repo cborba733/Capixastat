@@ -506,6 +506,18 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 3. (Opcional) Conta na API-Football → `API_FOOTBALL_KEY` no `backend/.env`.
 4. Colar no relatório a seção `docs/relatorio_secao_visao_computacional.md` (V6).
 
+## Rodada 2 — pedidos de 21/11/2026 (entrega 24/11)
+Ordem pedida: 1 navegação · 2 GitHub · 3 sem emojis · 4 Táticas · 5 Formação. Mesmas regras (commit por
+item, testar sem erro no console, atualizar este arquivo).
+
+- **R2-1 Navegação:** menu sem Scout ao Vivo, Simulador e Quadro Tático. **Estúdio Tático** (antes "Táticas") é uma
+  entrada só, com abas **Campo** (`taticas`), **Lance animado** (`simulador`) e **Sobre vídeo** (`telestrador`) —
+  `CS_ABAS`, `CS_ABA_DE`, `csAbasRender` (chamada no `goTo`); as telas continuam as mesmas, só mudam título e abas.
+  **Partidas** ganhou as abas **Jogos** e **Scout ao Vivo**. `NAV_PARENT` acende o item pai. **Biblioteca de lances**
+  vira botão nas abas que salvam (Lance animado e Sobre vídeo) e abre em janela (`simLibAbrir`; `simLibRender` desenha
+  no card e na janela; "Abrir" leva à aba Lance animado). **Análise de Vídeo** com selo "Exp." no menu e aviso
+  "Experimental" (testado só com dados sintéticos). Sugestões do assistente (L4) com os nomes novos.
+
 ## Trabalhos futuros
 O que ficou de fora ou só parcialmente feito, em ordem de valor:
 - **Visão computacional em vídeo real:** V1/V2/V3 foram testados com dados sintéticos e um YOLO falso (sem GPU nem

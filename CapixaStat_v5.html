@@ -2077,6 +2077,18 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .ob-tela b { color:var(--brand) }
 .ob-dica { margin-top:14px !important; font-size:12px !important }
 .ob-acoes { display:flex; gap:8px; margin-top:18px }
+
+/* NAV: abas de grupo e selo experimental */
+.cs-abas { display:flex; gap:4px; margin-top:6px; flex-wrap:wrap }
+.cs-aba { background:transparent; border:1px solid var(--border-md); color:var(--text-2); border-radius:8px; padding:4px 12px; font-size:12.5px; font-weight:600; cursor:pointer; font-family:inherit }
+.cs-aba:hover { color:var(--text-1); border-color:var(--brand) }
+.cs-aba.on { background:var(--brand-fill); border-color:var(--brand-fill); color:#fff }
+.cs-aba.lib { margin-left:8px; border-style:dashed }
+.nav-exp { margin-left:auto; font-size:9.5px; font-weight:800; letter-spacing:.4px; text-transform:uppercase; color:var(--warn); border:1px solid var(--warn); border-radius:5px; padding:1px 4px }
+.nav-exp-banner { margin-bottom:14px }
+.lib-modal { width:960px }
+.lib-head { display:flex; align-items:center; justify-content:space-between }
+.lib-head h2 { margin:0 }
 </style>
 </head>
 <body>
@@ -2230,13 +2242,9 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3c2 2 4 5 4 9s-2 7-4 9M12 3c-2 2-4 5-4 9s2 7 4 9M3 12h18"/></svg>
         Partidas
       </div>
-      <div class="nav-item" data-screen="scout" onclick="goTo('scout',this)">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg>
-        Scout ao Vivo
-      </div>
       <div class="nav-item" data-screen="video" onclick="goTo('video',this)">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="13" height="14" rx="2"/><path d="M16 10l5-3v10l-5-3z"/></svg>
-        Análise de Vídeo
+        Análise de Vídeo <span class="nav-exp" title="Prova de conceito testada com dados sintéticos">Exp.</span>
       </div>
 
       <div class="nav-group-label">Jogadores</div>
@@ -2270,17 +2278,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
       </div>
       <div class="nav-item" data-screen="taticas" onclick="goTo('taticas',this)">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M12 3v18M2 12h20M7 7.5h1M16 7.5h1M7 16.5h1M16 16.5h1M12 9v6"/></svg>
-        Táticas
+        Estúdio Tático
       </div>
-      <div class="nav-item" data-screen="simulador" onclick="goTo('simulador',this)">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="6 4 20 12 6 20 6 4"/></svg>
-        Simulador de Lances
-      </div>
-      <div class="nav-item" data-screen="telestrador" onclick="goTo('telestrador',this)">
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
-        Quadro Tático
-      </div>
-
       <div class="sidebar-bottom">
         <a class="sidebar-guia-link" onclick="goTo('guia')">Guia visual do sistema</a>
         <div id="cs-cloud" class="cs-cloud local" role="status" title="Situação da sincronização com a API">● Modo local</div>
@@ -3047,8 +3046,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
       <div id="screen-taticas" class="screen">
         <div class="topbar">
           <div class="topbar-left">
-            <h1>Táticas</h1>
-            <p>Sistema de jogo · Formação · Funções dos atletas</p>
+            <h1>Estúdio Tático</h1>
+            <p>Campo: sistema de jogo, formação e funções dos atletas</p>
           </div>
         </div>
         <div class="content">
@@ -3176,6 +3175,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
           </div>
         </div>
         <div class="content">
+          <div class="cs-est-banner nav-exp-banner"><span class="cs-status warn">Experimental</span><span>Prova de conceito: o fluxo (vídeo → <code>posicoes.csv</code> → análises) foi testado com dados sintéticos; ainda não foi validado com vídeo real de jogo.</span></div>
           <div id="va-status"></div>
           <div class="va-grid">
             <div class="card"><div class="card-title">Vídeo <span id="va-video-nome">nenhum arquivo</span></div>
@@ -3196,7 +3196,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
       <!-- ══ P2: SCOUT AO VIVO (registro manual de eventos no campo) ══ -->
       <div id="screen-scout" class="screen">
         <div class="topbar">
-          <div class="topbar-left"><h1>Scout ao Vivo</h1><p>Marque no campo cada ação do jogo — gera dados próprios do futebol capixaba</p></div>
+          <div class="topbar-left"><h1>Partidas</h1><p>Scout ao Vivo: marque no campo cada ação do jogo — gera dados próprios do futebol capixaba</p></div>
           <div class="topbar-right"><button class="btn btn-ghost btn-sm" onclick="scExportCSV()">Exportar CSV</button></div>
         </div>
         <div class="content">
@@ -3235,7 +3235,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
       <!-- ══ X1: SIMULADOR DE LANCES (quadros animados com legenda) ══ -->
       <div id="screen-simulador" class="screen">
         <div class="topbar">
-          <div class="topbar-left"><h1>Simulador de Lances</h1><p>Monte o lance em quadros, escreva a legenda de cada um e reproduza a animação</p></div>
+          <div class="topbar-left"><h1>Estúdio Tático</h1><p>Lance animado: monte o lance em quadros, escreva a legenda e reproduza a animação</p></div>
           <div class="topbar-right">
             <select id="sim-saved" class="form-select" style="width:auto;min-width:170px" onchange="simLoad(this.value)" aria-label="Lances salvos"></select>
             <span id="sim-editado" class="cs-editado" hidden>editado <button type="button" onclick="simSave(true)" title="Gravar as mudanças no lance salvo">salvar</button></span>
@@ -3327,7 +3327,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 
       <div id="screen-telestrador" class="screen">
         <div class="topbar">
-          <div class="topbar-left"><h1>Quadro Tático</h1><p>Telestração e análise de lances</p></div>
+          <div class="topbar-left"><h1>Estúdio Tático</h1><p>Sobre vídeo: desenhe e anote em cima de um vídeo ou imagem do jogo</p></div>
           <div class="topbar-right" style="gap:8px">
             <label class="tel-act" style="cursor:pointer"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.5-3.5a2 2 0 0 0-2.8 0L5 21"/></svg>Carregar<input id="tel-upload" type="file" accept="image/*,video/*" style="display:none"></label>
             <button class="tel-act" id="tel-undo-btn" onclick="telUndo()"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-4"/></svg>Desfazer</button>
@@ -3640,8 +3640,8 @@ function updateSidebarUser(user) {
 // L4: assistente de primeiro acesso — clube → função → por onde começar
 // ══════════════════════════════════════════════════════════════════
 var OB_FUNCOES = {
-  'Técnico': { d: 'Prepara o time e os jogos.', telas: [['time', 'Meu Time', 'forma, estilo e ranking Elo'], ['taticas', 'Táticas', 'formação e dossiê do adversário'], ['simulador', 'Simulador de Lances', 'monte e anime jogadas']] },
-  'Analista de Desempenho': { d: 'Analisa jogos, adversários e atletas.', telas: [['scout', 'Scout ao Vivo', 'marque as ações no campo'], ['video', 'Análise de Vídeo', 'posições, calor e compactação'], ['estatisticas', 'Estatísticas', 'números do campeonato']] },
+  'Técnico': { d: 'Prepara o time e os jogos.', telas: [['time', 'Meu Time', 'forma, estilo e ranking Elo'], ['taticas', 'Estúdio Tático', 'campo, formação e dossiê do adversário'], ['simulador', 'Estúdio Tático › Lance animado', 'monte e anime jogadas']] },
+  'Analista de Desempenho': { d: 'Analisa jogos, adversários e atletas.', telas: [['scout', 'Partidas › Scout ao Vivo', 'marque as ações no campo'], ['video', 'Análise de Vídeo (experimental)', 'posições, calor e compactação'], ['estatisticas', 'Estatísticas', 'números do campeonato']] },
   'Preparador Físico': { d: 'Controla carga e recuperação.', telas: [['formacao', 'Formação', 'registro diário de esforço e bem-estar'], ['dashboard', 'Visão Geral', 'alertas de carga (ACWR)'], ['perfil', 'Perfil do Atleta', 'maturação e histórico']] },
   'Médico / Fisioterapeuta': { d: 'Acompanha saúde e lesões.', telas: [['formacao', 'Formação', 'bem-estar e queixas de dor'], ['dashboard', 'Visão Geral', 'quem está em alerta'], ['perfil', 'Perfil do Atleta', 'maturação dos atletas da base']] },
   'Scout': { d: 'Procura e avalia jogadores.', telas: [['jogadores', 'Vitrine de Jogadores', 'filtros, lista de observação'], ['comparativo', 'Comparativo', 'dois atletas lado a lado'], ['ranking', 'Ranking', 'os melhores por posição']] },
@@ -4545,7 +4545,11 @@ function simLibPartidas() {
   });
 }
 function simLibRender() {
-  var el = document.getElementById('sim-lib'); if (!el) return;
+  var modal = document.getElementById('sim-lib-modal');
+  if (modal && !document.getElementById('lib-overlay').hidden) { simLibRenderEm(modal); }
+  var el = document.getElementById('sim-lib'); if (el) simLibRenderEm(el);
+}
+function simLibRenderEm(el) {
   var all = simSavedAll(), parts = simLibPartidas();
   var tags = {}; all.forEach(function (l) { (l.tags || []).forEach(function (t) { tags[t] = (tags[t] || 0) + 1; }); });
   var q = SIM_LIB.q.toLowerCase();
@@ -4555,7 +4559,7 @@ function simLibRender() {
   }).sort(function (a, b) { return (b.l.salvoEm || '') < (a.l.salvoEm || '') ? -1 : 1; });
   var partOpts = function (sel) { return '<option value="">— sem partida —</option>' + parts.map(function (p) { return '<option value="' + escAttr(p.label) + '"' + (p.label === sel ? ' selected' : '') + '>' + p.label + '</option>'; }).join(''); };
   el.innerHTML = '<div class="card-title">Biblioteca de lances <span>' + all.length + ' salvo(s)</span></div>' +
-    '<div class="sim-lib-bar"><input class="form-input" placeholder="Buscar por nome, tag ou partida" value="' + escAttr(SIM_LIB.q) + '" oninput="SIM_LIB.q=this.value;simLibRender();this.focus();this.setSelectionRange(this.value.length,this.value.length)" aria-label="Buscar lances">' +
+    '<div class="sim-lib-bar"><input class="form-input" placeholder="Buscar por nome, tag ou partida" value="' + escAttr(SIM_LIB.q) + '" oninput="simLibBusca(this)" aria-label="Buscar lances">' +
     '<div class="sim-lib-tags"><button class="chip' + (SIM_LIB.tag ? '' : ' on') + '" onclick="SIM_LIB.tag=\'\';simLibRender()">Todas</button>' +
     Object.keys(tags).sort().map(function (t) { return '<button class="chip' + (SIM_LIB.tag === t ? ' on' : '') + '" onclick="SIM_LIB.tag=\'' + escAttr(t).replace(/'/g, "\\'") + '\';simLibRender()">' + t + ' <small>' + tags[t] + '</small></button>'; }).join('') + '</div></div>' +
     (lista.length ? '<table class="sim-lib-tab"><thead><tr><th>Lance</th><th>Tags (separe por vírgula)</th><th>Partida</th><th>Quadros</th><th>Salvo em</th><th></th></tr></thead><tbody>' +
@@ -4564,7 +4568,7 @@ function simLibRender() {
           '<td><input class="form-input" value="' + escAttr((l.tags || []).join(', ')) + '" placeholder="ex.: bola parada, ataque" onchange="simLibSet(' + i + ',\'tags\',this.value)" aria-label="Tags de ' + escAttr(l.nome) + '"></td>' +
           '<td><select class="form-select" onchange="simLibSet(' + i + ',\'partida\',this.value)" aria-label="Partida de ' + escAttr(l.nome) + '">' + partOpts(l.partida || '') + '</select></td>' +
           '<td class="num">' + l.frames.length + '</td><td>' + (l.salvoEm ? new Date(l.salvoEm).toLocaleDateString('pt-BR') : '—') + '</td>' +
-          '<td class="act"><button class="btn btn-ghost btn-sm" onclick="simLoad(' + i + ');document.getElementById(\'sim-svg\').scrollIntoView({behavior:\'smooth\',block:\'center\'})">Abrir</button><button class="btn btn-ghost btn-sm" onclick="simLibDel(' + i + ')" aria-label="Excluir ' + escAttr(l.nome) + '">Excluir</button></td></tr>';
+          '<td class="act"><button class="btn btn-ghost btn-sm" onclick="simLibFechar();goTo(\'simulador\');simLoad(' + i + ');setTimeout(function(){document.getElementById(\'sim-svg\').scrollIntoView({behavior:\'smooth\',block:\'center\'})},150)">Abrir</button><button class="btn btn-ghost btn-sm" onclick="simLibDel(' + i + ')" aria-label="Excluir ' + escAttr(l.nome) + '">Excluir</button></td></tr>';
       }).join('') + '</tbody></table>'
       : '<div class="tl2-empty">' + (all.length ? 'Nenhum lance com esse filtro.' : 'Nenhum lance salvo. Monte um lance e clique em <b>Salvar lance</b>.') + '</div>');
 }
@@ -4579,6 +4583,52 @@ function simLibDel(i) {
   all.splice(i, 1); if (simLibWrite(all)) simRenderSaved();
 }
 function escAttr(v) { return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+
+
+// ══════════════════════════════════════════════════════════════════
+// NAV: abas do Estúdio Tático (Campo · Lance animado · Sobre vídeo) e de Partidas (Jogos · Scout ao Vivo)
+// ══════════════════════════════════════════════════════════════════
+var CS_ABAS = {
+  taticas: { grupo: 'estudio', itens: [['taticas', 'Campo'], ['simulador', 'Lance animado'], ['telestrador', 'Sobre vídeo']] },
+  partidas: { grupo: 'partidas', itens: [['partidas', 'Jogos'], ['scout', 'Scout ao Vivo']] }
+};
+var CS_ABA_DE = { taticas: 'taticas', simulador: 'taticas', telestrador: 'taticas', partidas: 'partidas', scout: 'partidas' };
+var CS_ABA_LIB = { simulador: 1, telestrador: 1 }; // abas que salvam lances: mostram o botão da biblioteca
+function csAbasRender(screenId) {
+  var grupo = CS_ABA_DE[screenId]; if (!grupo) return;
+  var tela = document.getElementById('screen-' + screenId); if (!tela) return;
+  var tb = tela.querySelector('.topbar'); if (!tb) return;
+  var bar = tb.querySelector('.cs-abas');
+  if (!bar) {
+    bar = document.createElement('div'); bar.className = 'cs-abas'; bar.setAttribute('role', 'tablist');
+    var h1 = tb.querySelector('h1'); (h1 ? h1.parentElement : tb).appendChild(bar);
+  }
+  bar.setAttribute('aria-label', grupo === 'taticas' ? 'Abas do Estúdio Tático' : 'Abas de Partidas');
+  bar.innerHTML = CS_ABAS[grupo].itens.map(function (a) {
+    var on = a[0] === screenId;
+    return '<button type="button" role="tab" class="cs-aba' + (on ? ' on' : '') + '" aria-selected="' + on + '" onclick="goTo(\'' + a[0] + '\')">' + a[1] + '</button>';
+  }).join('') + (CS_ABA_LIB[screenId] ? '<button type="button" class="cs-aba lib" onclick="simLibAbrir()" title="Lances salvos no Estúdio Tático">Biblioteca de lances</button>' : '');
+}
+// biblioteca de lances em janela, acessível nas abas que salvam lances
+function simLibAbrir() {
+  var ov = document.getElementById('lib-overlay');
+  if (!ov) {
+    ov = document.createElement('div'); ov.id = 'lib-overlay'; ov.className = 'ob-overlay'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-label', 'Biblioteca de lances');
+    ov.innerHTML = '<div class="ob-modal lib-modal"><div class="lib-head"><h2>Biblioteca de lances</h2><button type="button" class="btn btn-ghost btn-sm" onclick="simLibFechar()">Fechar</button></div>' +
+      '<p>Lances montados na aba <b>Lance animado</b>. A aba <b>Sobre vídeo</b> guarda a análise atual com o botão Salvar (uma por vez).</p><div id="sim-lib-modal" class="sim-lib"></div></div>';
+    ov.addEventListener('click', function (e) { if (e.target === ov) simLibFechar(); });
+    document.body.appendChild(ov);
+  }
+  ov.hidden = false; simLibRender();
+  var f = ov.querySelector('input, button'); if (f) f.focus();
+}
+function simLibBusca(inp) {
+  var sel = inp.closest('#sim-lib-modal') ? '#sim-lib-modal' : '#sim-lib';
+  SIM_LIB.q = inp.value; simLibRender();
+  var n = document.querySelector(sel + ' .sim-lib-bar input'); if (n) { n.focus(); n.setSelectionRange(n.value.length, n.value.length); }
+}
+function simLibFechar() { var ov = document.getElementById('lib-overlay'); if (ov) ov.hidden = true; }
+document.addEventListener('keydown', function (e) { var ov = document.getElementById('lib-overlay'); if (e.key === 'Escape' && ov && !ov.hidden) simLibFechar(); });
 
 function simSavedAll() { try { return JSON.parse(localStorage.getItem('capixastat_v5_lances') || '[]'); } catch (e) { return []; } }
 function simRenderSaved() {
@@ -13353,11 +13403,12 @@ function goTo(screenId, navEl) {
   if (s) s.classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   // L1: telas sem item próprio no menu acendem o item "pai"
-  const NAV_PARENT = { 'cadastro-jogador': 'jogadores' };
+  const NAV_PARENT = { 'cadastro-jogador': 'jogadores', simulador: 'taticas', telestrador: 'taticas', scout: 'partidas' }; // NAV: Estúdio Tático e Scout dentro de Partidas
   if (!navEl || !navEl.classList || !navEl.classList.contains('nav-item')) navEl = document.querySelector('.nav-item[data-screen="' + (NAV_PARENT[screenId] || screenId) + '"]');
   if (navEl) navEl.classList.add('active');
   document.querySelector('.main').scrollTo({top:0, behavior: csReduceMotion() ? 'auto' : 'smooth'}); // M4
   try { ctxBarRender(screenId); } catch (e) { console.warn('L3', e); }
+  try { csAbasRender(screenId); } catch (e) { console.warn('NAV', e); }
   setTimeout(function () { try { csA11yScan(); } catch (e) {} }, 400); // R4
   // Lembra a tela atual (restaurada ao recarregar a página)
   try {
