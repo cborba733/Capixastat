@@ -1902,6 +1902,12 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 
 /* R3 (ajuste tablet): topo do Meu Time quebra em linhas */
 @media (max-width: 1024px) { .team-hero { flex-wrap:wrap; gap:16px } .team-hero-stats { flex-wrap:wrap; gap:14px 22px } }
+
+/* X2 */
+.ds-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px }
+.ds-grid label { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; color:var(--text-2) }
+.ds-grid label:last-child { grid-column:1 / -1 }
+@media (max-width: 768px) { .ds-grid { grid-template-columns:1fr } }
 </style>
 </head>
 <body>
@@ -3909,7 +3915,7 @@ function regAtletaToggle() {
 // Qualquer gravação no localStorage destas chaves agenda o envio (1,5 s depois da última mudança).
 // Ao entrar, baixa o que estiver mais novo no servidor. Sem login real, tudo continua só local.
 // ══════════════════════════════════════════════════════════════════
-var CS_CLOUD_KEYS = { capixastat_taticas: 'taticas', capixastat_taticas_presets: 'taticas_presets', capixastat_tel: 'telestracao', capixastat_userphotos: 'fotos', capixastat_v5_filtros: 'filtros', capixastat_v5_lances: 'lances', capixastat_v5_obs: 'observacao', capixastat_v5_relatorios: 'relatorios', capixastat_v5_microciclos: 'microciclos' };
+var CS_CLOUD_KEYS = { capixastat_taticas: 'taticas', capixastat_taticas_presets: 'taticas_presets', capixastat_tel: 'telestracao', capixastat_userphotos: 'fotos', capixastat_v5_filtros: 'filtros', capixastat_v5_lances: 'lances', capixastat_v5_obs: 'observacao', capixastat_v5_relatorios: 'relatorios', capixastat_v5_microciclos: 'microciclos', capixastat_v5_anotacoes: 'anotacoes' };
 var _csCloudTimers = {}, _csCloudPulling = false;
 function csCloudStamps() { try { return JSON.parse(localStorage.getItem('capixastat_v5_stamps') || '{}'); } catch (e) { return {}; } }
 function csCloudSetStamp(chave, t) { var s = csCloudStamps(); s[chave] = t; try { Storage.prototype._csOrigSet.call(localStorage, 'capixastat_v5_stamps', JSON.stringify(s)); } catch (e) {} }
@@ -14481,12 +14487,39 @@ function _dossieAskAI(name) {
   }
   return tryModel(0);
 }
+
+// ── X2: anotações do estudo do adversário (ficam no Dossiê e entram no PDF) ──
+var DS_CAMPOS = [['ofensiva', 'Fase ofensiva', 'Como ataca: estrutura, saída de bola, por onde progride'], ['defensiva', 'Fase defensiva', 'Altura do bloco, pressão, como recompõe'],
+  ['fortes', 'Pontos fortes', 'O que precisamos neutralizar'], ['fracos', 'Pontos fracos', 'Onde podemos explorar'], ['jogadores', 'Jogadores-chave', 'Quem decide e como marcar']];
+function dsNotesAll() { try { return JSON.parse(localStorage.getItem('capixastat_v5_anotacoes') || '{}'); } catch (e) { return {}; } }
+function dsNotesRender(time) {
+  var holder = document.getElementById('dossie-report-holder'); if (!holder) return;
+  var n = dsNotesAll()[time] || {};
+  var report = document.getElementById('dossie-report');
+  var temAlgo = DS_CAMPOS.some(function (c) { return n[c[0]]; });
+  if (report && temAlgo) {
+    report.insertAdjacentHTML('beforeend', '<div class="dossie-sec"><h4>Anotações do estudo — comissão técnica</h4>' + DS_CAMPOS.filter(function (c) { return n[c[0]]; }).map(function (c) {
+      return '<p><b>' + c[1] + ':</b> ' + csEsc(n[c[0]]) + '</p>'; }).join('') + (n.atualizado ? '<p style="opacity:.7;font-size:12px">Atualizado em ' + new Date(n.atualizado).toLocaleString('pt-BR') + (n.autor ? ' por ' + csEsc(n.autor) : '') + '</p>' : '') + '</div>');
+  }
+  holder.insertAdjacentHTML('beforeend', '<div class="ds-notes"><div class="card-title" style="margin-top:14px">Anotações do estudo <span>salvas por adversário · aparecem no dossiê e no PDF</span></div>' +
+    '<div class="ds-grid">' + DS_CAMPOS.map(function (c) { return '<label>' + c[1] + '<textarea id="ds-' + c[0] + '" class="form-textarea" rows="2" maxlength="500" placeholder="' + c[2] + '">' + csEsc(n[c[0]] || '') + '</textarea></label>'; }).join('') + '</div>' +
+    '<button class="dossie-btn" onclick="dsNotesSave(\'' + time.replace(/'/g, "\\'") + '\')">Salvar anotações</button></div>');
+}
+function dsNotesSave(time) {
+  var all = dsNotesAll(), u = getCurrentUser() || {}, n = { atualizado: new Date().toISOString(), autor: u.nome || '' };
+  DS_CAMPOS.forEach(function (c) { n[c[0]] = (document.getElementById('ds-' + c[0]).value || '').trim(); });
+  all[time] = n;
+  try { localStorage.setItem('capixastat_v5_anotacoes', JSON.stringify(all)); } catch (e) {}
+  csToast('Anotações sobre ' + time + ' salvas'); _dossieGenerate();
+}
+
 function _dossieGenerate() {
   var sel = document.getElementById('dossie-select');
   var name = sel ? sel.value : '';
   if (!name) return;
   var holder = document.getElementById('dossie-report-holder');
   holder.innerHTML = _dossieBuildReport(name);
+  try { dsNotesRender(name); } catch (e) { console.warn('X2', e); }
   var exp = document.getElementById('dossie-export'); if (exp) exp.disabled = false;
   var aiBtn = document.getElementById('dossie-ai');
   if (aiBtn) aiBtn.style.display = _geminiKey() ? '' : 'none';

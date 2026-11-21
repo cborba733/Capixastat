@@ -141,7 +141,7 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 **Alta:** ✅ R1 · ✅ I1 · ✅ L1 · ✅ I4 · ✅ D1 · ✅ D2 · ✅ D3 · ✅ A4 · ✅ P1 · ✅ F1 · ✅ F2 · ✅ T1 · ✅ B4 ·
 ✅ A1 · ✅ A2 · ✅ A3 · ✅ B1 · ✅ B2 · ✅ B3 · ✅ L2 · ✅ R2 · ✅ R3 · ✅ V1 · ✅ X1 · ✅ P2
 **Dados externos:** ✅ pesquisa de fontes · ✅ integração TheSportsDB (rotina + banco + fonte/data na tela)
-**Média:** ✅ A5 · ✅ A7 · ✅ A8 · ✅ P4 · ✅ P5 · ✅ F3 · ✅ F4 · ✅ T2 · ✅ T3 · ⬜ X2 · ⬜ Q2 · ⬜ B6 · ⬜ V5 ·
+**Média:** ✅ A5 · ✅ A7 · ✅ A8 · ✅ P4 · ✅ P5 · ✅ F3 · ✅ F4 · ✅ T2 · ✅ T3 · ✅ X2 · ⬜ Q2 · ⬜ B6 · ⬜ V5 ·
 ⬜ I2 · ⬜ I3 · ⬜ M2 · ⬜ M4 · ⬜ R5 · ⬜ D4 · ⬜ A6 · ⬜ A9 · ⬜ P3 · ⬜ F5 · ⬜ T4 · ⬜ X3 · ⬜ Q1 · ⬜ B5 ·
 ⬜ V2 · ⬜ V4 · ⬜ L3 · ⬜ M1 · ⬜ R4 · ⬜ Q3 · ⬜ V3
 **Baixa:** ⬜ A10 · ⬜ X4 · ⬜ Q4 · ⬜ V6 · ⬜ M3 · ⬜ P6 · ⬜ F6 · ✅ B7 · ⬜ L4
@@ -325,6 +325,10 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 
 - **T3:** Meu Time › "Ranking de força — Elo" (`computeElo`: todos os jogos de `COMPETITIONS` em ordem de data, base 1500,
   K=20, mando +60, peso por saldo `G`), lista dos clubes ES com variação dos últimos 5 jogos + gráfico `chartElo`.
+
+- **X2:** Dossiê do Adversário ganhou "Anotações do estudo" por adversário (fase ofensiva/defensiva, fortes, fracos,
+  jogadores-chave; `dsNotesRender/dsNotesSave`, `capixastat_v5_anotacoes` → nuvem `anotacoes`); as anotações entram
+  no relatório e no PDF do dossiê.
 
 ### ONDE PAROU (21/11, madrugada — limite de uso)
 Próximos itens Média, nesta ordem: P5, F3, F4, T2, T3, X2, Q2, B6, V5, I2, I3, M2, M4, R5 (dif. baixa); depois D4, A6,
