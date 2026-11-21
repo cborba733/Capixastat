@@ -142,7 +142,7 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 ✅ A1 · ✅ A2 · ✅ A3 · ✅ B1 · ✅ B2 · ✅ B3 · ✅ L2 · ✅ R2 · ✅ R3 · ✅ V1 · ✅ X1 · ✅ P2
 **Dados externos:** ✅ pesquisa de fontes · ✅ integração TheSportsDB (rotina + banco + fonte/data na tela)
 **Média:** ✅ A5 · ✅ A7 · ✅ A8 · ✅ P4 · ✅ P5 · ✅ F3 · ✅ F4 · ✅ T2 · ✅ T3 · ✅ X2 · ✅ Q2 · ✅ B6 · ✅ V5 ·
-✅ I2 · ✅ I3 · ✅ M2 · ✅ M4 · ✅ R5 · ⬜ D4 · ⬜ A6 · ⬜ A9 · ⬜ P3 · ⬜ F5 · ⬜ T4 · ⬜ X3 · ⬜ Q1 · ⬜ B5 ·
+✅ I2 · ✅ I3 · ✅ M2 · ✅ M4 · ✅ R5 · ✅ D4 · ⬜ A6 · ⬜ A9 · ⬜ P3 · ⬜ F5 · ⬜ T4 · ⬜ X3 · ⬜ Q1 · ⬜ B5 ·
 ⬜ V2 · ⬜ V4 · ⬜ L3 · ⬜ M1 · ⬜ R4 · ⬜ Q3 · ⬜ V3
 **Baixa:** ⬜ A10 · ⬜ X4 · ⬜ Q4 · ⬜ V6 · ⬜ M3 · ⬜ P6 · ⬜ F6 · ✅ B7 · ⬜ L4
 
@@ -356,6 +356,11 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 - **R5:** plugin global Chart.js `csA11y`: no tema claro troca cores antigas fixas (<3:1 no branco) por versões escuras
   (`CS_A11Y_HEX/RGB`, `csA11yColor`); gráficos de linha/radar com várias séries ganham `pointStyle` e `borderDash`
   diferentes por série (não depender só de cor). Status já usa ícone+texto (I4/A2).
+
+- **D4:** seletor global de **competição** no menu (`.ctx-box`, `CS_CTX`, `ctxSet`, `ctxFilter`, salvo em
+  `capixastat_v5_ctx_comp`): filtra KPIs/próximo jogo/forma da Visão Geral, Meu Time (destaques com `playerAgg` da
+  competição, timing), Vitrine (`vf-comp`) e a aba de Partidas. `CTX_STATS_KEY` mapeia id da competição (`serie-d`) →
+  chave das estatísticas (`serieD`). Temporada fixa 2026 (a base só tem 2026).
 
 ### ONDE PAROU (21/11, madrugada — limite de uso)
 Próximos itens Média (dif. média): D4, A6,

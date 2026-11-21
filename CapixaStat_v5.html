@@ -1936,6 +1936,11 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
   *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important }
   .cs-skel { animation:none !important }
 }
+
+/* D4 */
+.ctx-box { display:grid; grid-template-columns:1fr; gap:4px; padding:10px 14px 6px; border-bottom:1px solid var(--border) }
+.ctx-box label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--text-3) }
+.ctx-box .form-select { font-size:12.5px; padding:6px 8px }
 </style>
 </head>
 <body>
@@ -2064,6 +2069,13 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
         <div class="sidebar-logo-sub">Futebol Capixaba · 2026</div>
       </div>
 
+      <!-- D4: contexto global (competição e temporada) -->
+      <div class="ctx-box">
+        <label for="ctx-comp">Competição</label>
+        <select id="ctx-comp" class="form-select" onchange="ctxSet(this.value)"><option value="">Todas as competições</option></select>
+        <label for="ctx-temp">Temporada</label>
+        <select id="ctx-temp" class="form-select" disabled title="A base tem só a temporada 2026 por enquanto"><option>2026</option></select>
+      </div>
       <div class="nav-group-label">Clube</div>
       <div class="nav-item active" data-screen="dashboard" onclick="goTo('dashboard',this)">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
@@ -3435,6 +3447,7 @@ function enterApp() {
   setTimeout(initCharts, 80);
   updateGlobalStats();
   loadApiPlayers();
+  try { ctxInit(); } catch (e) {}
   try { renderDashTopRow(); renderDashAlerts(); } catch (e) { console.warn('D1/D2', e); }
   setTimeout(function () { try { applyMetricChips(); } catch (e) {} }, 300);
   try { applyPermissions(); } catch (e) {}
@@ -4313,7 +4326,7 @@ var FAIXAS15 = ['0–15', '16–30', '31–45+', '46–60', '61–75', '76–90+
 function faixa15(t) { return t <= 15 ? 0 : t <= 30 ? 1 : t <= 45 ? 2 : t <= 60 ? 3 : t <= 75 ? 4 : 5; }
 function clubTiming(clube) {
   var res = { pro: [0, 0, 0, 0, 0, 0], contra: [0, 0, 0, 0, 0, 0], cartoes: [0, 0, 0, 0, 0, 0], jogos: 0, comEventos: 0 };
-  _getClubAllMatches(clube).forEach(function (j) {
+  ctxFilter(_getClubAllMatches(clube)).forEach(function (j) {
     if (j.gh == null) return;
     res.jogos++;
     var inc = (typeof INCIDENTS !== 'undefined') && INCIDENTS[j._compId + '|' + j.home + '|' + j.away + '|' + j.gh + '|' + j.ga];
@@ -4404,6 +4417,8 @@ function renderTimeDestaques(c, allMatches) {
   var el = document.getElementById('time-destaques');
   if (!el) return;
   var elenco = Object.values(PLAYERS).filter(function (p) { return p.clube === c.nome; });
+  var _sk = CTX_STATS_KEY[CS_CTX.comp];
+  if (_sk) elenco = elenco.map(function (p) { var a = playerAgg(p, _sk); return Object.assign({}, p, { gols: a.gols, assists: a.assists }); }); // D4: números da competição
   var played = allMatches.filter(function (m) { return m.gh !== undefined && m.gh !== null && m._date; }).sort(function (a, b) { return b._date - a._date; });
   var last5 = played.slice(0, 5).reverse();
   var pts = 0;
@@ -4447,6 +4462,27 @@ function csSkeleton(linhas) {
   return '<div class="cs-skel-wrap" aria-busy="true" aria-label="Carregando">' + h + '</div>';
 }
 
+
+// ══════════════════════════════════════════════════════════════════
+// D4: contexto global — competição escolhida no menu filtra Visão Geral, Meu Time, Vitrine e Partidas
+// ══════════════════════════════════════════════════════════════════
+var CTX_STATS_KEY = { 'capixabao': 'capixabao', 'copa-es': 'copaEs', 'serie-d': 'serieD', 'copa-verde': 'copaVerde', 'copa-do-brasil': 'c_copa_do_brasil' };
+var CS_CTX = { comp: (function () { try { return localStorage.getItem('capixastat_v5_ctx_comp') || ''; } catch (e) { return ''; } })(), temporada: '2026' };
+function ctxInit() {
+  var sel = document.getElementById('ctx-comp'); if (!sel) return;
+  if (sel.options.length <= 1) Object.keys(COMPETITIONS).forEach(function (k) { var o = document.createElement('option'); o.value = k; o.textContent = COMPETITIONS[k].nome; sel.appendChild(o); });
+  sel.value = CS_CTX.comp;
+}
+function ctxSet(comp) {
+  CS_CTX.comp = comp; try { localStorage.setItem('capixastat_v5_ctx_comp', comp); } catch (e) {}
+  var vfc = document.getElementById('vf-comp'); if (vfc) vfc.value = CTX_STATS_KEY[comp] || '';
+  var ativa = document.querySelector('.screen.active'); var id = ativa ? ativa.id.replace('screen-', '') : 'dashboard';
+  updateGlobalStats(); goTo(id);
+  csToast(comp ? 'Filtrando por ' + COMPETITIONS[comp].nome : 'Mostrando todas as competições');
+}
+function ctxFilter(jogos) { return CS_CTX.comp ? jogos.filter(function (j) { return j._compId === CS_CTX.comp; }) : jogos; }
+function ctxLabel() { return CS_CTX.comp ? COMPETITIONS[CS_CTX.comp].nome : 'Todas as competições'; }
+
 // ── D1: topo da Visão Geral (próximo jogo + forma) ────────────────
 function _dashClubBadge(nome) {
   return (CLUBS[nome] && CLUBS[nome].escudo) || (typeof EXTRA_BADGES !== 'undefined' && EXTRA_BADGES[nome]) || '';
@@ -4461,7 +4497,7 @@ function renderDashTopRow() {
   var user = getCurrentUser();
   var clube = user ? resolveClube(user.clube) : null;
   if (!clube) { nextEl.innerHTML = formEl.innerHTML = '<div class="dash-mini-lbl">Faça login</div>'; return; }
-  var all = _getClubAllMatches(clube);
+  var all = ctxFilter(_getClubAllMatches(clube)); // D4
   var played = all.filter(function (m) { return m.gh !== undefined && m.gh !== null && m._date; }).sort(function (a, b) { return b._date - a._date; });
   var future = all.filter(function (m) { return (m.gh === undefined || m.gh === null) && m._date; }).sort(function (a, b) { return a._date - b._date; });
   var esc = function (t) { return String(t).replace(/'/g, "\\'"); };
@@ -4510,7 +4546,8 @@ function updateGlobalStats() {
   const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
   const meuClube = user ? resolveClube(user.clube) : null;
   let jogosGerais = [], jogosKpi = [];
-  for (const cd of Object.values(COMPETITIONS)) {
+  for (const [cid, cd] of Object.entries(COMPETITIONS)) {
+    if (typeof CS_CTX !== 'undefined' && CS_CTX.comp && cid !== CS_CTX.comp) continue; // D4
     const jogos = (cd.jogos || []).filter(j => j.gh !== undefined);
     jogosGerais = jogosGerais.concat(jogos);
     jogosKpi = jogosKpi.concat(meuClube ? jogos.filter(j => j.home === meuClube || j.away === meuClube) : jogos);
@@ -12185,6 +12222,7 @@ function renderVitrineTabela(arr, grid) {
 
 function renderVitrineJogadores() {
   vfInitSelects();
+  if (!VF_STATE._ctxAplicado) { VF_STATE._ctxAplicado = true; var _vc = document.getElementById('vf-comp'); if (_vc && CTX_STATS_KEY[CS_CTX.comp]) _vc.value = CTX_STATS_KEY[CS_CTX.comp]; }
   var r = vfFilteredPlayers(), arr = r.arr;
   var sub = document.getElementById('vitrine-topbar-sub');
   if (sub) sub.textContent = (VF_STATE.scope === 'elenco' ? (r.clubeNome || 'Elenco') : VF_STATE.scope === 'obs' ? 'Lista de observação' : 'Toda a base de atletas') + ' · ' + arr.length + ' atleta' + (arr.length !== 1 ? 's' : '');
@@ -12309,7 +12347,7 @@ function goTo(screenId, navEl) {
   if (screenId === 'ranking')      renderEstatRankings();
   if (screenId === 'comparativo')  setTimeout(renderComparativo, 60);
   if (screenId === 'formacao')     { initEvolucaoDropdown(); setTimeout(initFormCharts, 60); }
-  if (screenId === 'partidas')     { showMatchList(); renderMatchList(); renderFontesExternas(); }
+  if (screenId === 'partidas')     { showMatchList(); renderMatchList(); try { if (CS_CTX.comp && document.getElementById('ptab-' + CS_CTX.comp)) setPartidaCompFilter(CS_CTX.comp); } catch (e) {} renderFontesExternas(); }
   if (screenId === 'time')         renderTeamScreen();
   if (screenId === 'taticas')      renderTaticasScreen();
   if (screenId === 'telestrador')  setTimeout(telInit, 30);
@@ -14744,7 +14782,7 @@ function renderTeamScreen() {
   });
 
   _renderTimeLastNext(c, allMatches);
-  try { renderTimeDestaques(c, allMatches); } catch (e) { console.warn('T1', e); }
+  try { renderTimeDestaques(c, ctxFilter(allMatches)); } catch (e) { console.warn('T1', e); }
   try { renderTimeTiming(c); } catch (e) { console.warn('P4', e); }
   try { renderTimeElo(c); } catch (e) { console.warn('T3', e); }
   _renderTimeCalendar(c, allMatches);
