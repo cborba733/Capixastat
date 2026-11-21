@@ -1811,6 +1811,24 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 /* L2 */
 .cs-section-head:first-child { margin-top:0 }
 .guia-ol { margin:0; padding-left:18px; font-size:13px; color:var(--text-2); display:grid; gap:4px }
+
+/* X1: simulador de lances */
+.sim-wrap { display:grid; gap:12px }
+.sim-stage { position:relative; padding:10px }
+#sim-svg { width:100%; height:auto; display:block; border-radius:8px; touch-action:none; user-select:none }
+.sim-tok { cursor:grab } .sim-tok:active { cursor:grabbing }
+.sim-caption { display:none; position:absolute; left:50%; top:18px; transform:translateX(-50%); max-width:80%; z-index:2; background:rgba(5,10,18,.82);
+  color:#fff; border:1px solid rgba(255,255,255,.15); border-radius:10px; padding:8px 14px; font-size:14px; font-weight:600; text-align:center; line-height:1.4 }
+.sim-bar { display:grid; gap:10px }
+.sim-row { display:flex; flex-wrap:wrap; gap:8px; align-items:center }
+.sim-ctl { width:38px; height:38px; border-radius:50%; border:1px solid var(--border-md); background:var(--bg-raised); color:var(--text-1); font-size:15px; cursor:pointer }
+.sim-ctl.play { width:46px; height:46px; background:var(--brand-fill); color:#fff; border:none; font-size:18px }
+.sim-frames { display:flex; gap:6px; flex-wrap:wrap }
+.sim-q { position:relative; padding:6px 12px; border-radius:8px; border:1px solid var(--border-md); background:var(--bg-raised); color:var(--text-2); font-weight:700; font-size:13px; cursor:pointer; font-family:var(--font-mono) }
+.sim-q.active { background:var(--brand-fill); border-color:var(--brand-fill); color:#fff }
+.sim-q i { position:absolute; top:3px; right:3px; width:5px; height:5px; border-radius:50%; background:var(--accent) }
+.sim-spacer { flex:1 }
+.sim-chk { display:inline-flex; gap:6px; align-items:center; font-size:12.5px; color:var(--text-2) }
 </style>
 </head>
 <body>
@@ -1985,6 +2003,10 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
       <div class="nav-item" data-screen="taticas" onclick="goTo('taticas',this)">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M12 3v18M2 12h20M7 7.5h1M16 7.5h1M7 16.5h1M16 16.5h1M12 9v6"/></svg>
         Táticas
+      </div>
+      <div class="nav-item" data-screen="simulador" onclick="goTo('simulador',this)">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+        Simulador de Lances
       </div>
       <div class="nav-item" data-screen="telestrador" onclick="goTo('telestrador',this)">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
@@ -2845,6 +2867,48 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
         .tel-workspace:-webkit-full-screen{background:#070b14;padding:12px;height:100vh;box-sizing:border-box}
         .tel-workspace.tel-max{position:fixed;inset:0;z-index:9999;width:100vw;height:100vh;background:#070b14;padding:12px;box-sizing:border-box}
       </style>
+      <!-- ══ X1: SIMULADOR DE LANCES (quadros animados com legenda) ══ -->
+      <div id="screen-simulador" class="screen">
+        <div class="topbar">
+          <div class="topbar-left"><h1>Simulador de Lances</h1><p>Monte o lance em quadros, escreva a legenda de cada um e reproduza a animação</p></div>
+          <div class="topbar-right">
+            <select id="sim-saved" class="form-select" style="width:auto;min-width:170px" onchange="simLoad(this.value)" aria-label="Lances salvos"></select>
+            <button class="btn btn-ghost btn-sm" onclick="simSave()">Salvar lance</button>
+            <button class="btn btn-ghost btn-sm" onclick="simExportPNG()">Exportar PNG</button>
+            <button class="btn btn-primary btn-sm" onclick="simNew()">+ Novo lance</button>
+          </div>
+        </div>
+        <div class="content">
+          <div class="sim-wrap">
+            <div class="sim-stage card">
+              <div class="sim-caption" id="sim-caption-view" aria-live="polite"></div>
+              <svg id="sim-svg" viewBox="-3 -3 111 74" role="img" aria-label="Campo do simulador de lances"></svg>
+            </div>
+            <div class="sim-bar card">
+              <div class="sim-row">
+                <button class="sim-ctl" onclick="simGo(0)" title="Primeiro quadro" aria-label="Primeiro quadro">⏮</button>
+                <button class="sim-ctl play" id="sim-play" onclick="simPlay()" title="Reproduzir" aria-label="Reproduzir">▶</button>
+                <button class="sim-ctl" onclick="simGo(SIM.cur + 1)" title="Próximo quadro" aria-label="Próximo quadro">⏭</button>
+                <div class="sim-frames" id="sim-frames" role="tablist" aria-label="Quadros"></div>
+                <button class="btn btn-ghost btn-sm" onclick="simAddFrame()">+ Quadro</button>
+                <span class="sim-spacer"></span>
+                <div class="vf-scope" role="group" aria-label="Velocidade">
+                  <button class="vf-seg" data-sp="0.5" onclick="simSpeed(0.5)">0,5×</button><button class="vf-seg active" data-sp="1" onclick="simSpeed(1)">1×</button><button class="vf-seg" data-sp="2" onclick="simSpeed(2)">2×</button>
+                </div>
+                <label class="sim-chk"><input type="checkbox" id="sim-loop"> Repetir</label>
+                <label class="sim-chk"><input type="checkbox" id="sim-trails" checked onchange="simRender()"> Rastros</label>
+              </div>
+              <div class="sim-row">
+                <input id="sim-caption" class="form-input" style="flex:1" maxlength="160" placeholder="Legenda deste quadro (ex.: o lateral sobe e o ponta entra por dentro)" oninput="simSetCaption(this.value)" aria-label="Legenda do quadro">
+                <button class="btn btn-ghost btn-sm" onclick="simDupFrame()">Duplicar quadro</button>
+                <button class="btn btn-ghost btn-sm" onclick="simDelFrame()">Excluir quadro</button>
+              </div>
+              <div class="cs-metric"><b class="cs-metric-tag">Como usar</b><span>Arraste jogadores e bola para montar o Q1. Clique em <b>+ Quadro</b> (copia as posições), mova quem se desloca e escreva a legenda. <b>▶</b> anima de um quadro para o outro. Azul = seu clube, laranja = adversário.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- ══ I4: GUIA VISUAL (documentação dos componentes) ══ -->
       <div id="screen-guia" class="screen">
         <div class="topbar">
@@ -3317,6 +3381,175 @@ function csClubPlayers() {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
 
+
+// ══════════════════════════════════════════════════════════════════
+// X1: SIMULADOR DE LANCES — quadros (posições + legenda) animados em SVG
+// Campo em metros: 105 × 68. Ataque do seu clube da esquerda para a direita.
+// ══════════════════════════════════════════════════════════════════
+var SIM = { frames: [], cur: 0, speed: 1, playing: false, raf: 0, nome: '' };
+var SIM_HOME_433 = [[5, 34], [20, 10], [17, 26], [17, 42], [20, 58], [36, 34], [42, 20], [42, 48], [62, 12], [66, 34], [62, 56]];
+var SIM_AWAY_442 = [[100, 34], [86, 12], [89, 27], [89, 41], [86, 56], [72, 12], [74, 27], [74, 41], [72, 56], [58, 28], [58, 40]];
+function simTokens() {
+  var u = getCurrentUser(); var clube = u ? resolveClube(u.clube) : null;
+  var ordem = { Goleiro: 0, Zagueiro: 1, Lateral: 1, Volante: 2, Meia: 2, Atacante: 3 };
+  var el = Object.values(PLAYERS).filter(function (p) { return p.clube === clube; }).sort(function (a, b) { return b.score - a.score; });
+  var gk = el.filter(function (p) { return p.pos === 'Goleiro'; }).slice(0, 1);
+  var resto = el.filter(function (p) { return p.pos !== 'Goleiro'; }).slice(0, 10).sort(function (a, b) { return (ordem[a.pos] || 2) - (ordem[b.pos] || 2); });
+  var xi = gk.concat(resto);
+  var t = [];
+  for (var i = 0; i < 11; i++) { var p = xi[i]; t.push({ id: 'h' + i, side: 'home', label: p ? p.iniciais : String(i + 1), nome: p ? p.nome : 'Jogador ' + (i + 1) }); }
+  for (var k = 0; k < 11; k++) t.push({ id: 'a' + k, side: 'away', label: String(k + 1), nome: 'Adversário ' + (k + 1) });
+  t.push({ id: 'ball', side: 'ball', label: '', nome: 'Bola' });
+  return t;
+}
+function simDefaultFrame() {
+  var pos = {};
+  for (var i = 0; i < 11; i++) { pos['h' + i] = SIM_HOME_433[i].slice(); pos['a' + i] = SIM_AWAY_442[i].slice(); }
+  pos.ball = [52.5, 34];
+  return { caption: '', pos: pos };
+}
+function simNew() {
+  SIM.tokens = simTokens(); SIM.frames = [simDefaultFrame()]; SIM.cur = 0; SIM.nome = '';
+  var sel = document.getElementById('sim-saved'); if (sel) sel.value = '';
+  simRender();
+}
+function simInit() {
+  if (!SIM.tokens || !SIM.frames.length) simNew(); else simRender();
+  simRenderSaved();
+}
+function simPitchSvg() {
+  var L = 'stroke="rgba(255,255,255,.55)" stroke-width=".35" fill="none"';
+  var g = '<rect x="-3" y="-3" width="111" height="74" fill="#1b5e33"/>';
+  for (var i = 0; i < 10; i++) g += '<rect x="' + (i * 10.5) + '" y="0" width="5.25" height="68" fill="rgba(255,255,255,.035)"/>';
+  g += '<rect x="0" y="0" width="105" height="68" ' + L + '/><line x1="52.5" y1="0" x2="52.5" y2="68" ' + L + '/>' +
+    '<circle cx="52.5" cy="34" r="9.15" ' + L + '/><circle cx="52.5" cy="34" r=".5" fill="rgba(255,255,255,.6)"/>' +
+    '<rect x="0" y="13.84" width="16.5" height="40.32" ' + L + '/><rect x="0" y="24.84" width="5.5" height="18.32" ' + L + '/>' +
+    '<rect x="88.5" y="13.84" width="16.5" height="40.32" ' + L + '/><rect x="99.5" y="24.84" width="5.5" height="18.32" ' + L + '/>' +
+    '<rect x="-1.6" y="30.34" width="1.6" height="7.32" ' + L + '/><rect x="105" y="30.34" width="1.6" height="7.32" ' + L + '/>';
+  return g;
+}
+function simRender(posOverride) {
+  var svg = document.getElementById('sim-svg'); if (!svg || !SIM.frames.length) return;
+  var fr = SIM.frames[SIM.cur], pos = posOverride || fr.pos;
+  var prev = SIM.cur > 0 ? SIM.frames[SIM.cur - 1].pos : null;
+  var showTrails = document.getElementById('sim-trails') && document.getElementById('sim-trails').checked;
+  var h = simPitchSvg();
+  if (showTrails && prev && !posOverride) {
+    SIM.tokens.forEach(function (t) {
+      var a = prev[t.id], b = pos[t.id];
+      if (a && b && (Math.abs(a[0] - b[0]) > .3 || Math.abs(a[1] - b[1]) > .3))
+        h += '<line x1="' + a[0] + '" y1="' + a[1] + '" x2="' + b[0] + '" y2="' + b[1] + '" stroke="' + (t.side === 'ball' ? '#fff' : t.side === 'home' ? '#9cc0ff' : '#fdba74') + '" stroke-width=".45" stroke-dasharray="1.2 .9" opacity=".85" marker-end="url(#sim-arr)"/>';
+    });
+  }
+  h += '<defs><marker id="sim-arr" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="4" markerHeight="4" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#fff"/></marker></defs>';
+  SIM.tokens.forEach(function (t) {
+    var q = pos[t.id]; if (!q) return;
+    if (t.side === 'ball') { h += '<g class="sim-tok" data-id="ball" transform="translate(' + q[0] + ' ' + q[1] + ')"><circle r="1.05" fill="#fff" stroke="#111" stroke-width=".3"/><title>Bola</title></g>'; return; }
+    var fill = t.side === 'home' ? '#2563eb' : '#ea580c';
+    h += '<g class="sim-tok" data-id="' + t.id + '" transform="translate(' + q[0] + ' ' + q[1] + ')"><circle r="2.1" fill="' + fill + '" stroke="#fff" stroke-width=".35"/>' +
+      '<text y=".75" text-anchor="middle" font-size="2" font-weight="800" fill="#fff" font-family="DM Sans, sans-serif">' + t.label + '</text><title>' + t.nome + '</title></g>';
+  });
+  svg.innerHTML = h;
+  simBindDrag(svg);
+  document.getElementById('sim-caption-view').textContent = (SIM.frames.length > 1 ? 'Q' + (SIM.cur + 1) + ' · ' : '') + (fr.caption || '');
+  document.getElementById('sim-caption-view').style.display = fr.caption || SIM.frames.length > 1 ? 'block' : 'none';
+  var cap = document.getElementById('sim-caption'); if (cap && document.activeElement !== cap) cap.value = fr.caption || '';
+  document.getElementById('sim-frames').innerHTML = SIM.frames.map(function (f, i) {
+    return '<button class="sim-q' + (i === SIM.cur ? ' active' : '') + '" role="tab" aria-selected="' + (i === SIM.cur) + '" onclick="simGo(' + i + ')">Q' + (i + 1) + (f.caption ? '<i></i>' : '') + '</button>';
+  }).join('');
+}
+function simBindDrag(svg) {
+  svg.querySelectorAll('.sim-tok').forEach(function (g) {
+    g.addEventListener('pointerdown', function (e) {
+      if (SIM.playing) return;
+      e.preventDefault();
+      var id = g.getAttribute('data-id');
+      var pt = svg.createSVGPoint();
+      g.setPointerCapture(e.pointerId);
+      var move = function (ev) {
+        pt.x = ev.clientX; pt.y = ev.clientY;
+        var c = pt.matrixTransform(svg.getScreenCTM().inverse());
+        var x = Math.max(-2, Math.min(107, c.x)), y = Math.max(-2, Math.min(70, c.y));
+        SIM.frames[SIM.cur].pos[id] = [+x.toFixed(2), +y.toFixed(2)];
+        g.setAttribute('transform', 'translate(' + x + ' ' + y + ')');
+      };
+      var up = function () { g.removeEventListener('pointermove', move); g.removeEventListener('pointerup', up); simRender(); };
+      g.addEventListener('pointermove', move); g.addEventListener('pointerup', up);
+    });
+  });
+}
+function simGo(i) { if (SIM.playing) simStop(); SIM.cur = Math.max(0, Math.min(SIM.frames.length - 1, i)); simRender(); }
+function simCopy(f) { return { caption: '', pos: JSON.parse(JSON.stringify(f.pos)) }; }
+function simAddFrame() { var f = simCopy(SIM.frames[SIM.frames.length - 1]); SIM.frames.push(f); SIM.cur = SIM.frames.length - 1; simRender(); document.getElementById('sim-caption').focus(); }
+function simDupFrame() { var f = simCopy(SIM.frames[SIM.cur]); f.caption = SIM.frames[SIM.cur].caption; SIM.frames.splice(SIM.cur + 1, 0, f); SIM.cur++; simRender(); }
+function simDelFrame() { if (SIM.frames.length < 2) { csToast('O lance precisa de pelo menos um quadro'); return; } SIM.frames.splice(SIM.cur, 1); SIM.cur = Math.max(0, SIM.cur - 1); simRender(); }
+function simSetCaption(v) { SIM.frames[SIM.cur].caption = v; var cv = document.getElementById('sim-caption-view'); cv.textContent = (SIM.frames.length > 1 ? 'Q' + (SIM.cur + 1) + ' · ' : '') + v; cv.style.display = 'block'; }
+function simSpeed(v) { SIM.speed = v; document.querySelectorAll('[data-sp]').forEach(function (b) { b.classList.toggle('active', +b.getAttribute('data-sp') === v); }); }
+function simStop() { SIM.playing = false; cancelAnimationFrame(SIM.raf); var b = document.getElementById('sim-play'); if (b) { b.textContent = '▶'; b.setAttribute('aria-label', 'Reproduzir'); } }
+function simPlay() {
+  if (SIM.playing) { simStop(); simRender(); return; }
+  if (SIM.frames.length < 2) { csToast('Adicione pelo menos 2 quadros para animar'); return; }
+  SIM.playing = true;
+  var b = document.getElementById('sim-play'); b.textContent = '⏸'; b.setAttribute('aria-label', 'Pausar');
+  if (SIM.cur >= SIM.frames.length - 1) SIM.cur = 0;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var from = SIM.cur, t0 = null, dur = 1100 / SIM.speed, hold = 650 / SIM.speed;
+  simRender();
+  var step = function (ts) {
+    if (!SIM.playing) return;
+    if (t0 === null) t0 = ts;
+    var el = ts - t0;
+    if (el < hold) { SIM.raf = requestAnimationFrame(step); return; }
+    var k = reduce ? 1 : Math.min(1, (el - hold) / dur), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+    var A = SIM.frames[from].pos, B = SIM.frames[from + 1].pos, P = {};
+    Object.keys(B).forEach(function (id) { var a = A[id] || B[id]; P[id] = [a[0] + (B[id][0] - a[0]) * e, a[1] + (B[id][1] - a[1]) * e]; });
+    SIM.cur = from; simRender(P);
+    var cv = document.getElementById('sim-caption-view'); cv.textContent = 'Q' + (from + 2) + ' · ' + (SIM.frames[from + 1].caption || ''); cv.style.display = 'block';
+    if (k < 1) { SIM.raf = requestAnimationFrame(step); return; }
+    from++; SIM.cur = from; t0 = null;
+    if (from >= SIM.frames.length - 1) {
+      if (document.getElementById('sim-loop').checked) { from = 0; SIM.cur = 0; simRender(); SIM.raf = requestAnimationFrame(step); return; }
+      simStop(); simRender(); return;
+    }
+    simRender(); SIM.raf = requestAnimationFrame(step);
+  };
+  SIM.raf = requestAnimationFrame(step);
+}
+function simSavedAll() { try { return JSON.parse(localStorage.getItem('capixastat_v5_lances') || '[]'); } catch (e) { return []; } }
+function simRenderSaved() {
+  var sel = document.getElementById('sim-saved'); if (!sel) return;
+  sel.innerHTML = '<option value="">Lances salvos…</option>' + simSavedAll().map(function (l, i) { return '<option value="' + i + '">' + l.nome + ' (' + l.frames.length + ' quadros)</option>'; }).join('');
+}
+function simSave() {
+  var nome = prompt('Nome do lance:', SIM.nome || 'Ultrapassagem pela direita');
+  if (!nome) return;
+  var all = simSavedAll().filter(function (l) { return l.nome !== nome; });
+  all.push({ nome: nome.slice(0, 60), frames: SIM.frames, tokens: SIM.tokens, salvoEm: new Date().toISOString() });
+  try { localStorage.setItem('capixastat_v5_lances', JSON.stringify(all)); } catch (e) { csToast('Não foi possível salvar (armazenamento cheio)'); return; }
+  SIM.nome = nome; simRenderSaved(); csToast('Lance "' + nome + '" salvo');
+}
+function simLoad(i) {
+  var l = simSavedAll()[+i]; if (!l) return;
+  simStop(); SIM.frames = JSON.parse(JSON.stringify(l.frames)); SIM.tokens = l.tokens || simTokens(); SIM.cur = 0; SIM.nome = l.nome; simRender();
+}
+function simExportPNG() {
+  var svg = document.getElementById('sim-svg'); if (!svg) return;
+  var W = 1600, H = Math.round(W * 74 / 111), FOOT = 70;
+  var xml = new XMLSerializer().serializeToString(svg).replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '"');
+  var img = new Image();
+  img.onload = function () {
+    var c = document.createElement('canvas'); c.width = W; c.height = H + FOOT;
+    var ctx = c.getContext('2d'); ctx.fillStyle = '#0a0f18'; ctx.fillRect(0, 0, c.width, c.height); ctx.drawImage(img, 0, 0, W, H);
+    var cap = SIM.frames[SIM.cur].caption;
+    if (cap) { ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(0, 0, W, 64); ctx.fillStyle = '#fff'; ctx.font = '600 30px DM Sans, sans-serif'; ctx.fillText('Q' + (SIM.cur + 1) + ' · ' + cap, 24, 42); }
+    ctx.fillStyle = '#5b95ff'; ctx.font = '700 30px Space Grotesk, sans-serif'; ctx.fillText('CapixaStat', 24, H + 46);
+    ctx.fillStyle = '#a9bccb'; ctx.font = '400 22px DM Sans, sans-serif';
+    var u = getCurrentUser(); ctx.fillText('Simulador de lances · ' + (u ? resolveClube(u.clube) : '') + ' · ' + new Date().toLocaleDateString('pt-BR'), 230, H + 45);
+    var a = document.createElement('a'); a.download = 'capixastat-lance-q' + (SIM.cur + 1) + '.png'; a.href = c.toDataURL('image/png'); a.click();
+  };
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml);
+}
+
 // ══════════════════════════════════════════════════════════════════
 // B2: perfis de acesso (espelho de backend/middleware/permissao.js)
 // ══════════════════════════════════════════════════════════════════
@@ -3357,7 +3590,7 @@ function regAtletaToggle() {
 // Qualquer gravação no localStorage destas chaves agenda o envio (1,5 s depois da última mudança).
 // Ao entrar, baixa o que estiver mais novo no servidor. Sem login real, tudo continua só local.
 // ══════════════════════════════════════════════════════════════════
-var CS_CLOUD_KEYS = { capixastat_taticas: 'taticas', capixastat_taticas_presets: 'taticas_presets', capixastat_tel: 'telestracao', capixastat_userphotos: 'fotos', capixastat_v5_filtros: 'filtros' };
+var CS_CLOUD_KEYS = { capixastat_taticas: 'taticas', capixastat_taticas_presets: 'taticas_presets', capixastat_tel: 'telestracao', capixastat_userphotos: 'fotos', capixastat_v5_filtros: 'filtros', capixastat_v5_lances: 'lances' };
 var _csCloudTimers = {}, _csCloudPulling = false;
 function csCloudStamps() { try { return JSON.parse(localStorage.getItem('capixastat_v5_stamps') || '{}'); } catch (e) { return {}; } }
 function csCloudSetStamp(chave, t) { var s = csCloudStamps(); s[chave] = t; try { Storage.prototype._csOrigSet.call(localStorage, 'capixastat_v5_stamps', JSON.stringify(s)); } catch (e) {} }
@@ -11418,6 +11651,7 @@ function goTo(screenId, navEl) {
   if (screenId === 'time')         renderTeamScreen();
   if (screenId === 'taticas')      renderTaticasScreen();
   if (screenId === 'telestrador')  setTimeout(telInit, 30);
+  if (screenId === 'simulador')    simInit();
   if (screenId === 'jogadores')    renderVitrineJogadores();
   setTimeout(function () { try { applyMetricChips(); } catch (e) {} }, 250);
   if (screenId === 'dashboard')    { try { renderDashTopRow(); renderDashAlerts(); } catch (e) { console.warn('dash', e); } }

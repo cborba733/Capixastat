@@ -139,7 +139,7 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 
 ### Status dos itens (✅ feito · ⏳ em andamento · ⬜ pendente)
 **Alta:** ✅ R1 · ✅ I1 · ✅ L1 · ✅ I4 · ✅ D1 · ✅ D2 · ✅ D3 · ✅ A4 · ✅ P1 · ✅ F1 · ✅ F2 · ✅ T1 · ✅ B4 ·
-✅ A1 · ✅ A2 · ✅ A3 · ✅ B1 · ✅ B2 · ✅ B3 · ✅ L2 · ✅ R2 · ✅ R3 · ⬜ V1 · ⬜ X1 · ⬜ P2
+✅ A1 · ✅ A2 · ✅ A3 · ✅ B1 · ✅ B2 · ✅ B3 · ✅ L2 · ✅ R2 · ✅ R3 · ⬜ V1 · ✅ X1 · ⬜ P2
 **Dados externos:** ⬜ pesquisa de fontes · ⬜ integração (rotina + banco + fonte/data na tela)
 **Média:** ⬜ A5 · ⬜ A7 · ⬜ A8 · ⬜ P4 · ⬜ P5 · ⬜ F3 · ⬜ F4 · ⬜ T2 · ⬜ T3 · ⬜ X2 · ⬜ Q2 · ⬜ B6 · ⬜ V5 ·
 ⬜ I2 · ⬜ I3 · ⬜ M2 · ⬜ M4 · ⬜ R5 · ⬜ D4 · ⬜ A6 · ⬜ A9 · ⬜ P3 · ⬜ F5 · ⬜ T4 · ⬜ X3 · ⬜ Q1 · ⬜ B5 ·
@@ -255,6 +255,12 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 
 - **L2:** padrão de página (cabeçalho → resumo → indicadores → visualizações → detalhes → sobre os dados) com
   `.cs-section-head` na Visão Geral e no Meu Time; padrão documentado no Guia visual.
+
+- **X1:** nova tela **Simulador de Lances** (`screen-simulador`, menu Preparação): campo SVG 105×68 m, 11 do clube
+  (azul, top-11 por score) × adversário 4-4-2 (laranja) + bola, arrastáveis (pointer events); quadros Q1…Qn
+  com legenda, + Quadro/Duplicar/Excluir, ▶ animação com easing entre quadros (0,5×/1×/2×, Repetir, Rastros
+  tracejados, respeita prefers-reduced-motion), salvar/abrir lances (`capixastat_v5_lances`, vai para a nuvem
+  como chave `lances`), Exportar PNG com legenda e rodapé da marca. Estado em `SIM`.
 
 ## Trabalhos futuros
 _(preencher na revisão de segunda-feira com o que não der tempo)_

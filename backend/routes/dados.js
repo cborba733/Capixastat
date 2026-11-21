@@ -8,7 +8,7 @@ const router  = require('express').Router();
 const db      = require('../db');
 const authMid = require('../middleware/auth');
 
-const CHAVES = ['taticas', 'taticas_presets', 'telestracao', 'fotos', 'filtros'];
+const CHAVES = ['taticas', 'taticas_presets', 'telestracao', 'fotos', 'filtros', 'lances'];
 const valida = (req, res) => {
   if (!CHAVES.includes(req.params.chave)) { res.status(404).json({ error: 'Chave desconhecida. Use: ' + CHAVES.join(', ') }); return false; }
   return true;
