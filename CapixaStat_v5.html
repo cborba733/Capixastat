@@ -1752,6 +1752,61 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 /* B1: indicador de nuvem */
 .cs-cloud { font-size:12px; margin:0 0 10px; color:var(--text-3) }
 .cs-cloud.ok { color:var(--ok) } .cs-cloud.pend { color:var(--warn) } .cs-cloud.off { color:var(--danger) }
+
+/* ═══════════════════════════════════════════
+   R3: RESPONSIVIDADE (tablet e celular)
+═══════════════════════════════════════════ */
+.cs-hamb { display:none; position:fixed; top:9px; left:10px; z-index:1001; width:40px; height:40px; border-radius:10px;
+  border:1px solid var(--border-md); background:var(--bg-surface); color:var(--text-1); font-size:20px; align-items:center; justify-content:center; cursor:pointer }
+.cs-nav-scrim { display:none }
+@media (max-width: 1024px) {
+  .kpi-grid { grid-template-columns:repeat(2,1fr) }
+  .player-grid { grid-template-columns:repeat(3,1fr) }
+  .grid-3 { grid-template-columns:1fr 1fr }
+}
+@media (max-width: 768px) {
+  html, body { overflow-x:hidden }
+  .cs-hamb { display:inline-flex }
+  .sidebar { position:fixed; left:0; top:0; bottom:0; height:100vh; transform:translateX(-105%); transition:transform .25s ease; z-index:1000; box-shadow:0 0 40px rgba(0,0,0,.5) }
+  body.nav-open .sidebar { transform:none }
+  body.nav-open .cs-nav-scrim { display:block; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:999 }
+  .main { width:100%; min-width:0 }
+  .topbar { height:auto; min-height:58px; padding:8px 12px 8px 60px; flex-wrap:wrap; gap:6px }
+  .topbar-right { flex-wrap:wrap; gap:6px }
+  .topbar-left h1 { font-size:16px }
+  .content { padding:14px 12px !important }
+  .grid-2, .grid-2-eq, .grid-3, .dash-top-row, .time-destaques, .rg-grid, .time-layout, .md-body, .ov-grid-4, .ov-grid-3,
+  .guia-grid, .fm-dashboard, .taticas-3col, .p90-grid { grid-template-columns:1fr !important }
+  .dash-alerts { grid-column:auto !important }
+  .kpi-grid { grid-template-columns:1fr 1fr }
+  .player-grid { grid-template-columns:1fr 1fr }
+  .vf-bar > * { flex:1 1 100% } .vf-bar .form-select { width:100% }
+  .vf-saved .form-select { min-width:0; flex:1 1 100% }
+  .rg-form { grid-template-columns:1fr }
+  .p90-row { grid-template-columns:1fr 48px 70px 34px }
+  .card, .kpi-card { min-width:0 }
+  canvas { max-width:100% !important }
+  .cs-table-wrap { max-height:60vh }
+  .form-tabs { overflow-x:auto; flex-wrap:nowrap; -webkit-overflow-scrolling:touch }
+  .form-tab { flex-shrink:0 }
+  .sidebar-logo { padding-left:60px }
+  /* R3: ajustes por tela */
+  .ds-method-grid { grid-template-columns:1fr 1fr }
+  .team-hero { flex-direction:column; align-items:flex-start; gap:14px }
+  .team-hero-stats { flex-wrap:wrap; gap:14px 20px; width:100% }
+  .mc-meta, .profile-stats, .ranking-sort-tabs, .p-highlight { flex-wrap:wrap; min-width:0 }
+  .profile-header { flex-direction:column; align-items:flex-start; gap:14px }
+  .profile-info { width:100%; min-width:0 }
+  .profile-stats { gap:12px 18px }
+  .data-table, .tac-player-table, .md-class-table { display:block; overflow-x:auto; white-space:nowrap }
+  .estat-layout { grid-template-columns:1fr !important }
+  .cmp-players, .cmp-cards { grid-template-columns:1fr !important }
+  .micro-calendar { grid-template-columns:repeat(7, 120px); overflow-x:auto; padding-bottom:6px }
+  .mc-meta * { min-width:0 }
+}
+@media (max-width: 420px) {
+  .player-grid { grid-template-columns:1fr }
+}
 </style>
 </head>
 <body>
@@ -2517,7 +2572,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
             <button class="btn btn-primary btn-sm" onclick="gerarRelatorio()">Gerar Relatório</button>
           </div>
         </div>
-        <div class="content" style="display:grid;grid-template-columns:190px 1fr;gap:18px">
+        <div class="content estat-layout" style="display:grid;grid-template-columns:190px 1fr;gap:18px">
           <aside>
             <div class="card">
               <div style="font-size:12px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Filtros</div>
@@ -2591,7 +2646,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
             <div class="cmp-vs">VS</div>
             <select class="form-select" id="cmp-p2" onchange="renderComparativo()"></select>
           </div>
-          <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center;margin-bottom:18px" id="cmp-cards-container">
+          <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center;margin-bottom:18px" id="cmp-cards-container" class="cmp-cards">
             <!-- Rendered dynamically -->
           </div>
           <div class="grid-2-eq">
@@ -3221,6 +3276,28 @@ function csClubPlayers() {
 
 
 
+
+
+// ── R3: menu em gaveta no celular ──
+(function () {
+  function init() {
+    if (document.querySelector('.cs-hamb')) return;
+    var b = document.createElement('button');
+    b.className = 'cs-hamb'; b.type = 'button'; b.setAttribute('aria-label', 'Abrir menu'); b.setAttribute('aria-expanded', 'false'); b.textContent = '☰';
+    var scrim = document.createElement('div'); scrim.className = 'cs-nav-scrim';
+    var toggle = function (open) {
+      document.body.classList.toggle('nav-open', open);
+      b.setAttribute('aria-expanded', String(open)); b.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu'); b.textContent = open ? '✕' : '☰';
+    };
+    b.addEventListener('click', function () { toggle(!document.body.classList.contains('nav-open')); });
+    scrim.addEventListener('click', function () { toggle(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') toggle(false); });
+    document.querySelectorAll('.sidebar .nav-item, .sidebar-guia-link').forEach(function (n) { n.addEventListener('click', function () { toggle(false); }); });
+    var app = document.getElementById('app');
+    (app || document.body).appendChild(scrim); (app || document.body).appendChild(b);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
 
 // ══════════════════════════════════════════════════════════════════
 // B2: perfis de acesso (espelho de backend/middleware/permissao.js)
