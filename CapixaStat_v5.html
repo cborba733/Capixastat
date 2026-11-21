@@ -2035,6 +2035,15 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .cmp-dif-bar.p1 { background:var(--brand) } .cmp-dif-bar.p2 { background:var(--accent) }
 .cmp-dif b.p1 { color:var(--brand) } .cmp-dif b.p2 { color:var(--accent) }
 .cmp-tab tfoot th, .cmp-tab tfoot td { font-weight:700; border-bottom:0 }
+
+/* X4 */
+.dossie-tm { display:grid; grid-template-columns:repeat(6, 1fr); gap:8px; align-items:end }
+.dossie-tm-col { display:flex; flex-direction:column; align-items:center; gap:3px; font-size:11px; color:var(--text-3) }
+.dossie-tm-col b { color:var(--text-1); font-size:12px }
+.dossie-tm-bars { height:70px; width:100%; display:flex; align-items:flex-end; justify-content:center; gap:3px; border-bottom:1px solid var(--border-md) }
+.dossie-tm-bars i { width:14px; border-radius:3px 3px 0 0; min-height:2px }
+.dossie-tm-bars i.pro, .dossie-leg.pro { background:#22c55e } .dossie-tm-bars i.contra, .dossie-leg.contra { background:#f87171 }
+.dossie-leg { display:inline-block; width:9px; height:9px; border-radius:2px; vertical-align:middle }
 </style>
 </head>
 <body>
@@ -15371,6 +15380,28 @@ function _dossieGamePlan(name) {
   parts.push('POSTURA RECOMENDADA: ' + _tacScoutTip(t));
   return parts.join('\n\n');
 }
+
+// ── X4: seção "Como marcam e sofrem gols" do dossiê (entra também no PDF) ──
+function _dossieTimingHtml(name) {
+  var t = clubTiming(name), FX = ["0–15'", "16–30'", "31–45'", "46–60'", "61–75'", "76–90'"];
+  var h = '<div class="dossie-sec"><h4>Como marcam e sofrem gols</h4>';
+  if (!t.comEventos) return h + '<div style="font-size:13px;color:var(--text-3)">Sem eventos minuto a minuto dos jogos deste clube na base.</div></div>';
+  var soma = function (a, i, j) { return a.slice(i, j).reduce(function (x, y) { return x + y; }, 0); };
+  var max = Math.max(1, Math.max.apply(null, t.pro), Math.max.apply(null, t.contra));
+  var tp = soma(t.pro, 0, 6), tc = soma(t.contra, 0, 6);
+  var picoP = t.pro.indexOf(Math.max.apply(null, t.pro)), picoS = t.contra.indexOf(Math.max.apply(null, t.contra));
+  h += '<div class="dossie-tm">' + FX.map(function (f, i) {
+    return '<div class="dossie-tm-col"><div class="dossie-tm-bars"><i class="pro" style="height:' + (t.pro[i] / max * 100).toFixed(0) + '%" title="' + t.pro[i] + ' marcados"></i><i class="contra" style="height:' + (t.contra[i] / max * 100).toFixed(0) + '%" title="' + t.contra[i] + ' sofridos"></i></div>' +
+      '<b>' + t.pro[i] + ' · ' + t.contra[i] + '</b><small>' + f + '</small></div>';
+  }).join('') + '</div>' +
+    '<div class="dossie-kv" style="margin-top:8px"><span><i class="dossie-leg pro"></i> marcados <b>' + tp + '</b> (1ºT ' + soma(t.pro, 0, 3) + ' · 2ºT ' + soma(t.pro, 3, 6) + ')</span>' +
+    '<span><i class="dossie-leg contra"></i> sofridos <b>' + tc + '</b> (1ºT ' + soma(t.contra, 0, 3) + ' · 2ºT ' + soma(t.contra, 3, 6) + ')</span></div>' +
+    '<div style="font-size:12.5px;color:var(--text-2);margin-top:8px">' +
+      (tp ? 'Marca mais entre <b>' + FX[picoP] + '</b>. ' : '') + (tc ? 'Sofre mais entre <b>' + FX[picoS] + '</b>' + (tc ? ' — momento para pressionar.' : '') : 'Não sofreu gols nos jogos com eventos.') +
+    '</div><div style="font-size:11px;color:var(--text-3);margin-top:6px">Eventos oficiais de ' + t.comEventos + ' de ' + t.jogos + ' jogos' + (CS_CTX.comp ? ' (' + ctxLabel() + ')' : '') + '. Acréscimos contam na última faixa de cada tempo.</div></div>';
+  return h;
+}
+
 function _dossieBuildReport(name) {
   var c = CLUBS[name] || null;
   var t = (c && c.taticas) || {};
@@ -15414,6 +15445,9 @@ function _dossieBuildReport(name) {
       '</div>';
   }
   html += '</div>';
+
+  // X4: como marcam e sofrem gols (eventos oficiais por faixa de 15 min — mesma conta do P4)
+  try { html += _dossieTimingHtml(name); } catch (e) { console.warn('X4', e); }
 
   // Jogadores perigosos
   html += '<div class="dossie-sec"><h4>Jogadores perigosos</h4>';

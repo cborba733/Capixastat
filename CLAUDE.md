@@ -146,7 +146,7 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 **Média:** ✅ A5 · ✅ A7 · ✅ A8 · ✅ P4 · ✅ P5 · ✅ F3 · ✅ F4 · ✅ T2 · ✅ T3 · ✅ X2 · ✅ Q2 · ✅ B6 · ✅ V5 ·
 ✅ I2 · ✅ I3 · ✅ M2 · ✅ M4 · ✅ R5 · ✅ D4 · ✅ A6 · ✅ A9 · ✅ P3 · ✅ F5 · ✅ T4 · ✅ X3 · ✅ Q1 · ✅ B5 ·
 ✅ V2 · ✅ V4 · ✅ L3 · ✅ M1 · ✅ R4 · ✅ Q3 · ✅ V3
-**Baixa:** ✅ A10 · ⬜ X4 · ⬜ Q4 · ⬜ V6 · ⬜ M3 · ⬜ P6 · ⬜ F6 · ✅ B7 · ⬜ L4
+**Baixa:** ✅ A10 · ✅ X4 · ⬜ Q4 · ⬜ V6 · ⬜ M3 · ⬜ P6 · ⬜ F6 · ✅ B7 · ⬜ L4
 
 ### Notas por item
 - **R1:** `--text-3` escuro `#4a6a7a`→`#8299aa`, `--text-2` →`#a9bccb`; tema claro: text-3 `#56667a`,
@@ -449,6 +449,11 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
   min, cartões, Score e os 6 eixos do radar), valor dos dois atletas, diferença (1º − 2º) com barra proporcional e cor de
   quem leva vantagem (cartões: menos é melhor), contagem de vantagens no rodapé. Eixos aproximados marcados "est.";
   por 90 só com ≥ 270 min; gols/assistências de goleiro ficam "—".
+
+- **X4:** Dossiê do Adversário ganhou a seção **Como marcam e sofrem gols** (`_dossieTimingHtml`, usa `clubTiming` do P4):
+  barras verdes/vermelhas por faixa de 15 min, totais por tempo, faixa de pico ("sofre mais entre 76–90' — momento para
+  pressionar") e quantos jogos têm eventos. Entra no PDF (o PDF é captura do relatório). Adversário de fora do ES sem
+  eventos → aviso. Testado: dossiê do Vitória-ES + PDF de 1 página gerado (download interceptado no teste).
 
 ### ONDE PAROU (21/11, madrugada — limite de uso)
 Próximos itens Média (dif. média): D4, A6,
