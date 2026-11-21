@@ -15592,6 +15592,16 @@ function _dossieExportPDF() {
         if (sy < canvas.height) pdf.addPage();
       }
     }
+    // Q4: rodapé da marca em todas as páginas
+    var u = getCurrentUser(), nPag = pdf.internal.getNumberOfPages();
+    for (var pg = 1; pg <= nPag; pg++) {
+      pdf.setPage(pg);
+      pdf.setFillColor(10, 15, 24); pdf.rect(0, ph - 20, pw, 20, 'F');
+      pdf.setFont('helvetica', 'bold'); pdf.setFontSize(9); pdf.setTextColor(91, 149, 255); pdf.text('CapixaStat', margin, ph - 7);
+      pdf.setFont('helvetica', 'normal'); pdf.setTextColor(169, 188, 203);
+      pdf.text('Dossiê do adversário · ' + (u ? resolveClube(u.clube) : '') + ' · ' + new Date().toLocaleDateString('pt-BR'), margin + 58, ph - 7);
+      pdf.text(pg + '/' + nPag, pw - margin, ph - 7, { align: 'right' });
+    }
     pdf.save('dossie_' + name + '.pdf');
   }).catch(function(e) {
     alert('Não foi possível gerar o PDF: ' + (e && e.message || e));
