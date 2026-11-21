@@ -1941,6 +1941,10 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .ctx-box { display:grid; grid-template-columns:1fr; gap:4px; padding:10px 14px 6px; border-bottom:1px solid var(--border) }
 .ctx-box label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--text-3) }
 .ctx-box .form-select { font-size:12.5px; padding:6px 8px }
+
+/* P3 */
+.shotmap { width:100%; max-width:420px; display:block; margin:0 auto; border-radius:8px }
+.leg-dot { display:inline-block; width:10px; height:10px; border-radius:50% }
 </style>
 </head>
 <body>
@@ -3038,6 +3042,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
             <div class="card">
               <div class="card-title">Resumo da partida <span id="sc-count"></span></div>
               <div id="sc-resumo"></div>
+              <div id="sc-shotmap" style="margin-top:14px"></div>
               <div class="card-title" style="margin-top:14px">Últimas marcações <span><button class="btn btn-ghost btn-sm" onclick="scUndo()">Desfazer última</button></span></div>
               <div id="sc-lista"></div>
             </div>
@@ -3656,6 +3661,37 @@ function notaFormulaTxt() {
   return 'Nota = 6,0 + gol 1,0 + finalização no alvo 0,2 + passe-chave 0,3 + drible 0,15 + desarme 0,25 + interceptação 0,2 − ação errada 0,15 − falta 0,1 − amarelo 0,5 − vermelho 1,5 (entre 3 e 10). Só considera ações marcadas no Scout ao Vivo.';
 }
 
+
+// ── P3: xG de cada finalização (modelo do V5 — analise-python/xg_modelo.json, StatsBomb Open Data) ──
+var XG_MODELO = { b0: -2.5403, b_dist: -0.0495, b_ang: 1.5248, fonte: 'regressão logística treinada em 794 chutes do StatsBomb Open Data (Copa 2018)' };
+function xgDoChute(x, y) {
+  // x, y de 0 a 100 → metros num campo 105 × 68, gol atacado em x = 105 (traves em y = 30,34 e 37,66)
+  var X = x * 1.05, Y = y * 0.68, dx = 105 - X;
+  var dist = Math.hypot(dx, 34 - Y);
+  var a = Math.hypot(dx, 30.34 - Y), b = Math.hypot(dx, 37.66 - Y), c = 7.32;
+  var ang = Math.acos(Math.max(-1, Math.min(1, (a * a + b * b - c * c) / (2 * a * b + 1e-9))));
+  return 1 / (1 + Math.exp(-(XG_MODELO.b0 + XG_MODELO.b_dist * dist + XG_MODELO.b_ang * ang)));
+}
+function renderShotMap(evs) {
+  var el = document.getElementById('sc-shotmap'); if (!el) return;
+  var chutes = evs.filter(function (e) { return e.tipo === 'finalizacao'; });
+  var totalXg = chutes.reduce(function (s, e) { return s + xgDoChute(e.x, e.y); }, 0), gols = chutes.filter(function (e) { return e.resultado === 'gol'; }).length;
+  // meio campo de ataque (x de 52,5 a 105 m)
+  var L = 'stroke="rgba(255,255,255,.55)" stroke-width=".35" fill="none"';
+  var h = '<rect x="50" y="-2" width="58" height="72" fill="#1b5e33"/><rect x="52.5" y="0" width="52.5" height="68" ' + L + '/><rect x="88.5" y="13.84" width="16.5" height="40.32" ' + L + '/>' +
+    '<rect x="99.5" y="24.84" width="5.5" height="18.32" ' + L + '/><rect x="105" y="30.34" width="1.6" height="7.32" ' + L + '/><circle cx="94" cy="34" r=".5" fill="#fff"/><path d="M52.5 24.85 A9.15 9.15 0 0 1 52.5 43.15" ' + L + '/>';
+  chutes.forEach(function (e) {
+    var xg = xgDoChute(e.x, e.y), r = 0.9 + Math.sqrt(xg) * 4.2, gol = e.resultado === 'gol';
+    h += '<circle cx="' + (e.x * 1.05) + '" cy="' + (e.y * 0.68) + '" r="' + r.toFixed(2) + '" fill="' + (gol ? '#facc15' : '#5b95ff') + '" fill-opacity=".7" stroke="' + (gol ? '#fff' : '#0a0f18') + '" stroke-width="' + (gol ? .5 : .25) + '"><title>' +
+      e.minuto + "' · " + ((PLAYERS[e.atletaId] || {}).nome || '') + ' · ' + (SC_RES_L[e.resultado] || '') + ' · xG ' + xg.toFixed(2) + '</title></circle>';
+  });
+  el.innerHTML = '<div class="card-title">Mapa de finalizações <span>' + chutes.length + ' chutes · ' + gols + ' gols · xG ' + totalXg.toFixed(2) + '</span></div>' +
+    (chutes.length ? '<svg viewBox="50 -2 58 72" class="shotmap" role="img" aria-label="Mapa de finalizações">' + h + '</svg>' +
+      '<div class="tl2-legend"><span><i class="leg-dot" style="background:#facc15"></i> gol</span><span><i class="leg-dot" style="background:#5b95ff"></i> não foi gol</span><span>círculo maior = mais chance de gol (xG)</span></div>'
+      : '<div class="tl2-empty">Nenhuma finalização marcada nesta partida.</div>') +
+    '<div class="cs-metric"><b class="cs-metric-tag">xG</b><span>Gols esperados: chance de cada chute virar gol pela distância e pelo ângulo do gol — ' + XG_MODELO.fonte + '. Soma do xG maior que os gols = time finalizou bem e faltou acerto; menor = aproveitou além do esperado.</span></div>';
+}
+
 // ══════════════════════════════════════════════════════════════════
 // P2: SCOUT AO VIVO — eventos {partida, atletaId, tipo, resultado, minuto, x, y} (formato do B3)
 // x, y de 0 a 100 (x = comprimento, 100 = gol atacado pelo seu clube).
@@ -3755,16 +3791,19 @@ function scRender() {
   });
   document.getElementById('sc-count').textContent = evs.length + ' marcação(ões)';
   var rows = Object.keys(porAt).map(function (id) { var a = porAt[id]; return { _p: PLAYERS[id] || { nome: id }, nome: (PLAYERS[id] || {}).nome || id, fin: a.fin, alvo: a.alvo, gol: a.gol, pc: a.pc, dr: a.dr, des: a.des, err: a.err,
-    nota: notaDoJogo(evs.filter(function (e) { return e.atletaId === id; })) }; }); // A9
+    nota: notaDoJogo(evs.filter(function (e) { return e.atletaId === id; })),
+    xg: evs.filter(function (e) { return e.atletaId === id && e.tipo === 'finalizacao'; }).reduce(function (t, e) { return t + xgDoChute(e.x, e.y); }, 0) }; }); // A9 + P3
   csTable(document.getElementById('sc-resumo'), [
     { key: 'nome', label: 'Atleta', sticky: true },
     { key: 'fin', label: 'Fin', title: 'Finalizações', num: true }, { key: 'alvo', label: 'Alvo', title: 'Finalizações no alvo (inclui gols)', num: true },
-    { key: 'gol', label: 'Gols', num: true }, { key: 'pc', label: 'PC', title: 'Passes-chave certos', num: true },
+    { key: 'gol', label: 'Gols', num: true }, { key: 'xg', label: 'xG', title: 'Gols esperados das finalizações (P3)', num: true, fmt: function (v) { return v.toFixed(2); } },
+    { key: 'pc', label: 'PC', title: 'Passes-chave certos', num: true },
     { key: 'dr', label: 'Dr', title: 'Dribles certos', num: true }, { key: 'des', label: 'Rec', title: 'Desarmes + interceptações', num: true },
     { key: 'err', label: 'Err', title: 'Ações erradas', num: true },
     { key: 'nota', label: 'Nota', title: 'Nota CapixaStat do jogo (fórmula abaixo)', num: true, range: [5, 8], fmt: function (v) { return v.toFixed(1); } }
   ], rows, { id: 'scout', sortKey: 'nota', label: 'Resumo do scout', empty: 'Nenhuma marcação nesta partida ainda.' });
   document.getElementById('sc-resumo').insertAdjacentHTML('beforeend', '<div class="cs-metric"><b class="cs-metric-tag">Nota</b><span>' + notaFormulaTxt() + '</span></div>');
+  renderShotMap(evs);
   document.getElementById('sc-lista').innerHTML = evs.slice().reverse().slice(0, 12).map(function (e) {
     return '<div class="sc-item"><span class="tl2-min">' + e.minuto + "'</span><i style=\"background:" + (SC_COR[e.resultado] || '#fff') + '"></i><span>' + ((PLAYERS[e.atletaId] || {}).nome || e.atletaId) + ' · ' + SC_TIPOS[e.tipo].l + ' · ' + (SC_RES_L[e.resultado] || '') + '</span><button class="btn btn-ghost btn-sm" onclick="scDel(\'' + e.id + '\')" aria-label="Excluir marcação">✕</button></div>';
   }).join('') || '<div class="tl2-empty">Clique no campo para marcar a primeira ação.</div>';

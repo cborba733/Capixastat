@@ -142,7 +142,7 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 ✅ A1 · ✅ A2 · ✅ A3 · ✅ B1 · ✅ B2 · ✅ B3 · ✅ L2 · ✅ R2 · ✅ R3 · ✅ V1 · ✅ X1 · ✅ P2
 **Dados externos:** ✅ pesquisa de fontes · ✅ integração TheSportsDB (rotina + banco + fonte/data na tela)
 **Média:** ✅ A5 · ✅ A7 · ✅ A8 · ✅ P4 · ✅ P5 · ✅ F3 · ✅ F4 · ✅ T2 · ✅ T3 · ✅ X2 · ✅ Q2 · ✅ B6 · ✅ V5 ·
-✅ I2 · ✅ I3 · ✅ M2 · ✅ M4 · ✅ R5 · ✅ D4 · ✅ A6 · ✅ A9 · ⬜ P3 · ⬜ F5 · ⬜ T4 · ⬜ X3 · ⬜ Q1 · ⬜ B5 ·
+✅ I2 · ✅ I3 · ✅ M2 · ✅ M4 · ✅ R5 · ✅ D4 · ✅ A6 · ✅ A9 · ✅ P3 · ⬜ F5 · ⬜ T4 · ⬜ X3 · ⬜ Q1 · ⬜ B5 ·
 ⬜ V2 · ⬜ V4 · ⬜ L3 · ⬜ M1 · ⬜ R4 · ⬜ Q3 · ⬜ V3
 **Baixa:** ⬜ A10 · ⬜ X4 · ⬜ Q4 · ⬜ V6 · ⬜ M3 · ⬜ P6 · ⬜ F6 · ✅ B7 · ⬜ L4
 
@@ -371,6 +371,10 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
   passe-chave +0,3, drible +0,15, desarme +0,25, interceptação +0,2, erro −0,15, falta −0,1, amarelo −0,5, vermelho −1,5;
   limite 3–10) — coluna "Nota" no resumo do Scout ao Vivo + fórmula na tela. Só usa ações marcadas (sem escalação
   não dá para avaliar quem jogou sem evento).
+
+- **P3:** `xgDoChute(x, y)` em JS com os coeficientes do V5 (`XG_MODELO` — mesmos valores do Python: 6 m→0,24,
+  11 m→0,11, 25 m→0,03); Scout ao Vivo ganhou **Mapa de finalizações** (`renderShotMap`, meio-campo em SVG, círculo ∝ √xG,
+  amarelo = gol) e coluna xG no resumo por atleta.
 
 ### ONDE PAROU (21/11, madrugada — limite de uso)
 Próximos itens Média (dif. média): D4, A6,
