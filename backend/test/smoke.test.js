@@ -105,3 +105,34 @@ test('B3: eventos de jogo', async () => {
   assert.equal(l.body.eventos[0].x, 88);
   assert.equal((await req('DELETE', '/api/eventos/e1', null, an)).status, 200);
 });
+
+test('Dados externos: importador TheSportsDB (fonte simulada) grava jogos, classificação e log B7', async () => {
+  process.env.THESPORTSDB_PAUSA_MS = '1';
+  const origFetch = global.fetch;
+  const rodadas = { 1: [{ idEvent: '900', intRound: '1', dateEvent: '2026-01-13', strTimeLocal: '19:00:00', strHomeTeam: 'Rio Branco-ES', strAwayTeam: 'Serra', intHomeScore: '0', intAwayScore: '0', strVenue: 'Kleber Andrade' }],
+                    2: [{ idEvent: '901', intRound: '2', dateEvent: '2026-01-17', strHomeTeam: 'Vitória-ES', strAwayTeam: 'Forte', intHomeScore: '2', intAwayScore: '1' }] };
+  global.fetch = async (url, opts) => {
+    if (!String(url).includes('thesportsdb')) return origFetch(url, opts);
+    const u = String(url);
+    let body;
+    if (u.includes('eventsround')) { const r = +/r=(\d+)/.exec(u)[1]; body = { events: rodadas[r] || null }; }
+    else body = { table: [{ intRank: '1', strTeam: 'Vitória-ES', intPlayed: '9', intWin: '6', intDraw: '2', intLoss: '1', intGoalsFor: '14', intGoalsAgainst: '4', intGoalDifference: '10', intPoints: '20', strForm: 'LWWDW' }] };
+    return new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } });
+  };
+  try {
+    const { importar } = require('../importar/thesportsdb');
+    const r = await importar({ competicao: 'capixabao', temporada: '2026', log: () => {} });
+    assert.equal(r.ok, true, JSON.stringify(r));
+    assert.equal(r.registros, 3);
+    const p = await req('GET', '/api/fontes/partidas?competicao=capixabao&temporada=2026');
+    assert.equal(p.body.partidas.length, 2);
+    assert.equal(p.body.partidas[0].fonte, 'thesportsdb');
+    const c = await req('GET', '/api/fontes/classificacao?competicao=capixabao&temporada=2026');
+    assert.equal(c.body.classificacao[0].forma, 'LWWDW');
+    const s = await req('GET', '/api/fontes/status');
+    assert.equal(s.body.importacoes[0].status, 'ok');
+    // reimportar não duplica (atualiza)
+    await importar({ competicao: 'capixabao', temporada: '2026', log: () => {} });
+    assert.equal((await req('GET', '/api/fontes/partidas?competicao=capixabao&temporada=2026')).body.partidas.length, 2);
+  } finally { global.fetch = origFetch; }
+});

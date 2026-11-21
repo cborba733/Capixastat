@@ -19,6 +19,7 @@ app.use('/api/matches', require('./routes/matches'));
 app.use('/api/registros', require('./routes/registros')); // B4
 app.use('/api/dados',     require('./routes/dados'));     // B1
 app.use('/api/eventos',   require('./routes/eventos'));   // B3
+app.use('/api/fontes',    require('./routes/fontes'));    // dados externos + B7
 
 // Rota de teste — confirma que o servidor está online
 app.get('/api/ping', (req, res) => {
@@ -54,6 +55,7 @@ if (require.main === module) {
     } catch (e) {
       console.error('Erro ao conectar no banco:', e.message);
     }
+    require('./routes/fontes').agendarImportacao(); // IMPORT_AUTO=1 liga a rotina diária
   });
 }
 

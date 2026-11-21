@@ -103,3 +103,50 @@ CREATE TABLE IF NOT EXISTS eventos_jogo (
   criado_por INTEGER,
   criado_em  TIMESTAMP DEFAULT NOW()
 );
+
+-- ═══ v5 · Dados externos + B7: partidas e classificação importadas de fontes permitidas ═══
+-- A rotina de importação (backend/importar/) grava aqui; as telas leem daqui (nunca chamam a fonte direto).
+CREATE TABLE IF NOT EXISTS fonte_partidas (
+  fonte         VARCHAR(30)  NOT NULL,   -- ex.: thesportsdb
+  id_externo    VARCHAR(40)  NOT NULL,   -- id do jogo na fonte
+  competicao    VARCHAR(60)  NOT NULL,   -- ex.: capixabao
+  temporada     VARCHAR(10)  NOT NULL,
+  rodada        INTEGER,
+  data          DATE,
+  hora          VARCHAR(8),
+  mandante      VARCHAR(100),
+  visitante     VARCHAR(100),
+  gols_mandante INTEGER,
+  gols_visitante INTEGER,
+  estadio       VARCHAR(120),
+  status        VARCHAR(30),
+  fonte_url     VARCHAR(300),
+  atualizado_em TIMESTAMP DEFAULT NOW(),
+  PRIMARY KEY (fonte, id_externo)
+);
+
+CREATE TABLE IF NOT EXISTS fonte_classificacao (
+  fonte         VARCHAR(30) NOT NULL,
+  competicao    VARCHAR(60) NOT NULL,
+  temporada     VARCHAR(10) NOT NULL,
+  posicao       INTEGER,
+  time          VARCHAR(100) NOT NULL,
+  pj INTEGER, v INTEGER, e INTEGER, d INTEGER, gp INTEGER, gc INTEGER, sg INTEGER, pts INTEGER,
+  forma         VARCHAR(10),
+  grupo         VARCHAR(80),
+  atualizado_em TIMESTAMP DEFAULT NOW(),
+  PRIMARY KEY (fonte, competicao, temporada, time)
+);
+
+-- B7: registro de cada importação (fonte, quando, quantos registros, erro)
+CREATE TABLE IF NOT EXISTS importacoes (
+  id           SERIAL PRIMARY KEY,
+  fonte        VARCHAR(30) NOT NULL,
+  competicao   VARCHAR(60),
+  temporada    VARCHAR(10),
+  iniciado_em  TIMESTAMP DEFAULT NOW(),
+  terminado_em TIMESTAMP,
+  status       VARCHAR(20),              -- ok | erro | parcial
+  registros    INTEGER DEFAULT 0,
+  mensagem     VARCHAR(500)
+);

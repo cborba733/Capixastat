@@ -1846,6 +1846,13 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .sc-item span:nth-child(3) { flex:1 }
 .sc-item i { width:10px; height:10px; border-radius:50%; flex-shrink:0 }
 .sc-item .tl2-min { width:42px }
+
+/* Dados externos */
+.ext-card { margin-bottom:16px }
+.ext-head { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px }
+.ext-actions { display:flex; flex-wrap:wrap; gap:8px; align-items:center }
+.ext-proc { font-size:12.5px; color:var(--text-2); margin-bottom:10px; display:flex; flex-wrap:wrap; gap:6px; align-items:center }
+.ext-proc a, .cs-table a.cs-src { color:var(--brand); text-decoration:none }
 </style>
 </head>
 <body>
@@ -2547,6 +2554,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 
           <!-- LISTA DE PARTIDAS -->
           <div id="match-list">
+            <!-- Dados externos importados (rotina diária no backend) + B7 procedência -->
+            <div class="card ext-card" id="ext-card"></div>
             <div id="match-list-title" style="font-size:12px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Partidas registradas — Camp. Capixaba 2026</div>
             <div id="match-comp-tabs" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px"></div>
             <div id="match-cards" style="display:flex;flex-direction:column;gap:10px"></div>
@@ -3440,6 +3449,71 @@ function csClubPlayers() {
 })();
 
 
+
+
+// ══════════════════════════════════════════════════════════════════
+// Dados externos (TheSportsDB → PostgreSQL pela rotina do backend) + B7 (fonte e data na tela)
+// As telas leem /api/fontes/* (banco). Nunca chamam a fonte externa direto do navegador.
+// ══════════════════════════════════════════════════════════════════
+var EXT = { comp: 'capixabao', temporada: '2026', aba: 'jogos' };
+var EXT_FONTES = { thesportsdb: { nome: 'TheSportsDB', url: 'https://www.thesportsdb.com', licenca: 'API pública gratuita' } };
+function extFmtDT(iso) { if (!iso) return '—'; var d = new Date(iso); return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); }
+async function renderFontesExternas() {
+  var el = document.getElementById('ext-card'); if (!el) return;
+  el.innerHTML = '<div class="card-title">Dados externos <span>carregando…</span></div>';
+  var st, jogos, tab;
+  try {
+    var q = '?competicao=' + EXT.comp + '&temporada=' + EXT.temporada;
+    var rs = await Promise.all([fetch(API_URL + '/api/fontes/status'), fetch(API_URL + '/api/fontes/partidas' + q), fetch(API_URL + '/api/fontes/classificacao' + q)]);
+    if (!rs[0].ok) throw new Error('status ' + rs[0].status);
+    st = await rs[0].json(); jogos = (await rs[1].json()).partidas || []; tab = (await rs[2].json()).classificacao || [];
+  } catch (e) {
+    el.innerHTML = '<div class="card-title">Dados externos</div><div class="cs-est-banner" style="margin:0"><span class="cs-status info">API offline</span><span>A importação automática roda no backend (' + API_URL + '). Com a API no ar, aqui aparecem os jogos e a classificação atualizados diariamente, com fonte e data.</span></div>';
+    return;
+  }
+  var ult = (st.importacoes || []).filter(function (i) { return i.competicao === EXT.comp && i.temporada === EXT.temporada; })[0];
+  var fonte = EXT_FONTES.thesportsdb;
+  var proc = ult ? '<span class="cs-status ' + (ult.status === 'ok' ? 'ok' : ult.status === 'rodando' ? 'warn' : 'danger') + '">' + (ult.status === 'ok' ? 'Atualizado' : ult.status === 'rodando' ? 'Atualizando…' : 'Falhou') + '</span> ' +
+      'Fonte: <a href="' + fonte.url + '" target="_blank" rel="noopener">' + fonte.nome + '</a> (' + fonte.licenca + ') · última importação ' + extFmtDT(ult.terminado_em || ult.iniciado_em) + ' · ' + (ult.registros || 0) + ' registros' + (ult.status !== 'ok' && ult.mensagem ? ' · ' + ult.mensagem : '')
+    : '<span class="cs-status info">Sem importação ainda</span> A rotina do backend busca os dados 1× por dia.';
+  var podeAtualizar = ['tecnico', 'analista', 'diretor'].indexOf(csPapel()) !== -1 && csBackendOn();
+  var head = '<div class="ext-head"><div class="card-title" style="margin:0">Dados externos — ' + (EXT.comp === 'capixabao' ? 'Campeonato Capixaba' : 'Série D') + ' ' + EXT.temporada + '</div>' +
+    '<div class="ext-actions"><div class="vf-scope"><button class="vf-seg' + (EXT.comp === 'capixabao' ? ' active' : '') + '" onclick="EXT.comp=\'capixabao\';renderFontesExternas()">Capixabão</button><button class="vf-seg' + (EXT.comp === 'serieD' ? ' active' : '') + '" onclick="EXT.comp=\'serieD\';renderFontesExternas()">Série D</button></div>' +
+    '<div class="vf-scope"><button class="vf-seg' + (EXT.aba === 'jogos' ? ' active' : '') + '" onclick="EXT.aba=\'jogos\';renderFontesExternas()">Jogos</button><button class="vf-seg' + (EXT.aba === 'tabela' ? ' active' : '') + '" onclick="EXT.aba=\'tabela\';renderFontesExternas()">Classificação</button></div>' +
+    (podeAtualizar ? '<button class="btn btn-ghost btn-sm" onclick="extAtualizar()">Atualizar agora</button>' : '') + '</div></div>' +
+    '<div class="ext-proc">' + proc + '</div><div id="ext-body"></div>';
+  el.innerHTML = head;
+  var body = document.getElementById('ext-body');
+  var srcCell = function (v, r) { return '<a class="cs-src real" href="' + (r.fonte_url || fonte.url) + '" target="_blank" rel="noopener" title="Importado em ' + extFmtDT(r.atualizado_em) + '">' + fonte.nome + '</a>'; };
+  if (EXT.aba === 'jogos') {
+    csTable(body, [
+      { key: 'rodada', label: 'Rd', title: 'Rodada', num: true },
+      { key: 'data', label: 'Data', fmt: function (v) { return v ? String(v).slice(0, 10).split('-').reverse().join('/') : '—'; } },
+      { key: 'mandante', label: 'Mandante', sticky: true },
+      { key: 'placar', label: 'Placar', fmt: function (v, r) { return r.gols_mandante == null ? '<span class="cs-dash">x</span>' : '<b class="font-mono">' + r.gols_mandante + '–' + r.gols_visitante + '</b>'; }, sortable: false },
+      { key: 'visitante', label: 'Visitante' },
+      { key: 'estadio', label: 'Estádio' },
+      { key: 'fonte', label: 'Fonte', fmt: srcCell, sortable: false },
+      { key: 'atualizado_em', label: 'Atualizado', fmt: function (v) { return extFmtDT(v); } }
+    ], jogos.map(function (j) { return Object.assign({ placar: '' }, j); }), { id: 'ext-jogos', sortKey: 'data', sortDir: 'desc', label: 'Jogos importados', empty: 'Nenhum jogo importado ainda para esta competição.' });
+  } else {
+    csTable(body, [
+      { key: 'posicao', label: '#', num: true }, { key: 'time', label: 'Time', sticky: true },
+      { key: 'pj', label: 'PJ', num: true }, { key: 'v', label: 'V', num: true }, { key: 'e', label: 'E', num: true }, { key: 'd', label: 'D', num: true },
+      { key: 'gp', label: 'GP', num: true }, { key: 'gc', label: 'GC', num: true }, { key: 'sg', label: 'SG', num: true }, { key: 'pts', label: 'Pts', num: true },
+      { key: 'forma', label: 'Forma', sortable: false, fmt: function (v) { return v ? '<span class="mini-form">' + v.split('').map(function (c) { var r = c === 'W' ? 'V' : c === 'D' ? 'E' : 'D'; return '<i class="' + r + '">' + r + '</i>'; }).join('') + '</span>' : '—'; } },
+      { key: 'fonte', label: 'Fonte', fmt: srcCell, sortable: false }
+    ], tab, { id: 'ext-tab', sortKey: 'posicao', sortDir: 'asc', label: 'Classificação importada', empty: 'Classificação ainda não importada.' });
+  }
+}
+async function extAtualizar() {
+  try {
+    var r = await apiCall('/api/fontes/atualizar', { method: 'POST', body: JSON.stringify({ competicao: EXT.comp, temporada: EXT.temporada }) });
+    var j = await r.json();
+    csToast(r.ok ? 'Importação iniciada — volte em ~1 minuto' : (j.error || 'Não foi possível atualizar'));
+    setTimeout(renderFontesExternas, 1500);
+  } catch (e) { csToast('API offline'); }
+}
 
 // ══════════════════════════════════════════════════════════════════
 // P2: SCOUT AO VIVO — eventos {partida, atletaId, tipo, resultado, minuto, x, y} (formato do B3)
@@ -11825,7 +11899,7 @@ function goTo(screenId, navEl) {
   if (screenId === 'ranking')      renderEstatRankings();
   if (screenId === 'comparativo')  setTimeout(renderComparativo, 60);
   if (screenId === 'formacao')     { initEvolucaoDropdown(); setTimeout(initFormCharts, 60); }
-  if (screenId === 'partidas')     { showMatchList(); renderMatchList(); }
+  if (screenId === 'partidas')     { showMatchList(); renderMatchList(); renderFontesExternas(); }
   if (screenId === 'time')         renderTeamScreen();
   if (screenId === 'taticas')      renderTaticasScreen();
   if (screenId === 'telestrador')  setTimeout(telInit, 30);

@@ -140,11 +140,11 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
 ### Status dos itens (✅ feito · ⏳ em andamento · ⬜ pendente)
 **Alta:** ✅ R1 · ✅ I1 · ✅ L1 · ✅ I4 · ✅ D1 · ✅ D2 · ✅ D3 · ✅ A4 · ✅ P1 · ✅ F1 · ✅ F2 · ✅ T1 · ✅ B4 ·
 ✅ A1 · ✅ A2 · ✅ A3 · ✅ B1 · ✅ B2 · ✅ B3 · ✅ L2 · ✅ R2 · ✅ R3 · ✅ V1 · ✅ X1 · ✅ P2
-**Dados externos:** ⬜ pesquisa de fontes · ⬜ integração (rotina + banco + fonte/data na tela)
+**Dados externos:** ✅ pesquisa de fontes · ✅ integração TheSportsDB (rotina + banco + fonte/data na tela)
 **Média:** ⬜ A5 · ⬜ A7 · ⬜ A8 · ⬜ P4 · ⬜ P5 · ⬜ F3 · ⬜ F4 · ⬜ T2 · ⬜ T3 · ⬜ X2 · ⬜ Q2 · ⬜ B6 · ⬜ V5 ·
 ⬜ I2 · ⬜ I3 · ⬜ M2 · ⬜ M4 · ⬜ R5 · ⬜ D4 · ⬜ A6 · ⬜ A9 · ⬜ P3 · ⬜ F5 · ⬜ T4 · ⬜ X3 · ⬜ Q1 · ⬜ B5 ·
 ⬜ V2 · ⬜ V4 · ⬜ L3 · ⬜ M1 · ⬜ R4 · ⬜ Q3 · ⬜ V3
-**Baixa:** ⬜ A10 · ⬜ X4 · ⬜ Q4 · ⬜ V6 · ⬜ M3 · ⬜ P6 · ⬜ F6 · ⬜ B7 · ⬜ L4
+**Baixa:** ⬜ A10 · ⬜ X4 · ⬜ Q4 · ⬜ V6 · ⬜ M3 · ⬜ P6 · ⬜ F6 · ✅ B7 · ⬜ L4
 
 ### Notas por item
 - **R1:** `--text-3` escuro `#4a6a7a`→`#8299aa`, `--text-2` →`#a9bccb`; tema claro: text-3 `#56667a`,
@@ -272,6 +272,21 @@ revisar/corrigir; o que faltar vai para "Trabalhos futuros" abaixo.
   e **clica no campo** (x,y 0–100). Relógio 1º/2º tempo ou minuto manual, Ctrl+Z desfaz, lista + resumo por
   atleta (`csTable`), Exportar CSV. Salva em `CSStore('eventos')` → sincroniza com `/api/eventos` (B3).
   Só `eventos:write` marca. Chave da partida: `compId|mandante|visitante|data`.
+
+- **Dados externos (fontes pesquisadas em 21/11):** TheSportsDB (API pública, chave grátis `123`, sem cadastro —
+  Capixabão liga **5686**: jogos/placar/rodada/estádio/escudos/classificação com forma; Série D liga **5079**; ~15
+  resultados por consulta e limite de chamadas → buscar **rodada a rodada** com pausa). API-Football cobre o
+  Capixabão (liga **611**) com escalações/estatísticas, mas exige conta (100 req/dia) — **aguardando o Caio criar a
+  conta** e pôr `API_FOOTBALL_KEY` no `backend/.env`. football-data.org grátis não cobre o ES. SofaScore/
+  FlashScore/Transfermarkt/oGol **não** (termos/bloqueio). Wikipedia/Wikidata = reserva para histórico.
+  Implementação: tabelas `fonte_partidas`, `fonte_classificacao`, `importacoes` (B7); importador
+  `backend/importar/thesportsdb.js` (CLI: `node importar/thesportsdb.js --competicao capixabao --temporada 2026`);
+  rotas `backend/routes/fontes.js` (`/api/fontes/status|partidas|classificacao`, `POST /atualizar` p/ técnico/
+  analista/diretor); rotina diária com `IMPORT_AUTO=1` (`IMPORT_COMPETICOES`, `IMPORT_TEMPORADA`,
+  `IMPORT_INTERVALO_H`). Front: painel "Dados externos" em Partidas (`renderFontesExternas`) com fonte, link e
+  data em cada linha + situação da última importação. Testado com importação real (memória).
+- **B7:** procedência: tabela `importacoes` (fonte, competição, início/fim, status, registros, mensagem) +
+  `atualizado_em`/`fonte_url` em cada linha importada, exibidos na tela.
 
 ## Trabalhos futuros
 _(preencher na revisão de segunda-feira com o que não der tempo)_
