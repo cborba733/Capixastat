@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CapixaStat — Plataforma de Análise do Futebol Capixaba</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Barlow+Condensed:ital,wght@0,600;0,700;1,700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1908,6 +1908,15 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .ds-grid label { display:flex; flex-direction:column; gap:4px; font-size:12px; font-weight:600; color:var(--text-2) }
 .ds-grid label:last-child { grid-column:1 / -1 }
 @media (max-width: 768px) { .ds-grid { grid-template-columns:1fr } }
+
+/* ═══ I2: TIPOGRAFIA — títulos condensados, números tabulares ═══ */
+:root { --font-cond: 'Barlow Condensed', 'Space Grotesk', sans-serif; }
+.topbar-left h1 { font-family:var(--font-cond); font-size:24px; font-weight:700; letter-spacing:.2px; line-height:1.1 }
+.cs-section-head h2 { font-family:var(--font-cond); font-size:20px; font-weight:700; letter-spacing:.3px }
+.sidebar-logo-name { font-family:var(--font-cond); font-size:26px; font-style:italic; letter-spacing:.2px }
+.kpi-value, .dest-val, .rg-result b, .tl2-min, .p90-v, .sc-time, .score-num, .insight-score, .profile-stat-val, .team-stat-val { font-variant-numeric:tabular-nums }
+.kpi-value { font-family:var(--font-cond); font-weight:700; letter-spacing:.3px }
+@media (max-width: 768px) { .topbar-left h1 { font-size:20px } }
 </style>
 </head>
 <body>
@@ -3063,7 +3072,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
               <div class="guia-sw"><span><i style="background:var(--data-1)"></i>data-1</span><span><i style="background:var(--data-2)"></i>data-2</span><span><i style="background:var(--data-3)"></i>data-3</span><span><i style="background:var(--data-4)"></i>data-4</span><span><i style="background:var(--data-5)"></i>data-5</span><span><i style="background:var(--data-6)"></i>data-6</span></div>
               <div class="guia-sw" style="margin-top:8px"><span style="width:150px"><i style="background:linear-gradient(90deg,var(--seq-0),var(--seq-1))"></i>sequencial (intensidade)</span><span style="width:150px"><i style="background:linear-gradient(90deg,var(--div-neg),var(--div-mid),var(--div-pos))"></i>divergente (vs. média)</span></div></div>
             <div class="card"><div class="card-title">Tipografia</div>
-              <div style="font-family:var(--font-display);font-size:22px;font-weight:700">Títulos — Space Grotesk</div>
+              <div style="font-family:var(--font-cond);font-size:28px;font-weight:700">Títulos de página — Barlow Condensed</div>
+              <div style="font-family:var(--font-display);font-size:18px;font-weight:700;margin-top:4px">Títulos de card — Space Grotesk</div>
               <div style="font-size:14px;margin:6px 0">Texto — DM Sans 14px (mínimo 12px em rótulos)</div>
               <div style="font-family:var(--font-mono);font-size:14px">Números — JetBrains Mono 0,41 · 87%</div></div>
             <div class="card"><div class="card-title">Botões e badges</div>
