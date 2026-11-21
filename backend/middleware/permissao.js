@@ -15,7 +15,7 @@ const PAPEIS = {
 
 // Quem pode ESCREVER em cada área (leitura é liberada para qualquer usuário logado)
 const PERMISSOES = {
-  'registros:srpe':     ['tecnico', 'analista', 'preparador', 'medico'],
+  'registros:srpe':     ['tecnico', 'analista', 'preparador', 'medico', 'atleta'], // F5: atleta informa o próprio esforço
   'registros:bemestar': ['tecnico', 'analista', 'preparador', 'medico', 'atleta'],
   'players:write':      ['tecnico', 'analista', 'scout', 'diretor'],
   'matches:write':      ['tecnico', 'analista'],

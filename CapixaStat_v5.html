@@ -1945,6 +1945,23 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 /* P3 */
 .shotmap { width:100%; max-width:420px; display:block; margin:0 auto; border-radius:8px }
 .leg-dot { display:inline-block; width:10px; height:10px; border-radius:50% }
+
+/* F5: tela do atleta (celular primeiro) */
+.at-wrap { max-width:640px; display:grid; gap:14px }
+.at-card { display:grid; gap:12px }
+.at-q { display:grid; gap:6px }
+.at-ql { font-size:15px; font-weight:600; color:var(--text-1) }
+.at-sc { display:grid; grid-template-columns:repeat(7, 1fr); gap:6px }
+.at-sc.rpe-row { grid-template-columns:repeat(11, 1fr) }
+.at-b { min-height:44px; border-radius:10px; border:1px solid var(--border-md); background:var(--bg-raised); color:var(--text-1); font-size:16px; font-weight:700; cursor:pointer; font-family:var(--font-mono) }
+.at-b.rpe { border-bottom:4px solid hsl(var(--h) 70% 45%) }
+.at-b.on { background:var(--brand-fill); border-color:var(--brand-fill); color:#fff }
+.at-ends { display:flex; justify-content:space-between; font-size:12px; color:var(--text-3) }
+.at-les { display:flex; gap:10px; align-items:center; font-size:14px; color:var(--text-2) }
+.at-les input { width:22px; height:22px }
+.at-min { display:flex; gap:10px; align-items:center; font-size:14px; color:var(--text-2) } .at-min .form-input { width:100px }
+.at-send { min-height:46px; font-size:15px }
+@media (max-width: 420px) { .at-sc.rpe-row { grid-template-columns:repeat(6, 1fr) } }
 </style>
 </head>
 <body>
@@ -2079,6 +2096,10 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
         <select id="ctx-comp" class="form-select" onchange="ctxSet(this.value)"><option value="">Todas as competições</option></select>
         <label for="ctx-temp">Temporada</label>
         <select id="ctx-temp" class="form-select" disabled title="A base tem só a temporada 2026 por enquanto"><option>2026</option></select>
+      </div>
+      <div class="nav-item nav-atleta" data-screen="atleta" onclick="goTo('atleta',this)" style="display:none">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"/></svg>
+        Meu dia
       </div>
       <div class="nav-group-label">Clube</div>
       <div class="nav-item active" data-screen="dashboard" onclick="goTo('dashboard',this)">
@@ -3012,6 +3033,12 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
         .tel-workspace:-webkit-full-screen{background:#070b14;padding:12px;height:100vh;box-sizing:border-box}
         .tel-workspace.tel-max{position:fixed;inset:0;z-index:9999;width:100vw;height:100vh;background:#070b14;padding:12px;box-sizing:border-box}
       </style>
+      <!-- ══ F5: TELA DO ATLETA (celular) ══ -->
+      <div id="screen-atleta" class="screen">
+        <div class="topbar"><div class="topbar-left"><h1>Meu dia</h1><p id="at-sub">Responda em 1 minuto — ajuda a comissão a cuidar de você</p></div></div>
+        <div class="content at-wrap" id="at-body"></div>
+      </div>
+
       <!-- ══ P2: SCOUT AO VIVO (registro manual de eventos no campo) ══ -->
       <div id="screen-scout" class="screen">
         <div class="topbar">
@@ -3692,6 +3719,56 @@ function renderShotMap(evs) {
     '<div class="cs-metric"><b class="cs-metric-tag">xG</b><span>Gols esperados: chance de cada chute virar gol pela distância e pelo ângulo do gol — ' + XG_MODELO.fonte + '. Soma do xG maior que os gols = time finalizou bem e faltou acerto; menor = aproveitou além do esperado.</span></div>';
 }
 
+
+// ══════════════════════════════════════════════════════════════════
+// F5: tela do atleta — bem-estar (antes do treino) e esforço da sessão (depois), pensada para o celular
+// ══════════════════════════════════════════════════════════════════
+var AT_Q = [['sono', 'Como você dormiu?', ['Muito bem', 'Muito mal']], ['fadiga', 'Cansaço', ['Descansado', 'Exausto']],
+  ['estresse', 'Estresse', ['Tranquilo', 'Muito estressado']], ['dor', 'Dor muscular', ['Sem dor', 'Muita dor']]];
+var AT_STATE = {};
+function atletaId() { var u = getCurrentUser() || {}; return u.atleta_id || null; }
+function renderAtleta() {
+  var el = document.getElementById('at-body'); if (!el) return;
+  var id = atletaId(), p = id && PLAYERS[id];
+  if (!p) { el.innerHTML = '<div class="cs-est-banner"><span class="cs-status info">Sem vínculo</span><span>Seu usuário não está ligado a um atleta do elenco. Peça à comissão ou recadastre-se escolhendo seu nome.</span></div>'; return; }
+  document.getElementById('at-sub').textContent = p.nome + ' · ' + p.clube;
+  var hoje = csToday(), jaW = wellnessEntries(id).some(function (r) { return r.data === hoje; }), jaS = srpeEntries(id).some(function (r) { return r.data === hoje; });
+  AT_STATE = { sono: 0, fadiga: 0, estresse: 0, dor: 0, rpe: -1 };
+  var escala = function (k) { var h = ''; for (var v = 1; v <= 7; v++) h += '<button class="at-b" data-k="' + k + '" data-v="' + v + '" onclick="atSet(\'' + k + '\',' + v + ')" aria-label="' + v + '">' + v + '</button>'; return h; };
+  var rpe = ''; for (var r = 0; r <= 10; r++) rpe += '<button class="at-b rpe" data-k="rpe" data-v="' + r + '" style="--h:' + (120 - r * 12) + '" onclick="atSet(\'rpe\',' + r + ')" title="' + RPE_LABELS[r] + '">' + r + '</button>';
+  var hist = wellnessEntries(id).sort(function (a, b) { return a.data < b.data ? 1 : -1; }).slice(0, 7);
+  el.innerHTML =
+    '<div class="card at-card"><div class="card-title">1. Antes do treino — como você está? ' + (jaW ? '<span class="cs-status ok">respondido hoje</span>' : '') + '</div>' +
+      AT_Q.map(function (q) { return '<div class="at-q"><div class="at-ql">' + q[1] + '</div><div class="at-sc">' + escala(q[0]) + '</div><div class="at-ends"><span>1 = ' + q[2][0] + '</span><span>7 = ' + q[2][1] + '</span></div></div>'; }).join('') +
+      '<label class="at-les"><input type="checkbox" id="at-lesao"> Estou com dor ou lesão que me impede de treinar normalmente</label>' +
+      '<button class="btn btn-primary at-send" onclick="atSaveWell()">Enviar</button></div>' +
+    '<div class="card at-card"><div class="card-title">2. Depois do treino — quanto puxou? ' + (jaS ? '<span class="cs-status ok">respondido hoje</span>' : '') + '</div>' +
+      '<div class="at-ql">Esforço do treino inteiro (0 = repouso, 10 = máximo)</div><div class="at-sc rpe-row">' + rpe + '</div><div class="at-ends"><span id="at-rpe-l">Toque numa nota</span></div>' +
+      '<label class="at-min">Duração (min) <input type="number" id="at-min" class="form-input" value="90" min="1" max="200" inputmode="numeric"></label>' +
+      '<button class="btn btn-primary at-send" onclick="atSaveRpe()">Enviar</button></div>' +
+    '<div class="card at-card"><div class="card-title">Meus últimos dias</div>' + (hist.length ? hist.map(function (r) {
+      return '<div class="rg-pl"><span>' + csFmtDate(r.data) + '</span><span class="cs-status ' + (r.lesao ? 'danger' : hooperClass(r.hooper)) + '">' + (r.lesao ? 'Lesão' : 'Índice ' + r.hooper) + '</span></div>'; }).join('') : '<div class="tl2-empty">Ainda sem respostas.</div>') + '</div>';
+}
+function atSet(k, v) {
+  AT_STATE[k] = v;
+  document.querySelectorAll('.at-b[data-k="' + k + '"]').forEach(function (b) { b.classList.toggle('on', +b.getAttribute('data-v') === v); });
+  if (k === 'rpe') document.getElementById('at-rpe-l').textContent = v + ' · ' + RPE_LABELS[v];
+}
+function atSaveWell() {
+  var id = atletaId(); if (!id) return;
+  if (!AT_STATE.sono || !AT_STATE.fadiga || !AT_STATE.estresse || !AT_STATE.dor) { csToast('Responda as 4 perguntas'); return; }
+  var rec = { atletaId: id, data: csToday(), sono: AT_STATE.sono, fadiga: AT_STATE.fadiga, estresse: AT_STATE.estresse, dor: AT_STATE.dor, lesao: document.getElementById('at-lesao').checked };
+  rec.hooper = rec.sono + rec.fadiga + rec.estresse + rec.dor;
+  CSStore.add('bemestar', rec); csToast('Obrigado! Resposta enviada'); renderAtleta();
+}
+function atSaveRpe() {
+  var id = atletaId(), m = +document.getElementById('at-min').value; if (!id) return;
+  if (AT_STATE.rpe < 0) { csToast('Toque numa nota de 0 a 10'); return; }
+  if (!(m >= 1 && m <= 200)) { csToast('Informe a duração em minutos'); return; }
+  CSStore.add('srpe', { atletaId: id, data: csToday(), tipo: 'Treino', minutos: m, rpe: AT_STATE.rpe, carga: AT_STATE.rpe * m });
+  csToast('Esforço registrado'); renderAtleta();
+}
+
 // ══════════════════════════════════════════════════════════════════
 // P2: SCOUT AO VIVO — eventos {partida, atletaId, tipo, resultado, minuto, x, y} (formato do B3)
 // x, y de 0 a 100 (x = comprimento, 100 = gol atacado pelo seu clube).
@@ -3991,7 +4068,7 @@ function simExportPNG() {
 var CS_PAPEIS = { 'Técnico': 'tecnico', 'Analista de Desempenho': 'analista', 'Preparador Físico': 'preparador', 'Médico / Fisioterapeuta': 'medico',
   'Scout': 'scout', 'Diretor': 'diretor', 'Atleta': 'atleta', 'Estudante': 'estudante' };
 var CS_PERMS = {
-  'registros:srpe':     ['tecnico', 'analista', 'preparador', 'medico'],
+  'registros:srpe':     ['tecnico', 'analista', 'preparador', 'medico', 'atleta'],
   'registros:bemestar': ['tecnico', 'analista', 'preparador', 'medico', 'atleta'],
   'players:write':      ['tecnico', 'analista', 'scout', 'diretor'],
   'matches:write':      ['tecnico', 'analista'],
@@ -4004,6 +4081,9 @@ function csSemPermissao(texto) {
 }
 // Esconde botões de ação que o perfil não pode usar
 function applyPermissions() {
+  var ehAtleta = csPapel() === 'atleta';
+  document.querySelectorAll('.nav-atleta').forEach(function (n) { n.style.display = ehAtleta ? '' : 'none'; });
+  if (ehAtleta && !applyPermissions._foi) { applyPermissions._foi = true; setTimeout(function () { goTo('atleta'); }, 120); }
   var podeAtleta = csPode('players:write'), podePartida = csPode('matches:write');
   document.querySelectorAll('[onclick*="cadastro-jogador"]').forEach(function (b) { if (b.closest('.nav-item')) return; b.style.display = podeAtleta ? '' : 'none'; });
   document.querySelectorAll('button').forEach(function (b) { if (/Nova Partida/.test(b.textContent)) b.style.display = podePartida ? '' : 'none'; });
@@ -12449,6 +12529,7 @@ function goTo(screenId, navEl) {
   if (screenId === 'telestrador')  setTimeout(telInit, 30);
   if (screenId === 'simulador')    simInit();
   if (screenId === 'scout')        scInit();
+  if (screenId === 'atleta')       renderAtleta();
   if (screenId === 'jogadores')    renderVitrineJogadores();
   setTimeout(function () { try { applyMetricChips(); } catch (e) {} }, 250);
   if (screenId === 'dashboard')    { try { renderDashTopRow(); renderDashAlerts(); } catch (e) { console.warn('dash', e); } }

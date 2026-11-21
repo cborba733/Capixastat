@@ -55,9 +55,9 @@ router.post('/:tipo', authMid, tipoValido, permitir((req) => 'registros:' + req.
   const b = req.body;
   const erro = validar(req.params.tipo, b);
   if (erro) return res.status(400).json({ error: erro });
-  // B2: atleta só registra o próprio bem-estar
+  // B2/F5: atleta só registra os próprios dados (bem-estar e esforço do treino)
   if (req.papel === 'atleta' && b.atletaId !== req.atletaId)
-    return res.status(403).json({ error: 'Atleta só pode registrar o próprio bem-estar.' });
+    return res.status(403).json({ error: 'Atleta só pode registrar os próprios dados.' });
   try {
     let r;
     if (req.params.tipo === 'srpe') {

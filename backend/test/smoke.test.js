@@ -88,7 +88,9 @@ test('B2: perfis de acesso (diretor, atleta)', async () => {
   const wb = { data: '2026-11-20', sono: 2, fadiga: 2, estresse: 2, dor: 2 };
   assert.equal((await req('POST', '/api/registros/bemestar', Object.assign({ id: 'a1', atletaId: 'rb_edu' }, wb), a.body.token)).status, 201);
   assert.equal((await req('POST', '/api/registros/bemestar', Object.assign({ id: 'a2', atletaId: 'rb_outro' }, wb), a.body.token)).status, 403);
-  assert.equal((await req('POST', '/api/registros/srpe', { id: 'a3', atletaId: 'rb_edu', data: '2026-11-20', minutos: 60, rpe: 5 }, a.body.token)).status, 403);
+  // F5: atleta informa o próprio esforço, mas não o de outro atleta
+  assert.equal((await req('POST', '/api/registros/srpe', { id: 'a3', atletaId: 'rb_edu', data: '2026-11-20', minutos: 60, rpe: 5 }, a.body.token)).status, 201);
+  assert.equal((await req('POST', '/api/registros/srpe', { id: 'a4', atletaId: 'rb_outro', data: '2026-11-20', minutos: 60, rpe: 5 }, a.body.token)).status, 403);
 });
 
 test('B3: eventos de jogo', async () => {
