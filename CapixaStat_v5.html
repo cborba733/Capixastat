@@ -3789,7 +3789,7 @@ function enterApp() {
 // ── A4: aviso de dado estimado nas abas da Formação ──
 var FORM_EST_TABS = {
   carga: 'Cargas e status são estimados (modelo) até a comissão registrar sRPE e bem-estar nesta tela.',
-  fisico: 'Peso e flexibilidade são simulados — aguardando aferição real do clube.',
+  fisico: '',
   antropometria: ''
 };
 function applyFormEstBanner(name) {
@@ -14232,7 +14232,7 @@ function renderFisico() {
       </div>
       <div class="fisico-metrics" id="fisico-metrics-grid"></div>
       <div class="card" style="padding:16px">
-        <div class="card-title">Evolução nas últimas 8 semanas (Peso corporal)</div>
+        <div class="card-title">Evolução entre avaliações</div>
         <canvas id="chartFisicoEvolucao" height="100"></canvas>
         <p class="chart-insight" id="insight-fisico-evolucao"></p>
       </div>`;
@@ -14240,60 +14240,39 @@ function renderFisico() {
   updateFisicoMetrics();
 }
 
-function updateFisicoMetrics() {
-  const id = document.getElementById('fisico-player-sel')?.value;
-  if (!id) return;
-  const p = PLAYERS[id]; if (!p) return;
-  const s = p.nome.length + p.idade;
-  const peso    = (p.peso - 2 + (s % 4)).toFixed(1);
-  const gordura = (8 + (s % 7)).toFixed(1);
-  const vel     = ((p.pos==='Atacante'||p.pos==='Lateral'?4.9:5.4) + ((s%5)/10)).toFixed(1);
-  const vo2     = (48 + (s % 14)).toFixed(1);
-  const impacto = 180 + (s % 80);
-  const dPeso = ((s%3)-1.5).toFixed(1), dGord = ((s%2)-.8).toFixed(1);
-  const dVel = ((s%3)/10-.15).toFixed(2), dVo2 = ((s%5)-2).toFixed(1), dImp = (s%40)-20;
-
-  const metrics = [
-    {lbl:'Peso Corporal',   val:peso+'kg',    d:dPeso,   posLow:true,  col:'var(--blue)'},
-    {lbl:'Gordura Corporal',val:gordura+'%',  d:dGord,   posLow:true,  col:'var(--amber)'},
-    {lbl:'40m Rasos',       val:vel+'s',      d:dVel,    posLow:true,  col:'var(--red)'},
-    {lbl:'VO₂ Estimado',    val:vo2+' ml/kg', d:dVo2,    posLow:false, col:'var(--green)'},
-    {lbl:'Impacto / Sessão',val:impacto+' UA',d:dImp,    posLow:false, col:'rgba(167,139,250,1)'}
-  ];
-
-  const gridEl = document.getElementById('fisico-metrics-grid');
-  if (gridEl) {
-    gridEl.innerHTML = metrics.map(m => {
-      const n = parseFloat(m.d);
-      const good = m.posLow ? n < 0 : n > 0;
-      const tc = n===0 ? 'var(--text-3)' : good ? 'var(--green)' : 'var(--red)';
-      const arrow = n < 0 ? '↓' : '↑';
-      return `<div class="fisico-card">
-        <div class="fisico-val" style="color:${m.col}">${m.val}</div>
-        <div class="fisico-lbl">${m.lbl}</div>
-        <div class="fisico-trend" style="color:${tc}">${arrow} ${Math.abs(n)}</div></div>`;
-    }).join('');
+function updateFisicoMetrics() { // R2-5 (FM2): só o que foi medido — avaliações antropométricas e maturação
+  var id = document.getElementById('fisico-player-sel') && document.getElementById('fisico-player-sel').value; if (!id) return;
+  var p = PLAYERS[id]; if (!p) return;
+  var regs = antroLista(id), m = matAll()[id] || {}, sexo = m.sexo || 'M';
+  var serie = regs.map(function (r) { var dd = ANTRO_DOBRAS.filter(function (c) { return r[c] != null; }); return { data: r.data, massa: r.massa != null ? +r.massa : null, soma: dd.length ? dd.reduce(function (t, c) { return t + +r[c]; }, 0) : null, n: dd.length, g: antroGordura(r, antroIdade(p, r.data), sexo) }; });
+  var ult = serie[serie.length - 1], pri = serie[0];
+  var fmt = function (v, d) { return v == null ? '—' : (+v).toLocaleString('pt-BR', { minimumFractionDigits: d, maximumFractionDigits: d }); };
+  var dif = function (k) { if (!ult || !pri || ult === pri || ult[k] == null || pri[k] == null) return ''; var d = ult[k] - pri[k]; return (d > 0 ? '+' : '') + fmt(d, 1) + ' desde ' + csFmtDate(pri.data); };
+  var mat = (m.registros || []).length && m.nasc ? m.registros.slice().sort(function (x, y) { return x.data < y.data ? -1 : 1; }).pop() : null, mo = mat ? matOffset(mat, m.nasc, sexo) : null;
+  var cards = [['Massa corporal', ult && ult.massa != null ? fmt(ult.massa, 1) + ' kg' : '—', dif('massa'), 'Medido'], ['Σ dobras cutâneas', ult && ult.soma != null ? fmt(ult.soma, 1) + ' mm (' + ult.n + ')' : '—', dif('soma'), 'Medido'],
+    ['% de gordura', ult && ult.g != null ? fmt(ult.g, 1) + '%' : '—', dif('g'), 'Estimativa'], ['Maturação (PHV)', mo ? (mo.mo > 0 ? '+' : '') + fmt(mo.mo, 1) + ' ano(s)' : '—', mo ? matFase(mo.mo).t : 'só atletas da base', 'Estimativa']];
+  var grid = document.getElementById('fisico-metrics-grid');
+  if (grid) grid.innerHTML = cards.map(function (c) { return '<div class="fisico-card"><div class="fisico-val">' + c[1] + '</div><div class="fisico-lbl">' + c[0] + ' <span class="cs-src ' + (c[3] === 'Medido' ? 'real' : 'est') + '">' + c[3] + '</span></div><div class="fisico-trend" style="color:var(--text-3)">' + (c[2] || '&nbsp;') + '</div></div>'; }).join('');
+  var card = document.getElementById('chartFisicoEvolucao') ? document.getElementById('chartFisicoEvolucao').closest('.card') : null;
+  if (card) {
+    card.querySelector('.card-title').textContent = 'Evolução entre avaliações (massa e soma das dobras)';
+    var ins = document.getElementById('insight-fisico-evolucao');
+    if (serie.length < 2) {
+      if (chartInstances.chartFisicoEvolucao) { chartInstances.chartFisicoEvolucao.destroy(); delete chartInstances.chartFisicoEvolucao; }
+      document.getElementById('chartFisicoEvolucao').style.display = 'none';
+      ins.innerHTML = serie.length ? 'Só uma avaliação registrada — a evolução aparece a partir da segunda (aba Antropometria).' : 'Nenhuma avaliação registrada para este atleta. Registre na aba <b>Antropometria</b>; testes físicos (salto, sprint, Yo-Yo) estão em Trabalhos futuros.';
+      return;
+    }
+    document.getElementById('chartFisicoEvolucao').style.display = '';
+    var cc = _chartColors();
+    mkChart('chartFisicoEvolucao', { type: 'line', data: { labels: serie.map(function (x) { return csFmtDate(x.data); }), datasets: [
+      { label: 'Massa (kg)', data: serie.map(function (x) { return x.massa; }), borderColor: csData(0), backgroundColor: 'transparent', yAxisID: 'y', tension: .3, spanGaps: true },
+      { label: 'Σ dobras (mm)', data: serie.map(function (x) { return x.soma; }), borderColor: csData(2), backgroundColor: 'transparent', yAxisID: 'y2', tension: .3, spanGaps: true }] },
+      options: { plugins: { legend: { labels: { color: cc.legend } } }, scales: { x: { ticks: { color: cc.tick }, grid: { color: cc.grid } }, y: { position: 'left', ticks: { color: cc.tick }, grid: { color: cc.grid } }, y2: { position: 'right', ticks: { color: cc.tick }, grid: { display: false } } } } });
+    var dm = ult.massa != null && pri.massa != null ? ult.massa - pri.massa : null, ds = ult.soma != null && pri.soma != null && ult.n === pri.n ? ult.soma - pri.soma : null;
+    ins.textContent = (dm == null ? '' : 'Massa ' + (dm >= 0 ? '+' : '') + fmt(dm, 1) + ' kg') + (ds == null ? '' : (dm == null ? '' : ' e ') + 'soma das dobras ' + (ds >= 0 ? '+' : '') + fmt(ds, 1) + ' mm') + ' entre ' + csFmtDate(pri.data) + ' e ' + csFmtDate(ult.data) + '.' +
+      (dm != null && ds != null ? (dm > 0 && ds <= 0 ? ' Ganho de massa sem aumento de gordura subcutânea — sugere ganho de massa magra.' : dm > 0 && ds > 0 ? ' Ganho de massa com aumento das dobras — vale avaliar a alimentação.' : dm < 0 && ds < 0 ? ' Perda de massa com redução das dobras — redução de gordura.' : '') : '');
   }
-
-  const base = parseFloat(peso);
-  const weeks = Array.from({length:8},(_,i) => (base + ((s*(i+1))%4)*0.3 - 1.5).toFixed(1));
-  weeks[7] = peso;
-  mkChart('chartFisicoEvolucao', {
-    type:'line',
-    data:{ labels:['S1','S2','S3','S4','S5','S6','S7','S8'],
-      datasets:[{ label:'Peso (kg)', data:weeks.map(Number),
-        borderColor:'rgba(56,189,248,1)', backgroundColor:'rgba(56,189,248,.1)',
-        tension:.4, fill:true, pointRadius:4, pointBackgroundColor:'rgba(56,189,248,1)' }] },
-    options:{ plugins:{legend:{display:false}}, scales:{ x:{grid,ticks}, y:{grid,ticks} } }
-  });
-  const wArr = weeks.map(Number);
-  const pesoTrend = wArr[7] - wArr[0];
-  const elFis = document.getElementById('insight-fisico-evolucao');
-  if (elFis) elFis.textContent = Math.abs(pesoTrend) < 0.5
-    ? `Peso estável ao longo das 8 semanas (${peso}kg). Indica boa manutenção da composição corporal durante o período.`
-    : pesoTrend < 0
-      ? `Redução de ${Math.abs(pesoTrend).toFixed(1)}kg nas últimas 8 semanas. Pode indicar processo de definição muscular ou desgaste físico — acompanhar com avaliação nutricional.`
-      : `Ganho de ${pesoTrend.toFixed(1)}kg nas últimas 8 semanas. Pode refletir ganho de massa muscular ou necessidade de ajuste nutricional.`;
 }
 
 // ── 5. ANTROPOMETRIA (R2-5) — só medidas registradas, padrão ISAK; corpo em SVG com regiões clicáveis ──

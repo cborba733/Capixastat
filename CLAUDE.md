@@ -559,6 +559,12 @@ item, testar sem erro no console, atualizar este arquivo).
   (mesmo documento do F6, já sincronizado com a nuvem). **3D não feito**: inviável com licença e qualidade até terça
   (justificativa no doc) — vai para Trabalhos futuros. `corpo_anatomico.png.png` deixou de ser usado.
 
+- **R2-5b Evolução Física (FM2):** a aba também **inventava** peso, % de gordura, 40 m, VO₂ e impacto a partir do nome —
+  removido. Agora mostra só o medido: massa, Σ dobras, % de gordura (estimativa) e maturação (estimativa, base), com
+  variação desde a 1ª avaliação, gráfico massa × Σ dobras entre avaliações e leitura do resultado (ex.: "ganho de massa
+  sem aumento de gordura subcutânea"). Sem avaliação: aviso para registrar na aba Antropometria. Os avisos "simulado"
+  das abas Físico e Antropometria saíram porque não há mais dado simulado nelas.
+
 ## Trabalhos futuros
 O que ficou de fora ou só parcialmente feito, em ordem de valor:
 - **Visão computacional em vídeo real:** V1/V2/V3 foram testados com dados sintéticos e um YOLO falso (sem GPU nem
