@@ -1628,6 +1628,12 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .light .form-dot.V, .light .form-dot.D { color:#fff }
 .form-list { font-size:12px; color:var(--text-2); display:grid; gap:3px }
 .form-list b { font-family:var(--font-mono); color:var(--text-1) }
+
+/* D2: alertas */
+.dash-alert-list { display:grid; gap:6px }
+.dash-alert { display:flex; align-items:center; gap:8px; padding:5px 6px; border-radius:8px; cursor:pointer }
+.dash-alert:hover { background:var(--bg-raised) }
+.dash-alert-nm { flex:1; font-size:13px; color:var(--text-1); font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
 </style>
 </head>
 <body>
@@ -2957,10 +2963,65 @@ function enterApp() {
   setTimeout(initCharts, 80);
   updateGlobalStats();
   loadApiPlayers();
-  try { renderDashTopRow(); } catch (e) { console.warn('D1', e); }
+  try { renderDashTopRow(); renderDashAlerts(); } catch (e) { console.warn('D1/D2', e); }
 }
 
 // ── Atualizar KPIs com dados reais ───────────
+
+
+// ── Condição física do atleta (fonte única usada por Formação, Alertas e Elenco) ──
+// Enquanto não houver registro real (F1/F2), o status vem do modelo simulado da v4
+// e é marcado como ESTIMADO. Registros reais (sRPE / bem-estar) sobrescrevem.
+function playerCondition(p) {
+  var real = (typeof wellnessStatusFor === 'function') ? wellnessStatusFor(p.id) : null;
+  if (real) return real;
+  var s = (p.nome.length * 7 + p.idade * 3) % 100;
+  var statuses = ['ok', 'ok', 'ok', 'ok', 'ok', 'lesion', 'restricao'];
+  return { status: statuses[s % statuses.length], est: true, fonte: 'modelo simulado' };
+}
+
+// ── D2: Alertas da semana (Visão Geral) ───────────────────────────
+function renderDashAlerts() {
+  var el = document.getElementById('dash-alerts');
+  if (!el) return;
+  var user = getCurrentUser();
+  var clube = user ? resolveClube(user.clube) : null;
+  var elenco = Object.values(PLAYERS).filter(function (p) { return !clube || p.clube === clube; });
+  var itens = [];
+  elenco.forEach(function (p) {
+    var c = playerCondition(p);
+    if (c.status === 'lesion') itens.push({ ord: 0, cls: 'danger', txt: 'Lesionado', p: p, est: c.est });
+    else if (c.status === 'restricao') itens.push({ ord: 2, cls: 'warn', txt: 'Treino restrito', p: p, est: c.est });
+    var a = computeACWR(p);
+    if (a.zone === 'Risco') itens.push({ ord: 1, cls: 'danger', txt: 'Carga ACWR ' + a.ratio.toFixed(2), p: p, est: a.est !== false });
+    else if (a.zone === 'Alerta') itens.push({ ord: 3, cls: 'warn', txt: 'Carga ACWR ' + a.ratio.toFixed(2), p: p, est: a.est !== false });
+    if ((p.cartoes || 0) >= 3) itens.push({ ord: 4, cls: 'warn', txt: p.cartoes + ' cartões na temporada', p: p, est: false });
+  });
+  itens.sort(function (a, b) { return a.ord - b.ord; });
+  var algumEst = itens.some(function (i) { return i.est; });
+  var cont = { les: 0, carga: 0, rest: 0, cart: 0 };
+  itens.forEach(function (i) { if (i.txt === 'Lesionado') cont.les++; else if (i.txt.indexOf('ACWR') === 0 || i.txt.indexOf('Carga') === 0) cont.carga++; else if (i.txt === 'Treino restrito') cont.rest++; else cont.cart++; });
+  var html = '<div class="dash-mini-lbl"><span>Alertas da semana</span><span>' + elenco.length + ' no elenco</span></div>' +
+    '<div class="guia-row" style="margin-top:0">' +
+      '<span class="cs-status danger" title="Lesionados">' + cont.les + ' lesão</span>' +
+      '<span class="cs-status warn" title="ACWR fora da zona ideal">' + cont.carga + ' carga</span>' +
+      '<span class="cs-status warn" title="Treino restrito">' + cont.rest + ' restrito</span>' +
+      '<span class="cs-status info" title="3+ cartões na temporada">' + cont.cart + ' cartões</span></div>';
+  if (!itens.length) {
+    html += '<div class="cs-status ok">Nenhum alerta no elenco</div>';
+  } else {
+    html += '<div class="dash-alert-list">' + itens.slice(0, 5).map(function (i) {
+      return '<div class="dash-alert" onclick="window._profileExplicit=true;showPlayer(\'' + i.p.id + '\');goTo(\'perfil\')">' +
+        '<span class="cs-status ' + i.cls + '">' + i.txt + '</span>' +
+        '<span class="dash-alert-nm">' + i.p.nome + '</span>' +
+        (i.est ? '<span class="cs-src est" title="Dado estimado: ainda não há registro real">est.</span>' : '<span class="cs-src real">real</span>') +
+        '</div>';
+    }).join('') + '</div>';
+    if (itens.length > 5) html += '<div class="dash-sub" style="text-align:left"><span class="team-link" onclick="goTo(\'formacao\')">+ ' + (itens.length - 5) + ' alerta(s) — ver Formação</span></div>';
+  }
+  html += '<div class="cs-metric"><b class="cs-metric-tag">Métrica</b><span>Lesão e carga (ACWR) ficam <b>estimadas</b> até a comissão registrar sRPE e bem-estar em Formação. Cartões são dado real da temporada.</span></div>';
+  el.innerHTML = html;
+}
 
 // ── D1: topo da Visão Geral (próximo jogo + forma) ────────────────
 function _dashClubBadge(nome) {
@@ -10431,7 +10492,7 @@ function goTo(screenId, navEl) {
   if (screenId === 'taticas')      renderTaticasScreen();
   if (screenId === 'telestrador')  setTimeout(telInit, 30);
   if (screenId === 'jogadores')    renderVitrineJogadores();
-  if (screenId === 'dashboard')    { try { renderDashTopRow(); renderDashAlerts && renderDashAlerts(); } catch (e) { console.warn('dash', e); } }
+  if (screenId === 'dashboard')    { try { renderDashTopRow(); renderDashAlerts(); } catch (e) { console.warn('dash', e); } }
 }
 function switchTab(e, paneId) {
   const nav = e.target.closest('.tab-nav');
@@ -10913,8 +10974,7 @@ function renderCarga() {
     const intP = 4 + (s % 6);
     const intR = 2 + ((s * 3) % 6);
     const intS = Math.round((intP + intR) / 2);
-    const statuses = ['ok','ok','ok','ok','ok','lesion','restricao'];
-    return { ...p, intP, intR, intS, status: statuses[s % statuses.length], acwr: computeACWR(p) };
+    return { ...p, intP, intR, intS, status: playerCondition(p).status, acwr: computeACWR(p) };
   });
 
   let tH = `<div class="card" style="overflow:hidden">
