@@ -4489,7 +4489,7 @@ function simCompSvg(pos) {
     h += '<polygon points="' + c.hull.map(function (p) { return p[0].toFixed(2) + ',' + p[1].toFixed(2); }).join(' ') + '" fill="' + cor + '" fill-opacity=".14" stroke="' + cor + '" stroke-width=".4" stroke-dasharray="1.2 .8"/>';
     c.linhas.forEach(function (l) { h += '<line x1="' + l.x.toFixed(2) + '" y1="0" x2="' + l.x.toFixed(2) + '" y2="68" stroke="' + cor + '" stroke-width=".3" opacity=".7"/>'; });
     [[0, 1, c.d12], [1, 2, c.d23]].forEach(function (d) {
-      var a = c.linhas[d[0]].x, b = c.linhas[d[1]].x, y = sd === 'home' ? 2.2 : 66.2;
+      var a = c.linhas[d[0]].x, b = c.linhas[d[1]].x, y = sd === 'home' ? 62.6 : 66.2; // embaixo: a legenda do quadro fica no topo
       h += '<line x1="' + a + '" y1="' + y + '" x2="' + b + '" y2="' + y + '" stroke="#fff" stroke-width=".35"/><text x="' + ((a + b) / 2) + '" y="' + (y - .7) + '" text-anchor="middle" font-size="2" font-weight="700" fill="#fff" font-family="DM Sans, sans-serif">' + d[2].toFixed(1) + ' m</text>';
     });
     txt += '<div class="comp-card" style="border-color:' + cor + '"><b>' + (sd === 'home' ? 'Meu time' : 'Adversário') + '</b>' +
