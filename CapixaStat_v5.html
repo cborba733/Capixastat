@@ -14682,11 +14682,11 @@ function _tacRoleInfo(idx) {
   var info = roles.filter(function(r){ return r.code === code; })[0] || roles[0] || {code:code, name:slot.funcao||'', desc:''};
   return info;
 }
-function _tacCond(p) {
-  if (!p) return 92;
-  var h = 0, str = String(p.id);
-  for (var i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
-  return 87 + (h % 13);
+function _tacCond(p) { // prontidão = 100 − (Hooper − 4) × 4, só com bem-estar registrado nos últimos 2 dias (antes era simulada)
+  var w = p && (typeof wellnessStatusFor === 'function') ? wellnessStatusFor(p.id) : null;
+  if (!w) return null;
+  if (w.status === 'lesion') return 0;
+  return Math.max(0, Math.min(100, Math.round(100 - (w.hooper - 4) * 4)));
 }
 
 // ── Tooltip (?) — renderizado no body para não ser cortado
@@ -14827,7 +14827,7 @@ function _tacRowHtml(idx, slot, p, isStarter) {
     '<td style="white-space:nowrap">' + avHtml + '<span class="tac-nome">' + nm + '</span></td>' +
     funcCell +
     '<td class="tac-ovr">' + (sc || '—') + '</td>' +
-    '<td><div class="tac-cond-wrap"><div class="tac-cond-bar"><div class="tac-cond-fill" style="width:' + cond + '%"></div></div><span class="tac-cond-lbl">' + cond + '%</span></div></td>' +
+    (cond == null ? '<td><span class="tac-cond-lbl" title="Sem bem-estar registrado nos últimos 2 dias (Formação › Registro diário)">—</span></td>' : '<td><div class="tac-cond-wrap" title="Prontidão = 100 − (Hooper − 4) × 4"><div class="tac-cond-bar"><div class="tac-cond-fill" style="width:' + cond + '%"></div></div><span class="tac-cond-lbl">' + cond + '%</span></div></td>') +
     '</tr>';
 }
 function _tacTable(c, st, assigned) {
