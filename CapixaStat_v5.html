@@ -2359,7 +2359,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
         <div class="topbar">
           <div class="topbar-left"><h1>Visão Geral</h1><p id="dash-subtitle">Visão geral da temporada 2026</p></div>
           <div class="topbar-right">
-            <span class="badge badge-season">Série A · 2026</span>
+            <span class="badge badge-season">Temporada 2026</span>
             <button class="btn btn-ghost btn-sm">Exportar</button>
             <button class="btn btn-primary btn-sm" onclick="goTo('partidas',document.querySelector('[data-screen=partidas]'))">+ Nova Partida</button>
           </div>
@@ -3356,7 +3356,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
               <div style="font-family:var(--font-mono);font-size:14px">Números — JetBrains Mono 0,41 · 87%</div></div>
             <div class="card"><div class="card-title">Botões e badges</div>
               <div class="guia-row"><button class="btn btn-primary btn-sm">Ação principal</button><button class="btn btn-ghost btn-sm">Ação secundária</button></div>
-              <div class="guia-row"><span class="badge badge-atk">ATA</span><span class="badge badge-mid">MEI</span><span class="badge badge-def">DEF</span><span class="badge badge-gk">GOL</span><span class="badge badge-season">Série A · 2026</span></div></div>
+              <div class="guia-row"><span class="badge badge-atk">ATA</span><span class="badge badge-mid">MEI</span><span class="badge badge-def">DEF</span><span class="badge badge-gk">GOL</span><span class="badge badge-season">Temporada 2026</span></div></div>
             <div class="card"><div class="card-title">Confiabilidade do dado</div>
               <div class="guia-row"><span class="cs-src real">Dado real</span><span class="cs-src est">Estimado</span><span class="cs-est-val">72 (estimado)</span></div>
               <div class="cs-metric"><b class="cs-metric-tag">Métrica</b><span>Todo gráfico termina com este chip: o que mede, como é calculado e se o dado é real ou estimado.</span></div></div>
@@ -5088,7 +5088,7 @@ function renderRegistroDiario() {
         '</div>' +
         '<div class="rg-result">Índice: <b id="rg-w-hooper">12</b> / 28 <span id="rg-w-status"></span></div>' +
         '<button class="btn btn-primary btn-sm" onclick="rgSaveWell()">Registrar bem-estar</button>' +
-        '<div class="cs-metric"><b class="cs-metric-tag">Métrica</b><span>Índice de Hooper = soma das 4 notas (4 a 28; maior = pior). Até 13: liberado · 14–19: atenção · 20+: treino restrito. Marcar lesão coloca o atleta como lesionado. Substitui o status estimado em Alertas e Carga.</span></div>' +
+        '<div class="cs-metric"><b class="cs-metric-tag">Métrica</b><span>Índice de Hooper = soma das 4 notas (4 a 28; maior = pior). Até 13: liberado · 14–19: atenção · 20+: treino restrito. Marcar lesão coloca o atleta como lesionado. Só com esse registro o atleta aparece como lesionado ou restrito nos Alertas, no Meu Time e no Perfil.</span></div>' +
       '</div>' +
     '</div>' +
     '<div class="card" style="margin-top:14px"><div class="card-title">Situação do elenco hoje <span>último bem-estar (até 2 dias)</span></div><div id="rg-elenco" class="rg-elenco"></div></div>' +
@@ -5165,9 +5165,8 @@ function csToast(msg) {
 function playerCondition(p) {
   var real = (typeof wellnessStatusFor === 'function') ? wellnessStatusFor(p.id) : null;
   if (real) return real;
-  var s = (p.nome.length * 7 + p.idade * 3) % 100;
-  var statuses = ['ok', 'ok', 'ok', 'ok', 'ok', 'lesion', 'restricao'];
-  return { status: statuses[s % statuses.length], est: true, fonte: 'modelo simulado' };
+  // Integridade: sem registro de bem-estar não se afirma lesão nem restrição (antes vinha de um modelo simulado pelo nome)
+  return { status: 'sem', est: true, fonte: 'sem registro' };
 }
 
 // ── D2: Alertas da semana (Visão Geral) ───────────────────────────
@@ -5183,8 +5182,8 @@ function renderDashAlerts() {
     if (c.status === 'lesion') itens.push({ ord: 0, cls: 'danger', txt: 'Lesionado', p: p, est: c.est });
     else if (c.status === 'restricao') itens.push({ ord: 2, cls: 'warn', txt: 'Treino restrito', p: p, est: c.est });
     var a = computeACWR(p);
-    if (a.zone === 'Risco') itens.push({ ord: 1, cls: 'danger', txt: 'Carga ACWR ' + a.ratio.toFixed(2), p: p, est: a.est !== false });
-    else if (a.zone === 'Alerta') itens.push({ ord: 3, cls: 'warn', txt: 'Carga ACWR ' + a.ratio.toFixed(2), p: p, est: a.est !== false });
+    if (a && a.est === false && a.zone === 'Risco') itens.push({ ord: 1, cls: 'danger', txt: 'Carga ACWR ' + a.ratio.toFixed(2), p: p, est: false });
+    else if (a && a.est === false && a.zone === 'Alerta') itens.push({ ord: 3, cls: 'warn', txt: 'Carga ACWR ' + a.ratio.toFixed(2), p: p, est: false });
     if ((p.cartoes || 0) >= 3) itens.push({ ord: 4, cls: 'warn', txt: p.cartoes + ' cartões na temporada', p: p, est: false });
   });
   itens.sort(function (a, b) { return a.ord - b.ord; });
@@ -5209,7 +5208,7 @@ function renderDashAlerts() {
     }).join('') + '</div>';
     if (itens.length > 5) html += '<div class="dash-sub" style="text-align:left"><span class="team-link" onclick="goTo(\'formacao\')">+ ' + (itens.length - 5) + ' alerta(s) — ver Formação</span></div>';
   }
-  html += '<div class="cs-metric"><b class="cs-metric-tag">Métrica</b><span>Lesão e carga (ACWR) ficam <b>estimadas</b> até a comissão registrar sRPE e bem-estar em Formação. Cartões são dado real da temporada.</span></div>';
+  html += '<div class="cs-metric"><b class="cs-metric-tag">Métrica</b><span>Lesão, restrição e carga (ACWR) só aparecem quando a comissão registra sRPE e bem-estar em Formação — o sistema não estima a saúde do atleta. Cartões são dado real da temporada.</span></div>';
   el.innerHTML = html;
 }
 
@@ -7560,11 +7559,13 @@ function renderOverview(p) {
   var stEl = document.getElementById('p-status');
   if (stEl) {
     var ac = (typeof computeACWR === 'function') ? computeACWR(p) : null;
-    var acTxt = ac ? ac.ratio.toFixed(2) + ' · ' + ac.zone : '—';
+    if (ac && ac.est !== false) ac = null; // sem sRPE registrado não se mostra ACWR (era estimado)
+    var acTxt = ac ? ac.ratio.toFixed(2) + ' · ' + ac.zone : 'sem registro';
     var acColor = ac ? ({'Ideal':'var(--green)','Subcarga':'#38bdf8','Alerta':'#fbbf24','Risco':'#f87171'}[ac.zone] || 'var(--text-1)') : 'var(--text-1)';
     stEl.innerHTML =
-      '<div class="ov-stat-row"><span class="k">Situação</span><span class="v" style="color:var(--green)">Disponível</span></div>' +
-      '<div class="ov-stat-row"><span class="k">Lesionado</span><span class="v">Não</span></div>' +
+      (function () { var c = playerCondition(p), t = c.status === 'lesion' ? ['Lesionado', 'var(--danger)'] : c.status === 'restricao' ? ['Treino restrito', 'var(--warn)'] : c.status === 'ok' ? ['Disponível', 'var(--ok)'] : ['Sem registro', 'var(--text-3)'];
+        return '<div class="ov-stat-row"><span class="k">Situação</span><span class="v" style="color:' + t[1] + '">' + t[0] + '</span></div>' +
+          '<div class="ov-stat-row"><span class="k">Fonte</span><span class="v">' + (c.status === 'sem' ? 'sem bem-estar registrado' : 'registro da comissão') + '</span></div>'; })() +
       '<div class="ov-stat-row"><span class="k">Carga (ACWR)</span><span class="v" style="color:' + acColor + '">' + acTxt + '</span></div>' +
       '<div class="ov-stat-row"><span class="k">Pé dominante</span><span class="v">' + (p.pe || '—') + '</span></div>';
   }
@@ -14141,7 +14142,7 @@ function renderCarga() {
   const _acwrColor = { 'acwr-low': '#38bdf8', 'acwr-ok': '#22c55e', 'acwr-warn': '#fbbf24', 'acwr-high': '#f87171' };
   cargaData.forEach(p => {
     const bc = v => v>=8?'ib-alta':v>=5?'ib-media':'ib-baixa';
-    const sl = p.status==='ok'?'Disponível':p.status==='lesion'?'Lesionado':'Restrição';
+    const sl = p.status==='ok'?'Disponível':p.status==='lesion'?'Lesionado':p.status==='restricao'?'Restrição':'Sem registro';
     const dash = p.status==='lesion'?'–':null;
     const ac = p.acwr;
     const acCell = (p.status === 'lesion' || !ac)
@@ -16242,11 +16243,11 @@ function _renderTimeTabContent(c, allMatches, tab) {
     var byPos = {};
     jogadores.forEach(function(p){ if (!byPos[p.pos]) byPos[p.pos] = []; byPos[p.pos].push(p); });
     // T2: resumo de disponibilidade do elenco
-    var disp = { ok: 0, lesion: 0, restricao: 0, est: false };
+    var disp = { ok: 0, lesion: 0, restricao: 0, sem: 0, est: false };
     jogadores.forEach(function (p) { var c = playerCondition(p); disp[c.status]++; if (c.est) disp.est = true; });
     var cart3 = jogadores.filter(function (p) { return (p.cartoes || 0) >= 3; }).length;
-    var html = '<div class="guia-row" style="margin:4px 0 8px"><span class="cs-status ok">' + disp.ok + ' disponíveis</span><span class="cs-status danger">' + disp.lesion + ' lesionados</span>' +
-      '<span class="cs-status warn">' + disp.restricao + ' restritos</span><span class="cs-status info">' + cart3 + ' com 3+ cartões</span>' + (disp.est ? '<span class="cs-src est" title="Sem registro de bem-estar recente para parte do elenco">status estimado</span>' : '') + '</div>';
+    var html = '<div class="guia-row" style="margin:4px 0 8px">' + (disp.sem ? '<span class="cs-status info">' + disp.sem + ' sem registro de bem-estar</span>' : '') + '<span class="cs-status ok">' + disp.ok + ' disponíveis</span><span class="cs-status danger">' + disp.lesion + ' lesionados</span>' +
+      '<span class="cs-status warn">' + disp.restricao + ' restritos</span><span class="cs-status info">' + cart3 + ' com 3+ cartões</span>' + '' + '</div>';
     Object.keys(byPos).forEach(function(pos) {
       html += '<div style="font-size:11px;font-weight:700;color:var(--text-3);margin:10px 0 5px;text-transform:uppercase;letter-spacing:.6px">' + pos + 's</div>';
       byPos[pos].forEach(function(p) {
