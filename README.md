@@ -1,204 +1,146 @@
-⚽ CapixaStat — Plataforma de Análise do Futebol Capixaba
+# CapixaStat — Plataforma de Análise de Desempenho do Futebol Capixaba
 
-📌 Sobre o Projeto
-O CapixaStat é uma plataforma web desenvolvida com o objetivo de contribuir para o
-desenvolvimento do futebol capixaba por meio de análise de dados, visibilidade de
-atletas e gestão de informações esportivas.
+Plataforma web de análise de desempenho voltada aos clubes do Espírito Santo: estatísticas de atletas e clubes,
+análise de partidas, estúdio tático, preparação física e análise de vídeo, usando dados reais da temporada 2026.
 
-O sistema busca resolver problemas como:
+Projeto Integrador 2 — Análise e Desenvolvimento de Sistemas — FAESA · Autor: **Caio Borba**
 
-- Falta de visibilidade de jogadores locais
-- Ausência de dados estruturados sobre desempenho
-- Dificuldade na análise tática e individual dos jogadores
+---
 
-🎯 Objetivo
-Desenvolver uma plataforma web que utiliza ciência de dados para analisar o desempenho
-de jogadores e clubes do futebol capixaba, promovendo a visibilidade dos atletas,
-apoiando a tomada de decisão em clubes e estimulando o desenvolvimento do ecossistema
-esportivo do Espírito Santo.
+## Como abrir
 
-👥 Público-Alvo
-- Técnicos e comissões técnicas
-- Clubes e dirigentes
-- Atletas (principalmente categorias de base)
-- Federação de Futebol do Espírito Santo (FES)
+1. Baixe os dois arquivos deste repositório para a mesma pasta: **`CapixaStat_v5.html`** e **`konva.min.js`**
+   (ou use *Code → Download ZIP*).
+2. Abra `CapixaStat_v5.html` no Google Chrome ou no Microsoft Edge (é preciso estar conectado à internet, porque os
+   gráficos e as exportações usam bibliotecas carregadas da web).
+3. Na tela de login, clique em **Usar sem servidor (modo local)**. Um assistente pede o seu clube e a sua função e
+   sugere por onde começar. Nesse modo, o que você registra fica salvo no próprio navegador.
 
-🌍 ODS (Objetivos de Desenvolvimento Sustentável)
-O projeto está alinhado com as seguintes ODS da ONU:
+> A plataforma foi feita para uso em computador. Com a API publicada, o login com conta salva tudo no banco de
+> dados e libera os perfis de acesso descritos abaixo.
 
-- ODS 4 — Educação de Qualidade
-- ODS 8 — Trabalho Decente e Crescimento Econômico
-- ODS 9 — Indústria, Inovação e Infraestrutura
-- ODS 10 — Redução das Desigualdades
+---
 
-🧩 Funcionalidades do Sistema
+## O problema
 
-⚽ Vitrine de Jogadores
-- Cadastro de atletas com estatísticas reais (jogos, gols, assistências, cartões, taxa de passe)
-- Perfil com informações (idade, posição, clube)
-- Radar de competências e Índice Ofensivo calculados a partir das estatísticas reais
-- Estatísticas individuais, score geral, percentil por posição e jogadores de perfil parecido
+Os clubes capixabas não têm acesso a ferramentas de análise de desempenho compatíveis com sua realidade: as
+plataformas do mercado (Wyscout, InStat, StatsBomb) são caras e voltadas a grandes clubes, e as competições do
+estado não têm dados públicos de eventos de jogo. O CapixaStat oferece essas análises a baixo custo, em português,
+e cria dentro da própria plataforma os dados que não existem em fontes públicas.
 
-📊 Análise de Desempenho
-- Cadastro de partidas
-- Registro de estatísticas por rodada
-- Detalhe da partida com estatísticas oficiais (posse, finalizações, escanteios, cartões) e linha do tempo de gols
-- Ranking de jogadores com KPIs
-- Comparativo entre atletas
+**Público-alvo:** técnicos, analistas de desempenho, preparadores físicos, departamentos médicos, scouts, dirigentes,
+atletas (inclusive da base) e estudantes da área.
 
-🧠 Formação de Atletas
-- Acompanhamento físico: carga e intensidade de treino
-- Gestão de carga com **ACWR** (razão carga aguda:crônica) e alerta de risco de lesão
-- Evolução física e avaliação antropométrica
-- Microciclo e registro de sessões
+**ODS da ONU:** 4 (Educação de Qualidade), 8 (Trabalho Decente e Crescimento Econômico), 9 (Indústria, Inovação e
+Infraestrutura) e 10 (Redução das Desigualdades).
 
-🛡️ Meu Time
-- Painel do clube: escudo, estádio, fundação e elenco
-- Competições do clube (Capixabão, Copa ES, Série D, Copa Verde)
-- Classificação e partidas recentes por competição
-- Índice ofensivo do clube (a partir dos placares reais das partidas)
+---
 
-🤖 Auxiliar Tático com IA
-- Dossiê do adversário e análise tática
-- Conversa com IA (Google Gemini) usando os dados cadastrados no sistema
+## Funcionalidades
 
-🆕 Atualizações recentes
-- **Radar de competências** dos jogadores agora **calculado a partir de estatísticas reais** (antes era modelo por posição / aleatório) — Gols, Passes e Disciplina saem do dado real; Físico e Consistência são proxies de durabilidade; Dribles é baseline por posição.
-- Novo **Índice Ofensivo** para jogadores (gols/assistências por jogo) e para clubes (placares reais das partidas).
-- **Cadastro de atletas** passou a coletar estatísticas reais e a calcular radar, score e índice a partir delas.
-- **Monitor de carga com ACWR** (razão carga aguda:crônica) e alerta de risco de lesão, na área de Formação.
-- **Competições 2026 atualizadas** com os resultados reais: Copa ES (campeão Rio Branco-VN) e Série D (Rio Branco-ES e Vitória-ES eliminados na 2ª fase), incluindo os jogos de mata-mata com **estatísticas oficiais e gols reais** obtidos da API pública do **SofaScore**.
+### Clube
+- **Visão Geral:** último e próximo jogo, forma recente (V/E/D), alertas da semana (lesão, carga e cartões) e
+  indicadores do clube. Cada gráfico tem o selo "Métrica", que explica o que ele mede e se o dado é real.
+- **Meu Time:** destaques do elenco, disponibilidade, gols marcados e sofridos por faixa de 15 minutos, radar de
+  estilo em percentis entre os clubes capixabas e **ranking de força Elo** com gráfico de evolução.
+- **Partidas:** jogos e resultados reais de 2026 com linha do tempo de gols, cartões e substituições, e a aba
+  **Scout ao Vivo**: o analista clica no campo para registrar cada ação (finalização, passe-chave, drible, desarme,
+  interceptação, falta, cartão) com o minuto. Daí saem o **xG** de cada chute, o mapa de finalizações, a **nota do
+  jogo** de cada atleta (fórmula pública) e o gráfico de **momentum**. Exporta em CSV.
+- **Análise de Vídeo (experimental):** lê o arquivo de posições gerado pela visão computacional e mostra uma visão
+  de cima sincronizada ao vídeo, posições médias, mapa de calor e compactação.
 
-🖥️ Sistema Web (CapixaStat v4)
-A versão atual é um sistema web funcional desenvolvido em HTML, CSS e JavaScript,
-com dashboards interativos, gráficos em tempo real e navegação completa entre módulos.
+### Jogadores
+- **Vitrine:** busca com filtros (posição, idade, minutos, competição, últimos 5 jogos), filtros salvos, lista de
+  observação e exportação em CSV.
+- **Perfil do Atleta:** números **por 90 minutos** (mínimo de 270 minutos), percentil contra a mesma posição,
+  radar de atributos, relatório de observação, maturação biológica (atletas da base) e card para compartilhar em
+  PNG ou PDF.
+- **Ranking, Comparativo** (tabela lado a lado com diferença colorida) e **Estatísticas** da competição.
 
-Para visualizar:
-1. Baixe o arquivo `CapixaStat_v4.html`
-2. Abra no navegador (Chrome, Firefox ou Edge)
-3. Nenhuma instalação necessária
+### Preparação
+- **Formação:** microciclos salvos e reaplicáveis, sessões de treino, **registro diário de carga (sRPE)** e de
+  **bem-estar (índice de Hooper)** com semáforo, **ACWR** como alerta, evolução física e **avaliação
+  antropométrica** com corpo clicável (frente e costas) e medidas no padrão **ISAK**.
+- **Meu dia:** tela do próprio atleta para responder o bem-estar antes do treino e o esforço depois.
+- **Estúdio Tático**, com três abas:
+  - **Campo:** prancheta com formação, funções e comportamentos com e sem bola, e predefinições salvas;
+  - **Lance animado:** jogadas em quadros com legenda, medição de **compactação** (área, profundidade e distância
+    entre linhas em metros), biblioteca de lances e exportação em vídeo MP4;
+  - **Sobre vídeo:** desenho e anotação em cima de imagem ou vídeo de jogo.
+- **Dossiê do Adversário:** resumo de uma página para a preleção (3 chaves do jogo tiradas dos dados reais,
+  últimos jogos, casa × fora, Elo, confronto direto, lances salvos), gols por faixa de tempo, jogadores perigosos,
+  anotações por fases do jogo e matriz SWOT. Exporta em PDF.
+- **Auxiliar Tático com IA (Google Gemini):** responde perguntas usando só os dados do sistema e informa quais
+  dados usou (requer chave do próprio usuário).
 
-> Recomendado visualizar em desktop para melhor experiência.
+### Em todas as telas
+- Barra de contexto (clube, competição e temporada) e filtro por competição.
+- Tema escuro e claro, ícones Lucide, acessibilidade (contraste, navegação por teclado, tabela alternativa para
+  cada gráfico) e assistente de primeiro acesso.
 
-🔄 Evolução em React (pasta `web-react/`)
-Em paralelo ao MVP, o frontend está sendo reescrito em **React + Vite + TypeScript**
-(pasta `web-react/`), preparando o sistema para uma arquitetura componentizada e
-integrada ao backend. Para rodar localmente:
+---
 
-```
-cd web-react
-npm install
-npm run dev
-```
+## Integridade dos dados
 
-🗄️ Backend (pasta `backend/`)
-API REST em **Node.js + Express** com autenticação via **JWT**, senhas protegidas com
-**bcrypt** e persistência em banco **PostgreSQL hospedado na nuvem (Supabase)**.
-Rotas para autenticação, jogadores e partidas.
+Todo número da plataforma diz de onde vem, com os selos **Dado real**, **Medido**, **Estimativa** e
+**Não verificado**. Nada é inventado: lesões, carga, condição física e medidas corporais só aparecem quando são
+registradas pela comissão ou pelo atleta; sem registro, a tela mostra "sem registro". O perfil tático dos
+adversários aparece como "não verificado" até a comissão confirmar.
 
-🧪 Backend v5 — como rodar, testar e documentar
-```
-cd backend
-npm install
-npm test                      # 9 testes automáticos (banco em memória, não precisa do Supabase)
-npm start                     # usa DATABASE_URL e JWT_SECRET do .env (copie de .env.example)
-```
-- Documentação interativa da API: `http://localhost:3001/api/docs` (OpenAPI em `/api/openapi.json`)
-- Banco: rode `backend/schema.sql` no Supabase (tabelas de usuários, atletas, partidas, registros de carga e
-  bem-estar, eventos de jogo, documentos do usuário, dados externos e log de importações)
-- Dados externos: com `IMPORT_AUTO=1` o servidor importa o Capixabão (TheSportsDB) ao subir e 1× por dia;
-  manual: `node importar/thesportsdb.js --competicao capixabao --temporada 2026`
-- Publicação: `render.yaml` na raiz (Render → New → Blueprint)
+---
 
-🐍 Serviço de cálculos em Python (pasta `servico-python/`)
-```
-cd servico-python
-python -m pip install -r requirements.txt
-python -m pytest -q                       # 8 testes
-python -m uvicorn app:app --port 8000     # documentação em http://localhost:8000/docs
-```
-FastAPI + Pandas com as mesmas fórmulas da plataforma: percentis por 90 min, Elo e xG (por chute e por zona).
-Conferido com os 136 jogos reais de 2026: Elo idêntico ao da tela Meu Time.
+## Dados
 
-🎥 Exibição em Vídeo
-Vídeo demonstrando o funcionamento e a explicação do projeto:
+- **Temporada 2026 real:** mais de 760 atletas dos 10 principais clubes capixabas e de adversários de outros
+  estados; 136 partidas do Campeonato Capixaba, Copa Espírito Santo, Copa Verde, Série D e Copa do Brasil, com
+  placares, eventos e estatísticas oficiais quando disponíveis.
+- **Fontes:** SofaScore e FlashScore (placares, eventos e estatísticas), Transfermarkt e ogol (estatísticas
+  individuais), **TheSportsDB** (importação automática diária com fonte e data registradas) e **StatsBomb Open
+  Data** (treino do modelo de xG).
 
-🔗 Assista aqui:
-👉 https://youtu.be/AtuLAsqaVMQ
+## Métricas e métodos
 
-📄 Relatório
-O relatório completo do PI3 está disponível no repositório:
+| Métrica | Como é calculada |
+|---|---|
+| Por 90 minutos e percentis | valor × 90 / minutos (≥ 270 min); percentil contra a mesma posição |
+| xG | regressão logística (distância e ângulo) treinada com 794 chutes do StatsBomb Open Data |
+| Elo | base 1500, K = 20, +60 para o mandante, peso pelo saldo de gols (ELO, 1978) |
+| Nota do jogo e momentum | pesos públicos por ação registrada no Scout ao Vivo |
+| Compactação | fecho convexo dos jogadores de linha e distância entre as linhas, em metros |
+| sRPE e ACWR | esforço 0–10 × minutos (FOSTER et al., 2001); carga aguda ÷ crônica, zona 0,8–1,3 |
+| Bem-estar | índice de Hooper (4 a 28): até 13 liberado, 14–19 atenção, 20+ treino restrito |
+| Antropometria | perímetros e dobras ISAK; % de gordura estimado (Jackson & Pollock + Siri) |
+| Maturação | distância até o pico de crescimento (Mirwald 2002 / Moore 2015) |
 
-📎 [Baixar Relatório](https://github.com/cborba733/Capixastat/raw/main/relatorio_pi3_capixastat.pdf) · [Visualizar no GitHub](https://github.com/cborba733/Capixastat/blob/main/relatorio_pi3_capixastat.pdf)
+---
 
-📊 Ciência de Dados no Projeto
-O sistema aplica conceitos de ciência de dados para:
+## Arquitetura do projeto
 
-- Análise de desempenho dos jogadores
-- Criação de indicadores (KPIs)
-- Classificação e ranking de atletas
-- Comparação entre jogadores
-- Geração de insights automáticos para tomada de decisão
+| Parte | Tecnologias | Situação |
+|---|---|---|
+| Plataforma (este repositório) | HTML5, CSS3, JavaScript, Chart.js, Konva, html2canvas, jsPDF, Lucide | funciona sozinha, no navegador |
+| API | Node.js, Express, JWT, bcrypt, PostgreSQL (Supabase), OpenAPI | 8 perfis de acesso, 9 testes, pronta para o Render |
+| Serviço de cálculos | Python, FastAPI, Pandas | percentis, Elo e xG com as mesmas fórmulas da plataforma; 8 testes |
+| Visão computacional | Python, YOLOv8, ByteTrack, NumPy (homografia e KMeans) | prova de conceito; 14 testes com dados sintéticos |
 
-📌 Origem dos dados
-O sistema utiliza **dados reais** da temporada 2026 do futebol capixaba, coletados de
-fontes públicas e integrados à plataforma:
+**Perfis de acesso da API:** técnico, analista de desempenho, preparador físico, médico/fisioterapeuta, scout,
+diretor, atleta (só vê e registra os próprios dados) e estudante.
 
-- **Resultados e eventos das partidas:** FlashScore
-- **Estatísticas individuais dos atletas** (gols, assistências, jogos, cartões, minutos),
-  por competição (Capixabão, Série D, Copa Verde, Copa do ES e Copa do Brasil):
-  Transfermarkt e oGol
-- **Fotos dos jogadores:** API da SofaScore (com opção de upload manual de foto)
-- **Escudos e logos dos clubes:** TheSportsDB e Transfermarkt
-- **Auxiliar Tático com IA** ("Dossiê do Adversário"): API do Google Gemini
-  (usa a chave do próprio usuário, salva apenas no navegador)
+Este repositório contém apenas o necessário para abrir e usar a plataforma. A API, o serviço em Python e a prova
+de conceito de visão computacional fazem parte do projeto e estão descritos no relatório.
 
-> Sobre as camadas de dados: indicadores como gols, assistências, jogos, o **Score Geral**,
-> o **Radar de competências** e o **Índice Ofensivo** (todos calculados pelo próprio sistema)
-> partem de dados reais da temporada. No radar, os eixos Gols, Passes e Disciplina saem
-> diretamente das estatísticas; Físico e Consistência são proxies de durabilidade (jogos
-> disputados); o eixo Dribles é um baseline por posição, pois não há dado público de dribles.
-> Já os **mapas de calor são ilustrativos** nesta fase — a análise por **visão computacional
-> (YOLOv8)** sobre vídeos de jogo é o próximo passo planejado do projeto.
+---
 
-⚙️ Tecnologias Utilizadas
+## Limitações e próximos passos
 
-✔️ Frontend
-- HTML, CSS e JavaScript (MVP `CapixaStat_v4.html`)
-- React + Vite + TypeScript (evolução em `web-react/`)
-- Chart.js (gráficos e visualizações)
-- Figma (protótipo)
+- A visão computacional ainda não foi validada com vídeo real de jogo; o próximo passo é gravar com câmera fixa e
+  alta, que permite calibrar o campo uma vez por estádio.
+- Dados físicos dependem do registro da comissão; a aba de carga semanal ainda é estimada (sinalizada).
+- O Auxiliar Tático depende de uma chave do Google Gemini.
+- Planejado: testes físicos com protocolo (salto, sprint, Yo-Yo), corpo em 3D na antropometria, dossiê em
+  apresentação e modelos preditivos de risco de lesão.
 
-✔️ Backend e dados
-- Node.js + Express (API REST)
-- Autenticação JWT + bcrypt
-- PostgreSQL hospedado na nuvem (Supabase)
+---
 
-✔️ Integrações e APIs
-- FlashScore (resultados de partidas)
-- Transfermarkt e oGol (estatísticas dos atletas)
-- SofaScore (fotos dos jogadores)
-- TheSportsDB (escudos dos clubes)
-- Google Gemini (auxiliar tático com IA)
-
-🔜 Planejadas para evolução
-- Python (análise de dados) — Pandas, NumPy
-- YOLOv8 (visão computacional — prova de conceito)
-- Machine learning para análise preditiva
-
-🚀 Status do Projeto
-📍 Fase atual: Entrega C3 — PI3
-
-O projeto encontra-se na terceira entrega, com foco em:
-
-- Sistema web funcional com dashboards interativos
-- Integração de dados reais do futebol capixaba (temporada 2026)
-- Backend com API REST, autenticação e banco de dados na nuvem
-- Auxiliar tático com inteligência artificial
-- Início da migração do frontend para React
-
-🔮 Evoluções Futuras
-- Análise automática de vídeos com visão computacional (YOLOv8)
-- Machine learning para análise preditiva
-- Métricas avançadas: xG (gols esperados) e ELO
-- Conclusão da migração do frontend para React
+Vídeo de demonstração (versão anterior): https://youtu.be/AtuLAsqaVMQ

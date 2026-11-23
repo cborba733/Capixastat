@@ -1,46 +1,7 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# Arquivos de trabalho (scraping, dumps de dados, geração do relatório) — uso local, não vão pro GitHub
-_scratch/
-*.docx
-
-# POC de visão computacional: pesos do YOLO (baixados automaticamente) e cache do Python
-poc-cv/*.pt
-poc-cv/__pycache__/
-
-# Segredos (chaves de API, senha do banco) — nunca versionar
-.env
-**/.env
-
-# Configuração local do Claude Code
-.claude/
-
-# Cache de downloads do StatsBomb (analise-python)
-analise-python/cache_statsbomb/
-
-# Python (servico-python e testes)
-**/__pycache__/
-**/.pytest_cache/
+# O repositório guarda só o necessário para abrir a plataforma (ver README).
+# Os demais arquivos do projeto (API, Python, relatórios, apresentações) ficam só no computador do autor.
+/*
+!/CapixaStat_v5.html
+!/konva.min.js
+!/README.md
+!/.gitignore
