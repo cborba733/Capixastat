@@ -2142,6 +2142,11 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .ab-linha { display:grid; grid-template-columns:auto 1fr; gap:2px 12px; margin-top:10px; font-size:12.5px; color:var(--text-2) }
 .ab-linha b { font-family:var(--font-mono); color:var(--text-1); text-align:right } .ab-linha small { grid-column:1 / -1; color:var(--text-3); font-size:11.5px }
 .ab-form { display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; margin:10px 0 } .ab-form label { display:grid; gap:3px; font-size:11.5px; color:var(--text-3) }
+
+/* modo local (sem servidor) */
+.login-local { width:100%; margin-top:14px; padding:11px; border-radius:10px; border:1px dashed var(--border-md); background:transparent; color:var(--text-2); font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit }
+.login-local:hover { border-color:var(--brand); color:var(--brand) }
+.login-local-dica { margin-top:6px; font-size:11.5px; color:var(--text-3); text-align:center }
 </style>
 </head>
 <body>
@@ -2192,6 +2197,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
       </div>
       <button class="login-btn" onclick="handleLogin()">Entrar na plataforma →</button>
       <div class="login-footer">Não tem acesso? <a onclick="showRegister()" style="cursor:pointer;color:var(--green)">Criar uma conta</a></div>
+      <button type="button" class="login-local" onclick="entrarModoLocal()">Usar sem servidor (modo local)</button>
+      <div class="login-local-dica">Os dados ficam só neste navegador. Para salvar na nuvem, use uma conta com a API publicada.</div>
     </div>
 
     <!-- FORMULÁRIO DE CADASTRO -->
@@ -3612,13 +3619,21 @@ async function handleLogin() {
     updateSidebarUser(data.user);
     enterApp();
   } catch (e) {
-    errBox.textContent = 'Erro de conexão com o servidor. Tente novamente.';
+    errBox.textContent = 'Não foi possível falar com o servidor. Tente novamente ou use o modo local (sem servidor), logo abaixo.';
     errBox.style.display = 'block';
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = 'Entrar'; }
   }
 }
 
+// Modo local: entra sem servidor; o assistente de primeiro acesso pede clube e função
+function entrarModoLocal() {
+  localStorage.removeItem('capixastat_token');
+  var u = getCurrentUser() || { nome: 'Usuário local', clube: '', funcao: '' };
+  u.local = true; setCurrentUser(u);
+  try { updateSidebarUser(u); } catch (e) {}
+  enterApp();
+}
 // ── Register Handler ─────────────────────────
 async function handleRegister() {
   const nome = document.getElementById('reg-nome').value.trim();
