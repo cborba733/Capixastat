@@ -3,29 +3,16 @@
   "slides": [
     {
       "tipo": "capa",
-      "chip": "Projeto Integrador 3 · ADS FAESA",
+      "chip": "Projeto Integrador 2 · ADS FAESA",
       "titulo": "CapixaStat",
       "sub": "Plataforma de análise de desempenho do futebol capixaba",
-      "rodape": "Caio Borba · 24/11/2026",
       "img": "dashboard.jpg",
       "notas": "Apresente o CapixaStat: uma plataforma web para clubes capixabas analisarem jogos, atletas e preparação física com dados reais da temporada 2026."
     },
     {
-      "tipo": "lado",
-      "chip": "Visão Geral",
-      "titulo": "O que importa hoje, em uma tela",
-      "pontos": [
-        "Último jogo, próximo jogo e forma recente (V/E/D)",
-        "Alertas da semana: lesão e carga só aparecem com registro real; cartões vêm da súmula",
-        "Cada gráfico tem o chip “Métrica”: o que mede e se é dado real"
-      ],
-      "img": "dashboard-c.jpg",
-      "notas": "Mostre a tela inicial. Destaque que os alertas de lesão e de carga só aparecem quando a comissão registra o bem-estar e o esforço — o sistema não inventa a saúde do atleta."
-    },
-    {
       "tipo": "pilha",
       "chip": "Meu Time",
-      "titulo": "Força e comportamento do time",
+      "titulo": "Desempenho do time",
       "pontos": [
         "Ranking Elo dos clubes capixabas, recalculado jogo a jogo",
         "Quando o time marca e sofre gols (faixas de 15 minutos)",
@@ -38,9 +25,23 @@
       "notas": "Elo: o mesmo sistema do xadrez adaptado ao futebol. Começa em 1500, ganha mais quem vence um time mais forte, com vantagem de mando e peso pelo saldo de gols. Conferido de forma independente pelo serviço em Python."
     },
     {
+      "tipo": "duo",
+      "chip": "Jogadores",
+      "titulo": "Busca e avaliação de atletas",
+      "imgs": [
+        "vitrine-c.jpg",
+        "perfil-c.jpg"
+      ],
+      "legendas": [
+        "Vitrine: filtros por posição, idade, minutos e competição; filtros salvos e lista de observação",
+        "Perfil: números por 90 minutos, percentil na posição e selos real/estimado"
+      ],
+      "notas": "Números por 90 minutos só aparecem a partir de 270 minutos jogados, para não premiar quem jogou pouco. O percentil compara o atleta com os da mesma posição."
+    },
+    {
       "tipo": "lado",
       "chip": "Partidas · Scout ao Vivo",
-      "titulo": "Dados que não existem em nenhuma fonte pública",
+      "titulo": "Registro de ações durante o jogo",
       "pontos": [
         "Clique no campo e marque cada ação com o minuto",
         "Resumo por atleta com xG e nota do jogo de fórmula pública",
@@ -53,7 +54,7 @@
     {
       "tipo": "xg",
       "chip": "Partidas · Scout ao Vivo",
-      "titulo": "Chance de gol e momento do jogo",
+      "titulo": "Finalizações (xG) e momentum",
       "pontos": [
         "xG: chance de cada chute virar gol pela distância e pelo ângulo",
         "Modelo treinado com dados abertos da StatsBomb",
@@ -67,9 +68,21 @@
       "notas": "O modelo de xG é uma regressão logística treinada em 794 chutes do StatsBomb Open Data. Círculo maior = mais chance de gol. O momentum usa pesos públicos, mostrados na tela."
     },
     {
+      "tipo": "lado",
+      "chip": "Estúdio Tático · Campo",
+      "titulo": "Prancheta tática",
+      "pontos": [
+        "Formação, funções e titulares em um só lugar",
+        "Comportamento com bola, sem bola e nas transições",
+        "Predefinições salvas para cada adversário"
+      ],
+      "img": "campo-c.jpg",
+      "notas": "O Estúdio Tático junta três ferramentas: Campo (prancheta), Lance animado e Sobre vídeo. A coluna de condição só aparece quando o atleta respondeu o bem-estar."
+    },
+    {
       "tipo": "lance",
       "chip": "Estúdio Tático · Lance animado",
-      "titulo": "Monte, anime e meça a jogada",
+      "titulo": "Lance animado e compactação",
       "pontos": [
         "Lance em quadros com legenda e animação",
         "Compactação: área do bloco e distância entre linhas, em metros",
@@ -84,7 +97,7 @@
     {
       "tipo": "dossie",
       "chip": "Estúdio Tático · Dossiê",
-      "titulo": "Resumo do adversário para a preleção",
+      "titulo": "Dossiê do adversário",
       "pontos": [
         "3 chaves do jogo tiradas dos dados reais",
         "Últimos jogos, casa × fora, Elo e confronto direto",
@@ -99,7 +112,7 @@
     {
       "tipo": "formacao",
       "chip": "Formação",
-      "titulo": "Carga e bem-estar registrados de verdade",
+      "titulo": "Carga e bem-estar dos atletas",
       "pontos": [
         "sRPE: esforço de 0 a 10 × minutos = carga da sessão",
         "Bem-estar diário (índice de Hooper) com semáforo",
@@ -114,7 +127,7 @@
     {
       "tipo": "lado",
       "chip": "Formação · Antropometria",
-      "titulo": "Corpo clicável, só com medidas reais",
+      "titulo": "Avaliação antropométrica",
       "pontos": [
         "Frente e costas: clique numa região e veja as medidas dela",
         "Perímetros e dobras no padrão internacional ISAK",
@@ -123,29 +136,6 @@
       "img": "antropometria-demo-c.jpg",
       "demo": true,
       "notas": "Antes esta aba inventava as medidas a partir do nome do atleta. Agora só mostra o que a comissão mediu. As medidas da imagem são de demonstração."
-    },
-    {
-      "tipo": "integridade",
-      "chip": "Integridade dos dados",
-      "titulo": "Todo número diz de onde vem",
-      "trocas": [
-        [
-          "Antropometria",
-          "medidas geradas a partir do nome",
-          "só medidas ISAK registradas"
-        ],
-        [
-          "Alertas de lesão",
-          "modelo simulado",
-          "só com bem-estar registrado"
-        ],
-        [
-          "Perfil do adversário",
-          "rótulo sem fonte tratado como fato",
-          "“não verificado” ou informado pela comissão"
-        ]
-      ],
-      "notas": "Esta é a principal decisão do projeto: onde a versão anterior mostrava valores inventados, nós removemos ou marcamos como estimativa. Um sistema de análise só é útil se o técnico confia nos números."
     }
   ]
 }
