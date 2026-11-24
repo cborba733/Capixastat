@@ -1,7 +1,11 @@
 # O repositório guarda só o necessário para abrir a plataforma (ver README).
-# Os demais arquivos do projeto (API, Python, relatórios, apresentações) ficam só no computador do autor.
+# Além disso, o relatório do projeto fica em docs/. Os demais arquivos ficam só no computador do autor.
 /*
 !/CapixaStat_v5.html
 !/konva.min.js
 !/README.md
 !/.gitignore
+!/docs/
+/docs/*
+!/docs/relatorio_pi2_capixastat.pdf
+!/docs/relatorio_pi2_capixastat.docx

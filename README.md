@@ -5,6 +5,9 @@ análise de partidas, estúdio tático, preparação física e análise de víde
 
 Projeto Integrador 2 — Análise e Desenvolvimento de Sistemas — FAESA · Autor: **Caio Borba**
 
+📄 **Relatório completo do projeto:** [docs/relatorio_pi2_capixastat.pdf](docs/relatorio_pi2_capixastat.pdf)
+(também em [Word](docs/relatorio_pi2_capixastat.docx))
+
 ---
 
 ## Como abrir
@@ -127,8 +130,8 @@ adversários aparece como "não verificado" até a comissão confirmar.
 **Perfis de acesso da API:** técnico, analista de desempenho, preparador físico, médico/fisioterapeuta, scout,
 diretor, atleta (só vê e registra os próprios dados) e estudante.
 
-Este repositório contém apenas o necessário para abrir e usar a plataforma. A API, o serviço em Python e a prova
-de conceito de visão computacional fazem parte do projeto e estão descritos no relatório.
+Este repositório contém o necessário para abrir e usar a plataforma e o relatório do projeto (pasta `docs`). A API,
+o serviço em Python e a prova de conceito de visão computacional fazem parte do projeto e estão descritos no relatório.
 
 ---
 
