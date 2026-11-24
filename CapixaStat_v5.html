@@ -2147,6 +2147,20 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
 .login-local { width:100%; margin-top:14px; padding:11px; border-radius:10px; border:1px dashed var(--border-md); background:transparent; color:var(--text-2); font-size:13.5px; font-weight:600; cursor:pointer; font-family:inherit }
 .login-local:hover { border-color:var(--brand); color:var(--brand) }
 .login-local-dica { margin-top:6px; font-size:11.5px; color:var(--text-3); text-align:center }
+
+/* desenho no Lance animado */
+.sim-ferr { display:flex; align-items:center; gap:4px; flex-wrap:wrap; margin-bottom:8px }
+.sim-fb { width:34px; height:34px; display:inline-flex; align-items:center; justify-content:center; border-radius:8px; border:1px solid var(--border-md); background:var(--bg-raised); color:var(--text-2); cursor:pointer }
+.sim-fb .cs-ico { width:18px; height:18px }
+.sim-fb:hover { color:var(--text-1); border-color:var(--brand) }
+.sim-fb.on { background:var(--brand-fill); border-color:var(--brand-fill); color:#fff }
+.sim-cor { width:22px; height:22px; border-radius:50%; border:2px solid var(--border-md); background:var(--c); cursor:pointer; padding:0 }
+.sim-cor.on { border-color:var(--text-1); box-shadow:0 0 0 2px var(--brand) }
+.sim-fsep { width:1px; height:22px; background:var(--border-md); margin:0 6px }
+.sim-ferr-dica { font-size:12px; color:var(--text-3); margin:-2px 0 6px }
+.sim-ferr-dica { min-height:17px }
+#sim-svg.desenhando { cursor:crosshair }
+#sim-svg.desenhando .sim-d { cursor:pointer }
 </style>
 </head>
 <body>
@@ -3308,6 +3322,8 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
         <div class="content">
           <div class="sim-wrap">
             <div class="sim-stage card">
+              <div class="sim-ferr" id="sim-ferr" role="toolbar" aria-label="Ferramentas de desenho"></div>
+              <div class="sim-ferr-dica" id="sim-ferr-dica" aria-live="polite"></div>
               <div class="sim-caption" id="sim-caption-view" aria-live="polite"></div>
               <svg id="sim-svg" viewBox="-3 -3 111 74" role="img" aria-label="Campo do simulador de lances"></svg>
             </div>
@@ -3333,7 +3349,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
                 <button class="btn btn-ghost btn-sm" onclick="simDelFrame()">Excluir quadro</button>
               </div>
               <div id="sim-comp-out" class="comp-out" hidden></div>
-              <div class="cs-metric"><b class="cs-metric-tag">Como usar</b><span>Arraste jogadores e bola para montar o Q1. Clique em <b>+ Quadro</b> (copia as posições), mova quem se desloca e escreva a legenda. <b>Reproduzir</b> anima de um quadro para o outro. Azul = seu clube, laranja = adversário.</span></div>
+              <div class="cs-metric"><b class="cs-metric-tag">Como usar</b><span>Arraste jogadores e bola para montar o Q1. Use as ferramentas acima do campo para desenhar passes, movimentos, zonas, textos e <b>ligações entre jogadores</b> (triangulações), que acompanham os jogadores na animação. Clique em <b>+ Quadro</b> (copia as posições), mova quem se desloca e escreva a legenda. <b>Reproduzir</b> anima de um quadro para o outro. Azul = seu clube, laranja = adversário.</span></div>
             </div>
             <div class="card sim-lib" id="sim-lib"></div>
           </div>
@@ -3523,7 +3539,7 @@ function setCurrentUser(user) {
   localStorage.setItem('capixastat_current', JSON.stringify(user));
 }
 // ── R2-3: ícones Lucide (https://lucide.dev, licença ISC) — substituem os emojis em todo o sistema ──
-var CS_ICONES = {"moon": "<path d=\"M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z\"/>", "sun": "<circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2\"/><path d=\"M12 20v2\"/><path d=\"m4.93 4.93 1.41 1.41\"/><path d=\"m17.66 17.66 1.41 1.41\"/><path d=\"M2 12h2\"/><path d=\"M20 12h2\"/><path d=\"m6.34 17.66-1.41 1.41\"/><path d=\"m19.07 4.93-1.41 1.41\"/>", "lightbulb": "<path d=\"M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5\"/><path d=\"M9 18h6\"/><path d=\"M10 22h4\"/>", "sparkles": "<path d=\"M9.94 15.5A2 2 0 0 0 8.5 14.06l-6.14-1.58a.5.5 0 0 1 0-.96L8.5 9.94A2 2 0 0 0 9.94 8.5l1.58-6.14a.5.5 0 0 1 .96 0L14.06 8.5A2 2 0 0 0 15.5 9.94l6.14 1.58a.5.5 0 0 1 0 .96L15.5 14.06a2 2 0 0 0-1.44 1.44l-1.58 6.14a.5.5 0 0 1-.96 0z\"/><path d=\"M20 3v4\"/><path d=\"M22 5h-4\"/>", "user": "<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\"/><circle cx=\"12\" cy=\"7\" r=\"4\"/>", "goal": "<path d=\"M12 13V2l8 4-8 4\"/><path d=\"M20.56 10.22a9 9 0 1 1-12.55-5.29\"/><path d=\"M8 10a5 5 0 1 0 8.9 2.02\"/>", "chart": "<path d=\"M3 3v18h18\"/><path d=\"M18 17V9\"/><path d=\"M13 17V5\"/><path d=\"M8 17v-3\"/>", "trophy": "<path d=\"M6 9H4.5a2.5 2.5 0 0 1 0-5H6\"/><path d=\"M18 9h1.5a2.5 2.5 0 0 0 0-5H18\"/><path d=\"M4 22h16\"/><path d=\"M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22\"/><path d=\"M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22\"/><path d=\"M18 2H6v7a6 6 0 0 0 12 0V2Z\"/>", "globe": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20\"/><path d=\"M2 12h20\"/>", "star": "<polygon points=\"12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2\"/>", "camera": "<path d=\"M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z\"/><circle cx=\"12\" cy=\"13\" r=\"3\"/>", "calendar": "<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"/><path d=\"M16 2v4\"/><path d=\"M8 2v4\"/><path d=\"M3 10h18\"/>", "clipboard": "<rect x=\"8\" y=\"2\" width=\"8\" height=\"4\" rx=\"1\"/><path d=\"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2\"/><path d=\"M12 11h4\"/><path d=\"M12 16h4\"/><path d=\"M8 11h.01\"/><path d=\"M8 16h.01\"/>", "pencil": "<path d=\"M12 20h9\"/><path d=\"M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z\"/>", "activity": "<path d=\"M22 12h-4l-3 9L9 3l-3 9H2\"/>", "ruler": "<path d=\"M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z\"/><path d=\"m14.5 12.5 2-2\"/><path d=\"m11.5 9.5 2-2\"/><path d=\"m8.5 6.5 2-2\"/><path d=\"m17.5 15.5 2-2\"/>", "play": "<polygon points=\"6 3 20 12 6 21 6 3\"/>", "pause": "<rect x=\"6\" y=\"4\" width=\"4\" height=\"16\" rx=\"1\"/><rect x=\"14\" y=\"4\" width=\"4\" height=\"16\" rx=\"1\"/>", "skip-back": "<polygon points=\"19 20 9 12 19 4 19 20\"/><line x1=\"5\" x2=\"5\" y1=\"19\" y2=\"5\"/>", "skip-forward": "<polygon points=\"5 4 15 12 5 20 5 4\"/><line x1=\"19\" x2=\"19\" y1=\"5\" y2=\"19\"/>", "arrow-right": "<path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/>", "check-circle": "<path d=\"M22 11.08V12a10 10 0 1 1-5.93-9.14\"/><path d=\"m9 11 3 3L22 4\"/>", "check": "<path d=\"M20 6 9 17l-5-5\"/>", "menu": "<line x1=\"4\" x2=\"20\" y1=\"12\" y2=\"12\"/><line x1=\"4\" x2=\"20\" y1=\"6\" y2=\"6\"/><line x1=\"4\" x2=\"20\" y1=\"18\" y2=\"18\"/>", "x": "<path d=\"M18 6 6 18\"/><path d=\"m6 6 12 12\"/>", "chevron-right": "<path d=\"m9 18 6-6-6-6\"/>", "chevron-down": "<path d=\"m6 9 6 6 6-6\"/>", "award": "<circle cx=\"12\" cy=\"8\" r=\"6\"/><path d=\"M15.48 12.89 17 22l-5-3-5 3 1.52-9.11\"/>", "cross": "<path d=\"M4 9a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h4a1 1 0 0 1 1 1v4a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-4a1 1 0 0 1 1-1h4a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-4a1 1 0 0 1-1-1V4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4a1 1 0 0 1-1 1z\"/>", "save": "<path d=\"M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z\"/><polyline points=\"17 21 17 13 7 13 7 21\"/><polyline points=\"7 3 7 8 15 8\"/>", "trash": "<path d=\"M3 6h18\"/><path d=\"M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6\"/><path d=\"M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2\"/>", "shield": "<path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\"/>", "zap": "<path d=\"M13 2 3 14h9l-1 8 10-12h-9l1-8z\"/>", "alert": "<path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3\"/><path d=\"M12 9v4\"/><path d=\"M12 17h.01\"/>", "settings": "<path d=\"M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/>", "send": "<path d=\"m22 2-7 20-4-9-9-4Z\"/><path d=\"M22 2 11 13\"/>", "download": "<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><polyline points=\"7 10 12 15 17 10\"/><line x1=\"12\" x2=\"12\" y1=\"15\" y2=\"3\"/>", "flame": "<path d=\"M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z\"/>", "briefcase": "<rect width=\"20\" height=\"14\" x=\"2\" y=\"7\" rx=\"2\"/><path d=\"M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16\"/>", "map-pin": "<path d=\"M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/>", "card": "<rect width=\"12\" height=\"18\" x=\"6\" y=\"3\" rx=\"2\"/>"};
+var CS_ICONES = {"pointer": "<path d=\"M12.59 12.59 19 19\"/><path d=\"M3.69 3.04a.5.5 0 0 0-.65.65l6.5 16a.5.5 0 0 0 .95-.06l1.57-6.08a2 2 0 0 1 1.45-1.48l6.12-1.58a.5.5 0 0 0 .06-.95z\"/>", "curva": "<path d=\"M4 18c4-8 10-11 16-9\"/><path d=\"m16 5 4 4-4 4\"/>", "tracejada": "<path d=\"M3 12h3\"/><path d=\"M9 12h3\"/><path d=\"m15 6 6 6-6 6\"/>", "reta": "<path d=\"M5 19 19 5\"/>", "retangulo": "<rect width=\"18\" height=\"14\" x=\"3\" y=\"5\" rx=\"2\"/>", "elipse": "<ellipse cx=\"12\" cy=\"12\" rx=\"10\" ry=\"7\"/>", "triangulo": "<path d=\"M13.73 4a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z\"/>", "texto": "<polyline points=\"4 7 4 4 20 4 20 7\"/><line x1=\"9\" x2=\"15\" y1=\"20\" y2=\"20\"/><line x1=\"12\" x2=\"12\" y1=\"4\" y2=\"20\"/>", "borracha": "<path d=\"m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21\"/><path d=\"M22 21H7\"/><path d=\"m5 11 9 9\"/>", "desfazer": "<path d=\"M9 14 4 9l5-5\"/><path d=\"M4 9h11a5 5 0 0 1 0 10h-4\"/>", "moon": "<path d=\"M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z\"/>", "sun": "<circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2\"/><path d=\"M12 20v2\"/><path d=\"m4.93 4.93 1.41 1.41\"/><path d=\"m17.66 17.66 1.41 1.41\"/><path d=\"M2 12h2\"/><path d=\"M20 12h2\"/><path d=\"m6.34 17.66-1.41 1.41\"/><path d=\"m19.07 4.93-1.41 1.41\"/>", "lightbulb": "<path d=\"M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5\"/><path d=\"M9 18h6\"/><path d=\"M10 22h4\"/>", "sparkles": "<path d=\"M9.94 15.5A2 2 0 0 0 8.5 14.06l-6.14-1.58a.5.5 0 0 1 0-.96L8.5 9.94A2 2 0 0 0 9.94 8.5l1.58-6.14a.5.5 0 0 1 .96 0L14.06 8.5A2 2 0 0 0 15.5 9.94l6.14 1.58a.5.5 0 0 1 0 .96L15.5 14.06a2 2 0 0 0-1.44 1.44l-1.58 6.14a.5.5 0 0 1-.96 0z\"/><path d=\"M20 3v4\"/><path d=\"M22 5h-4\"/>", "user": "<path d=\"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2\"/><circle cx=\"12\" cy=\"7\" r=\"4\"/>", "goal": "<path d=\"M12 13V2l8 4-8 4\"/><path d=\"M20.56 10.22a9 9 0 1 1-12.55-5.29\"/><path d=\"M8 10a5 5 0 1 0 8.9 2.02\"/>", "chart": "<path d=\"M3 3v18h18\"/><path d=\"M18 17V9\"/><path d=\"M13 17V5\"/><path d=\"M8 17v-3\"/>", "trophy": "<path d=\"M6 9H4.5a2.5 2.5 0 0 1 0-5H6\"/><path d=\"M18 9h1.5a2.5 2.5 0 0 0 0-5H18\"/><path d=\"M4 22h16\"/><path d=\"M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22\"/><path d=\"M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22\"/><path d=\"M18 2H6v7a6 6 0 0 0 12 0V2Z\"/>", "globe": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20\"/><path d=\"M2 12h20\"/>", "star": "<polygon points=\"12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2\"/>", "camera": "<path d=\"M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z\"/><circle cx=\"12\" cy=\"13\" r=\"3\"/>", "calendar": "<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"/><path d=\"M16 2v4\"/><path d=\"M8 2v4\"/><path d=\"M3 10h18\"/>", "clipboard": "<rect x=\"8\" y=\"2\" width=\"8\" height=\"4\" rx=\"1\"/><path d=\"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2\"/><path d=\"M12 11h4\"/><path d=\"M12 16h4\"/><path d=\"M8 11h.01\"/><path d=\"M8 16h.01\"/>", "pencil": "<path d=\"M12 20h9\"/><path d=\"M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z\"/>", "activity": "<path d=\"M22 12h-4l-3 9L9 3l-3 9H2\"/>", "ruler": "<path d=\"M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z\"/><path d=\"m14.5 12.5 2-2\"/><path d=\"m11.5 9.5 2-2\"/><path d=\"m8.5 6.5 2-2\"/><path d=\"m17.5 15.5 2-2\"/>", "play": "<polygon points=\"6 3 20 12 6 21 6 3\"/>", "pause": "<rect x=\"6\" y=\"4\" width=\"4\" height=\"16\" rx=\"1\"/><rect x=\"14\" y=\"4\" width=\"4\" height=\"16\" rx=\"1\"/>", "skip-back": "<polygon points=\"19 20 9 12 19 4 19 20\"/><line x1=\"5\" x2=\"5\" y1=\"19\" y2=\"5\"/>", "skip-forward": "<polygon points=\"5 4 15 12 5 20 5 4\"/><line x1=\"19\" x2=\"19\" y1=\"5\" y2=\"19\"/>", "arrow-right": "<path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/>", "check-circle": "<path d=\"M22 11.08V12a10 10 0 1 1-5.93-9.14\"/><path d=\"m9 11 3 3L22 4\"/>", "check": "<path d=\"M20 6 9 17l-5-5\"/>", "menu": "<line x1=\"4\" x2=\"20\" y1=\"12\" y2=\"12\"/><line x1=\"4\" x2=\"20\" y1=\"6\" y2=\"6\"/><line x1=\"4\" x2=\"20\" y1=\"18\" y2=\"18\"/>", "x": "<path d=\"M18 6 6 18\"/><path d=\"m6 6 12 12\"/>", "chevron-right": "<path d=\"m9 18 6-6-6-6\"/>", "chevron-down": "<path d=\"m6 9 6 6 6-6\"/>", "award": "<circle cx=\"12\" cy=\"8\" r=\"6\"/><path d=\"M15.48 12.89 17 22l-5-3-5 3 1.52-9.11\"/>", "cross": "<path d=\"M4 9a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h4a1 1 0 0 1 1 1v4a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-4a1 1 0 0 1 1-1h4a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-4a1 1 0 0 1-1-1V4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4a1 1 0 0 1-1 1z\"/>", "save": "<path d=\"M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z\"/><polyline points=\"17 21 17 13 7 13 7 21\"/><polyline points=\"7 3 7 8 15 8\"/>", "trash": "<path d=\"M3 6h18\"/><path d=\"M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6\"/><path d=\"M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2\"/>", "shield": "<path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\"/>", "zap": "<path d=\"M13 2 3 14h9l-1 8 10-12h-9l1-8z\"/>", "alert": "<path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3\"/><path d=\"M12 9v4\"/><path d=\"M12 17h.01\"/>", "settings": "<path d=\"M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/>", "send": "<path d=\"m22 2-7 20-4-9-9-4Z\"/><path d=\"M22 2 11 13\"/>", "download": "<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><polyline points=\"7 10 12 15 17 10\"/><line x1=\"12\" x2=\"12\" y1=\"15\" y2=\"3\"/>", "flame": "<path d=\"M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z\"/>", "briefcase": "<rect width=\"20\" height=\"14\" x=\"2\" y=\"7\" rx=\"2\"/><path d=\"M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16\"/>", "map-pin": "<path d=\"M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/>", "card": "<rect width=\"12\" height=\"18\" x=\"6\" y=\"3\" rx=\"2\"/>"};
 function ico(n, cls) { return '<svg class="cs-ico' + (cls ? ' ' + cls : '') + '" viewBox="0 0 24 24" aria-hidden="true">' + (CS_ICONES[n] || '') + '</svg>'; }
 function getCurrentUser() {
   return JSON.parse(localStorage.getItem('capixastat_current') || 'null');
@@ -4515,7 +4531,124 @@ function simCompSvg(pos) {
   return h;
 }
 
-function simRender(posOverride) {
+
+// ══════════════════════════════════════════════════════════════════
+// Desenho no Lance animado: passe, movimento, linha, zona, elipse, texto e LIGAÇÕES entre jogadores
+// (triangulações). Cada desenho pertence a um quadro; a ligação acompanha os jogadores na animação.
+// ══════════════════════════════════════════════════════════════════
+var SIM_FERR = [['mover', 'pointer', 'Mover jogadores e bola'], ['passe', 'curva', 'Passe (seta curva)'], ['mov', 'tracejada', 'Movimento sem bola (seta tracejada)'],
+  ['linha', 'reta', 'Linha reta'], ['zona', 'retangulo', 'Zona (retângulo)'], ['elipse', 'elipse', 'Destaque (elipse)'],
+  ['lig', 'triangulo', 'Ligação entre jogadores — triangulação (clique nos jogadores; Enter ou duplo clique conclui)'], ['texto', 'texto', 'Texto'], ['borracha', 'borracha', 'Apagar um desenho']];
+var SIM_CORES = ['#ffffff', '#facc15', '#22d3ee', '#f472b6', '#f87171'];
+SIM.ferr = 'mover'; SIM.cor = '#ffffff'; SIM.ligTmp = [];
+function simDesenhos(fr) { fr = fr || SIM.frames[SIM.cur]; if (!fr.desenhos) fr.desenhos = []; return fr.desenhos; }
+function simFerrRender() {
+  var el = document.getElementById('sim-ferr'); if (!el) return;
+  el.innerHTML = SIM_FERR.map(function (f) { return '<button type="button" class="sim-fb' + (SIM.ferr === f[0] ? ' on' : '') + '" title="' + f[2] + '" aria-label="' + f[2] + '" aria-pressed="' + (SIM.ferr === f[0]) + '" onclick="simFerr(\'' + f[0] + '\')">' + ico(f[1]) + '</button>'; }).join('') +
+    '<span class="sim-fsep"></span>' + SIM_CORES.map(function (c) { return '<button type="button" class="sim-cor' + (SIM.cor === c ? ' on' : '') + '" style="--c:' + c + '" title="Cor" aria-label="Cor ' + c + '" onclick="SIM.cor=\'' + c + '\';simFerrRender()"></button>'; }).join('') +
+    '<span class="sim-fsep"></span><button type="button" class="sim-fb" title="Desfazer o último desenho deste quadro" aria-label="Desfazer desenho" onclick="simDesfazerDesenho()">' + ico('desfazer') + '</button>' +
+    '<button type="button" class="sim-fb" title="Apagar todos os desenhos deste quadro" aria-label="Limpar desenhos" onclick="simLimparDesenhos()">' + ico('trash') + '</button>';
+  var d = document.getElementById('sim-ferr-dica'), t = { mover: '', passe: 'Arraste do jogador até o destino do passe.', mov: 'Arraste para mostrar o deslocamento sem bola.', linha: 'Arraste para traçar uma linha.',
+    zona: 'Arraste para marcar uma zona.', elipse: 'Arraste para destacar uma região.', texto: 'Clique no campo onde o texto deve ficar.', borracha: 'Clique num desenho para apagá-lo.',
+    lig: SIM.ligTmp.length ? 'Ligação com ' + SIM.ligTmp.length + ' jogador(es) — clique em mais; Enter ou duplo clique conclui; Esc cancela.' : 'Clique nos jogadores, em ordem (3 ou mais formam um triângulo/polígono).' }[SIM.ferr];
+  if (d) d.textContent = t || 'Ferramenta Mover: arraste jogadores e bola.';
+  var svg = document.getElementById('sim-svg'); if (svg) svg.classList.toggle('desenhando', SIM.ferr !== 'mover');
+}
+function simFerr(f) { if (SIM.ferr === 'lig' && f !== 'lig') simLigConcluir(); SIM.ferr = f; SIM.ligTmp = []; simFerrRender(); simRender(); }
+function simDesfazerDesenho() { var d = simDesenhos(); if (!d.length) { csToast('Nenhum desenho neste quadro'); return; } d.pop(); simRender(); }
+function simLimparDesenhos() { var d = simDesenhos(); if (!d.length) return; if (!confirm('Apagar os ' + d.length + ' desenho(s) deste quadro?')) return; SIM.frames[SIM.cur].desenhos = []; simRender(); }
+function simLigConcluir() {
+  if (SIM.ligTmp.length >= 2) simDesenhos().push({ t: 'lig', ids: SIM.ligTmp.slice(), cor: SIM.cor });
+  SIM.ligTmp = []; simFerrRender(); simRender();
+}
+// geometria de cada desenho (SVG)
+function simMarcador(cor) { return 'sim-m-' + cor.replace('#', ''); }
+function simDesenhosSvg(desenhos, pos, previa) {
+  var h = '<defs>' + SIM_CORES.map(function (c) { return '<marker id="' + simMarcador(c) + '" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="3.4" markerHeight="3.4" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="' + c + '"/></marker>'; }).join('') + '</defs>';
+  var lista = desenhos || [];
+  lista.concat(previa ? [previa] : []).forEach(function (d, i) {
+    var cor = d.cor || '#fff', di = previa && i === lista.length ? '' : ' data-di="' + i + '"', p = d.p || [];
+    if (d.t === 'passe' || d.t === 'mov' || d.t === 'linha') {
+      var a = p[0], b = p[1]; if (!a || !b) return;
+      var dash = d.t === 'mov' ? ' stroke-dasharray="1.4 1"' : '', mk = d.t === 'linha' ? '' : ' marker-end="url(#' + simMarcador(cor) + ')"';
+      var path = 'M' + a[0] + ' ' + a[1] + ' L' + b[0] + ' ' + b[1];
+      if (d.t === 'passe') { var mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, dx = b[0] - a[0], dy = b[1] - a[1]; path = 'M' + a[0] + ' ' + a[1] + ' Q' + (mx - dy * .18).toFixed(2) + ' ' + (my + dx * .18).toFixed(2) + ' ' + b[0] + ' ' + b[1]; }
+      h += '<path class="sim-d"' + di + ' d="' + path + '" fill="none" stroke="' + cor + '" stroke-width=".55" stroke-linecap="round"' + dash + mk + '/>';
+    } else if (d.t === 'zona' || d.t === 'elipse') {
+      var a2 = p[0], b2 = p[1]; if (!a2 || !b2) return;
+      var x = Math.min(a2[0], b2[0]), y = Math.min(a2[1], b2[1]), w = Math.abs(b2[0] - a2[0]), hh = Math.abs(b2[1] - a2[1]);
+      h += d.t === 'zona' ? '<rect class="sim-d"' + di + ' x="' + x + '" y="' + y + '" width="' + w + '" height="' + hh + '" rx=".6" fill="' + cor + '" fill-opacity=".16" stroke="' + cor + '" stroke-width=".4" stroke-dasharray="1.2 .8"/>'
+        : '<ellipse class="sim-d"' + di + ' cx="' + (x + w / 2) + '" cy="' + (y + hh / 2) + '" rx="' + (w / 2) + '" ry="' + (hh / 2) + '" fill="' + cor + '" fill-opacity=".14" stroke="' + cor + '" stroke-width=".45"/>';
+    } else if (d.t === 'texto') {
+      if (!p[0]) return;
+      h += '<text class="sim-d sim-dt"' + di + ' x="' + p[0][0] + '" y="' + p[0][1] + '" fill="' + cor + '" font-size="2.6" font-weight="800" font-family="DM Sans, sans-serif" paint-order="stroke" stroke="#0a0f18" stroke-width=".6">' + csEsc(d.txt || '') + '</text>';
+    } else if (d.t === 'lig') {
+      var pts = (d.ids || []).map(function (id) { return pos[id]; }).filter(Boolean); if (pts.length < 2) return;
+      var str = pts.map(function (q) { return q[0].toFixed(2) + ',' + q[1].toFixed(2); }).join(' ');
+      h += pts.length >= 3 ? '<polygon class="sim-d"' + di + ' points="' + str + '" fill="' + cor + '" fill-opacity=".12" stroke="' + cor + '" stroke-width=".5" stroke-linejoin="round"/>'
+        : '<polyline class="sim-d"' + di + ' points="' + str + '" fill="none" stroke="' + cor + '" stroke-width=".5"/>';
+      pts.forEach(function (q) { h += '<circle cx="' + q[0] + '" cy="' + q[1] + '" r="2.9" fill="none" stroke="' + cor + '" stroke-width=".35" opacity=".9"/>'; });
+    }
+  });
+  return h;
+}
+// mesmo desenho no canvas (exportação em vídeo)
+function simDesenhosCanvas(ctx, k, X, Y, desenhos, pos) {
+  (desenhos || []).forEach(function (d) {
+    var cor = d.cor || '#fff', p = d.p || [];
+    ctx.save(); ctx.strokeStyle = cor; ctx.fillStyle = cor; ctx.lineWidth = .55 * k; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    var seta = function (x1, y1, x2, y2) { var ang = Math.atan2(y2 - y1, x2 - x1), L = 1.7 * k; ctx.setLineDash([]); ctx.beginPath(); ctx.moveTo(X(x2), Y(y2));
+      ctx.lineTo(X(x2) - L * Math.cos(ang - .45), Y(y2) - L * Math.sin(ang - .45)); ctx.lineTo(X(x2) - L * Math.cos(ang + .45), Y(y2) - L * Math.sin(ang + .45)); ctx.closePath(); ctx.fill(); };
+    if ((d.t === 'passe' || d.t === 'mov' || d.t === 'linha') && p[0] && p[1]) {
+      var a = p[0], b = p[1]; ctx.setLineDash(d.t === 'mov' ? [1.4 * k, 1 * k] : []); ctx.beginPath(); ctx.moveTo(X(a[0]), Y(a[1]));
+      if (d.t === 'passe') { var mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, dx = b[0] - a[0], dy = b[1] - a[1], cx = mx - dy * .18, cy = my + dx * .18;
+        ctx.quadraticCurveTo(X(cx), Y(cy), X(b[0]), Y(b[1])); ctx.stroke(); seta(cx, cy, b[0], b[1]); }
+      else { ctx.lineTo(X(b[0]), Y(b[1])); ctx.stroke(); if (d.t === 'mov') seta(a[0], a[1], b[0], b[1]); }
+    } else if ((d.t === 'zona' || d.t === 'elipse') && p[0] && p[1]) {
+      var x = Math.min(p[0][0], p[1][0]), y = Math.min(p[0][1], p[1][1]), w = Math.abs(p[1][0] - p[0][0]), h = Math.abs(p[1][1] - p[0][1]);
+      ctx.lineWidth = .4 * k; ctx.beginPath();
+      if (d.t === 'zona') { ctx.setLineDash([1.2 * k, .8 * k]); ctx.rect(X(x), Y(y), w * k, h * k); } else ctx.ellipse(X(x + w / 2), Y(y + h / 2), w * k / 2, h * k / 2, 0, 0, Math.PI * 2);
+      ctx.globalAlpha = .16; ctx.fill(); ctx.globalAlpha = 1; ctx.stroke();
+    } else if (d.t === 'texto' && p[0]) {
+      ctx.font = '800 ' + (2.6 * k).toFixed(0) + 'px DM Sans, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+      ctx.lineWidth = .6 * k; ctx.strokeStyle = '#0a0f18'; ctx.strokeText(d.txt || '', X(p[0][0]), Y(p[0][1])); ctx.fillText(d.txt || '', X(p[0][0]), Y(p[0][1]));
+    } else if (d.t === 'lig') {
+      var pts = (d.ids || []).map(function (id) { return pos[id]; }).filter(Boolean);
+      if (pts.length >= 2) { ctx.beginPath(); pts.forEach(function (q, i) { if (i) ctx.lineTo(X(q[0]), Y(q[1])); else ctx.moveTo(X(q[0]), Y(q[1])); });
+        if (pts.length >= 3) { ctx.closePath(); ctx.globalAlpha = .12; ctx.fill(); ctx.globalAlpha = 1; } ctx.stroke();
+        ctx.lineWidth = .35 * k; pts.forEach(function (q) { ctx.beginPath(); ctx.arc(X(q[0]), Y(q[1]), 2.9 * k, 0, Math.PI * 2); ctx.stroke(); }); }
+    }
+    ctx.restore();
+  });
+}
+// interação no campo (ferramentas que não são "mover")
+function simPontoSvg(svg, ev) { var pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY; var c = pt.matrixTransform(svg.getScreenCTM().inverse());
+  return [+Math.max(-2, Math.min(107, c.x)).toFixed(2), +Math.max(-2, Math.min(70, c.y)).toFixed(2)]; }
+function simBindDesenho(svg) {
+  if (svg._desenhoLigado) return; svg._desenhoLigado = true;
+  svg.addEventListener('pointerdown', function (e) {
+    if (SIM.playing || SIM.ferr === 'mover') return;
+    var alvo = e.target.closest ? e.target.closest('[data-di], .sim-tok') : null;
+    if (SIM.ferr === 'borracha') { if (alvo && alvo.hasAttribute('data-di')) { simDesenhos().splice(+alvo.getAttribute('data-di'), 1); simRender(); } return; }
+    if (SIM.ferr === 'lig') { if (alvo && alvo.classList.contains('sim-tok') && alvo.getAttribute('data-id') !== 'ball') { var id = alvo.getAttribute('data-id');
+        if (SIM.ligTmp[SIM.ligTmp.length - 1] !== id) SIM.ligTmp.push(id); simFerrRender(); simRender(); } return; }
+    var p0 = simPontoSvg(svg, e);
+    if (SIM.ferr === 'texto') { var t = prompt('Texto:'); if (t && t.trim()) { simDesenhos().push({ t: 'texto', p: [p0], txt: t.trim().slice(0, 60), cor: SIM.cor }); simRender(); } return; }
+    e.preventDefault(); svg.setPointerCapture(e.pointerId);
+    var prev = { t: SIM.ferr, p: [p0, p0], cor: SIM.cor };
+    var move = function (ev) { prev.p[1] = simPontoSvg(svg, ev); simRender(null, prev); };
+    var up = function () { svg.removeEventListener('pointermove', move); svg.removeEventListener('pointerup', up);
+      var a = prev.p[0], b = prev.p[1]; if (Math.hypot(b[0] - a[0], b[1] - a[1]) > 1) simDesenhos().push(prev); simRender(); };
+    svg.addEventListener('pointermove', move); svg.addEventListener('pointerup', up);
+  });
+  svg.addEventListener('dblclick', function () { if (SIM.ferr === 'lig') simLigConcluir(); });
+  document.addEventListener('keydown', function (e) {
+    if (SIM.ferr !== 'lig' || !document.getElementById('screen-simulador').classList.contains('active')) return;
+    if (e.key === 'Enter') { e.preventDefault(); simLigConcluir(); } else if (e.key === 'Escape') { SIM.ligTmp = []; simFerrRender(); simRender(); }
+  });
+}
+
+function simRender(posOverride, previa) {
   var svg = document.getElementById('sim-svg'); if (!svg || !SIM.frames.length) return;
   var fr = SIM.frames[SIM.cur], pos = posOverride || fr.pos;
   var prev = SIM.cur > 0 ? SIM.frames[SIM.cur - 1].pos : null;
@@ -4529,6 +4662,8 @@ function simRender(posOverride) {
     });
   }
   h += simCompSvg(pos); // X3
+  h += simDesenhosSvg(fr.desenhos, pos, previa);
+  if (SIM.ferr === 'lig') SIM.ligTmp.forEach(function (id) { var q = pos[id]; if (q) h += '<circle cx="' + q[0] + '" cy="' + q[1] + '" r="3.1" fill="none" stroke="' + SIM.cor + '" stroke-width=".5" stroke-dasharray=".8 .6"/>'; });
   h += '<defs><marker id="sim-arr" viewBox="0 0 6 6" refX="5" refY="3" markerWidth="4" markerHeight="4" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#fff"/></marker></defs>';
   SIM.tokens.forEach(function (t) {
     var q = pos[t.id]; if (!q) return;
@@ -4538,7 +4673,8 @@ function simRender(posOverride) {
       '<text y=".75" text-anchor="middle" font-size="2" font-weight="800" fill="#fff" font-family="DM Sans, sans-serif">' + t.label + '</text><title>' + t.nome + '</title></g>';
   });
   svg.innerHTML = h;
-  simBindDrag(svg);
+  simBindDrag(svg); simBindDesenho(svg);
+  if (!document.querySelector('#sim-ferr .sim-fb')) simFerrRender();
   document.getElementById('sim-caption-view').textContent = (SIM.frames.length > 1 ? 'Q' + (SIM.cur + 1) + ' · ' : '') + (fr.caption || '');
   document.getElementById('sim-caption-view').style.display = fr.caption || SIM.frames.length > 1 ? 'block' : 'none';
   var cap = document.getElementById('sim-caption'); if (cap && document.activeElement !== cap) cap.value = fr.caption || '';
@@ -4550,7 +4686,7 @@ function simRender(posOverride) {
 function simBindDrag(svg) {
   svg.querySelectorAll('.sim-tok').forEach(function (g) {
     g.addEventListener('pointerdown', function (e) {
-      if (SIM.playing) return;
+      if (SIM.playing || SIM.ferr !== 'mover') return;
       e.preventDefault();
       var id = g.getAttribute('data-id');
       var pt = svg.createSVGPoint();
@@ -4568,9 +4704,9 @@ function simBindDrag(svg) {
   });
 }
 function simGo(i) { if (SIM.playing) simStop(); SIM.cur = Math.max(0, Math.min(SIM.frames.length - 1, i)); simRender(); }
-function simCopy(f) { return { caption: '', pos: JSON.parse(JSON.stringify(f.pos)) }; }
+function simCopy(f) { return { caption: '', pos: JSON.parse(JSON.stringify(f.pos)), desenhos: JSON.parse(JSON.stringify((f.desenhos || []).filter(function (d) { return d.t === 'lig'; }))) }; }
 function simAddFrame() { var f = simCopy(SIM.frames[SIM.frames.length - 1]); SIM.frames.push(f); SIM.cur = SIM.frames.length - 1; simRender(); document.getElementById('sim-caption').focus(); }
-function simDupFrame() { var f = simCopy(SIM.frames[SIM.cur]); f.caption = SIM.frames[SIM.cur].caption; SIM.frames.splice(SIM.cur + 1, 0, f); SIM.cur++; simRender(); }
+function simDupFrame() { var f = simCopy(SIM.frames[SIM.cur]); f.caption = SIM.frames[SIM.cur].caption; f.desenhos = JSON.parse(JSON.stringify(SIM.frames[SIM.cur].desenhos || [])); SIM.frames.splice(SIM.cur + 1, 0, f); SIM.cur++; simRender(); }
 function simDelFrame() { if (SIM.frames.length < 2) { csToast('O lance precisa de pelo menos um quadro'); return; } SIM.frames.splice(SIM.cur, 1); SIM.cur = Math.max(0, SIM.cur - 1); simRender(); }
 function simSetCaption(v) { SIM.frames[SIM.cur].caption = v; simCheckEditado(); var cv = document.getElementById('sim-caption-view'); cv.textContent = (SIM.frames.length > 1 ? 'Q' + (SIM.cur + 1) + ' · ' : '') + v; cv.style.display = 'block'; }
 function simSpeed(v) { SIM.speed = v; document.querySelectorAll('[data-sp]').forEach(function (b) { b.classList.toggle('active', +b.getAttribute('data-sp') === v); }); }
@@ -4731,7 +4867,7 @@ function simLoad(i) {
 }
 
 // ── Q3: exportar o lance animado em vídeo (canvas + MediaRecorder, sem biblioteca) ──
-function simDesenharCanvas(ctx, W, H, pos, legenda) {
+function simDesenharCanvas(ctx, W, H, pos, legenda, desenhos) {
   var k = W / 111, X = function (m) { return (m + 3) * k; }, Y = function (m) { return (m + 3) * k; };
   ctx.fillStyle = '#1b5e33'; ctx.fillRect(0, 0, W, H);
   ctx.fillStyle = 'rgba(255,255,255,.035)'; for (var i = 0; i < 10; i++) ctx.fillRect(X(i * 10.5), Y(0), 5.25 * k, 68 * k);
@@ -4740,6 +4876,7 @@ function simDesenharCanvas(ctx, W, H, pos, legenda) {
   R(0, 0, 105, 68); R(0, 13.84, 16.5, 40.32); R(0, 24.84, 5.5, 18.32); R(88.5, 13.84, 16.5, 40.32); R(99.5, 24.84, 5.5, 18.32); R(-1.6, 30.34, 1.6, 7.32); R(105, 30.34, 1.6, 7.32);
   ctx.beginPath(); ctx.moveTo(X(52.5), Y(0)); ctx.lineTo(X(52.5), Y(68)); ctx.stroke();
   ctx.beginPath(); ctx.arc(X(52.5), Y(34), 9.15 * k, 0, Math.PI * 2); ctx.stroke();
+  simDesenhosCanvas(ctx, k, X, Y, desenhos, pos);
   SIM.tokens.forEach(function (t) {
     var q = pos[t.id]; if (!q) return;
     ctx.beginPath();
@@ -4771,17 +4908,17 @@ function simExportVideo() {
   var total = (SIM.frames.length - 1) * (HOLD + TRANS) + FIM;
   var quadro = function (t) { // estado do lance no instante t (ms)
     var seg = Math.floor(t / (HOLD + TRANS)), n = SIM.frames.length;
-    if (seg >= n - 1) return { pos: SIM.frames[n - 1].pos, cap: 'Q' + n + (SIM.frames[n - 1].caption ? ' · ' + SIM.frames[n - 1].caption : '') };
+    if (seg >= n - 1) return { d: SIM.frames[n - 1].desenhos, pos: SIM.frames[n - 1].pos, cap: 'Q' + n + (SIM.frames[n - 1].caption ? ' · ' + SIM.frames[n - 1].caption : '') };
     var dt = t - seg * (HOLD + TRANS);
-    if (dt < HOLD) return { pos: SIM.frames[seg].pos, cap: 'Q' + (seg + 1) + (SIM.frames[seg].caption ? ' · ' + SIM.frames[seg].caption : '') };
+    if (dt < HOLD) return { d: SIM.frames[seg].desenhos, pos: SIM.frames[seg].pos, cap: 'Q' + (seg + 1) + (SIM.frames[seg].caption ? ' · ' + SIM.frames[seg].caption : '') };
     var kk = Math.min(1, (dt - HOLD) / TRANS), e = kk < .5 ? 2 * kk * kk : 1 - Math.pow(-2 * kk + 2, 2) / 2;
     var A = SIM.frames[seg].pos, B = SIM.frames[seg + 1].pos, P = {};
     Object.keys(B).forEach(function (id) { var a = A[id] || B[id]; P[id] = [a[0] + (B[id][0] - a[0]) * e, a[1] + (B[id][1] - a[1]) * e]; });
-    return { pos: P, cap: 'Q' + (seg + 2) + (SIM.frames[seg + 1].caption ? ' · ' + SIM.frames[seg + 1].caption : '') };
+    return { d: SIM.frames[seg].desenhos, pos: P, cap: 'Q' + (seg + 2) + (SIM.frames[seg + 1].caption ? ' · ' + SIM.frames[seg + 1].caption : '') };
   };
   var desenhar = function (t) {
     var f = quadro(t);
-    ctx.save(); simDesenharCanvas(ctx, W, H, f.pos, f.cap); ctx.restore();
+    ctx.save(); simDesenharCanvas(ctx, W, H, f.pos, f.cap, f.d); ctx.restore();
     ctx.fillStyle = '#0a0f18'; ctx.fillRect(0, H, W, FOOT);
     ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
     ctx.fillStyle = '#5b95ff'; ctx.font = '700 26px Space Grotesk, sans-serif'; ctx.fillText('CapixaStat', 22, H + FOOT / 2);
