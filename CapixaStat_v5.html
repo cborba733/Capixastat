@@ -3059,7 +3059,7 @@ button,input,select,textarea{font-family:inherit;font-size:inherit}
       <div id="screen-formacao" class="screen">
         <div class="topbar">
           <div class="topbar-left"><h1>Formação de Atletas</h1><p>Microciclo · Sessões · Carga · Físico · Antropometria</p></div>
-          <div class="topbar-right"><button class="btn btn-primary btn-sm" onclick="switchFormTab('sessoes',document.querySelectorAll('.form-tab')[1])">+ Registrar Sessão</button></div>
+          <div class="topbar-right"><span id="form-demo-area" style="display:inline-flex;align-items:center;gap:6px;margin-right:8px"></span><button class="btn btn-primary btn-sm" onclick="switchFormTab('sessoes',document.querySelectorAll('.form-tab')[1])">+ Registrar Sessão</button></div>
         </div>
         <div class="content">
           <div class="form-tabs">
@@ -3896,6 +3896,64 @@ var CSStore = {
 function csToday() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
 function csDaysAgo(isoDate) { var d = new Date(isoDate + 'T12:00:00'); var t = new Date(); t.setHours(12, 0, 0, 0); return Math.round((t - d) / 86400000); }
 function csFmtDate(isoDate) { var p = isoDate.split('-'); return p[2] + '/' + p[1]; }
+
+// ══════════════════════════════════════════════════════════════════
+// Dados de EXEMPLO da Formação (para apresentar): bem-estar e esforço do elenco e antropometria de 3 atletas.
+// Tudo marcado com demo: true, só no navegador (não vai para a nuvem) e removível com um clique.
+// ══════════════════════════════════════════════════════════════════
+function formDemoAtivo() { return CSStore.all('bemestar').some(function (r) { return r.demo; }) || Object.values(matAll()).some(function (m) { return m && m.demo; }); }
+function formDemoArea() {
+  var el = document.getElementById('form-demo-area'); if (!el) return;
+  el.innerHTML = formDemoAtivo()
+    ? '<span class="cs-status warn" title="Registros fictícios para demonstração">Dados de exemplo</span> <button class="btn btn-ghost btn-sm" onclick="formDemoRemover()">Remover exemplo</button>'
+    : '<button class="btn btn-ghost btn-sm" onclick="formDemoCarregar()" title="Preenche bem-estar, esforço e antropometria com dados de demonstração">Carregar exemplo</button>';
+}
+function formDemoData(diasAtras) { var d = new Date(); d.setDate(d.getDate() - diasAtras); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function formDemoCarregar() {
+  var elenco = csClubPlayers(); if (!elenco.length) { csToast('Escolha um clube primeiro'); return; }
+  formDemoRemover(true);
+  var bem = CSStore.all('bemestar'), srpe = CSStore.all('srpe'), agora = new Date().toISOString(), n = 0;
+  var id = function () { return 'demo' + (++n).toString(36) + Math.random().toString(36).slice(2, 6); };
+  elenco.forEach(function (p, i) {
+    // esforço: 4 semanas, 5 treinos por semana; dois atletas com carga bem maior nesta semana (alerta de ACWR)
+    for (var dia = 27; dia >= 0; dia--) {
+      var dow = (new Date(formDemoData(dia) + 'T12:00:00')).getDay(); if (dow === 0 || dow === 1) continue;
+      var pico = dia < 7 && (i === 2 || i === 7), rpe = Math.min(10, 4 + ((i + dia) % 3) + (pico ? 3 : 0)), min = 60 + ((i * 7 + dia * 3) % 35) + (pico ? 25 : 0);
+      srpe.push({ id: id(), atletaId: p.id, data: formDemoData(dia), tipo: 'Treino', minutos: min, rpe: rpe, carga: rpe * min, demo: true, criadoEm: agora });
+    }
+    // bem-estar de hoje e de ontem: a maioria liberada, alguns em atenção, um restrito e um com dor que impede treinar
+    [1, 0].forEach(function (dia) {
+      var base = [2, 2, 3, 2], extra = i === 4 ? [3, 3, 2, 3] : i === 9 ? [4, 4, 3, 3] : (i % 5 === 1 ? [1, 2, 1, 2] : [0, (i + dia) % 2, 0, (i % 3) ? 1 : 0]);
+      var v = base.map(function (b, k) { return Math.min(7, b + extra[k]); }), les = i === 12 && dia === 0;
+      bem.push({ id: id(), atletaId: p.id, data: formDemoData(dia), sono: v[0], fadiga: v[1], estresse: v[2], dor: les ? 6 : v[3], lesao: les, hooper: v[0] + v[1] + v[2] + (les ? 6 : v[3]), demo: true, criadoEm: agora });
+    });
+  });
+  CSStore.save('srpe', srpe); CSStore.save('bemestar', bem); // grava direto: o exemplo não é enviado para a nuvem
+  // antropometria: 3 atletas com 2 avaliações
+  var all = matAll(), mod = [[74, 178, 55.2, 53.1, 37.8, 37.2, 96, 80.5, 8, 14, 10, 7, 9], [70, 172, 53.8, 53.5, 36.9, 36.7, 93, 77, 7, 11, 9, 6.5, 8], [81, 185, 58.4, 56.0, 39.0, 38.1, 101, 84, 10, 16, 12, 8, 11]];
+  [elenco[0], elenco[Math.min(3, elenco.length - 1)], elenco[Math.min(19, elenco.length - 1)]].filter(function (p, k, a) { return a.indexOf(p) === k; }).forEach(function (p, j) {
+    var m = mod[j], r1 = { data: formDemoData(80), massa: m[0], estatura: m[1], per_coxa_d: m[2], per_coxa_e: m[3], per_pant_d: m[4], per_pant_e: m[5], per_torax: m[6], per_cintura: m[7], per_braco_rel_d: 31.5 + j, per_braco_rel_e: 31.0 + j,
+      dc_peitoral: m[8], dc_abdominal: m[9], dc_coxa: m[10], dc_triceps: m[11], dc_subescapular: m[12], dc_biceps: 4 + j, dc_suprailiaca: 9 + j, dc_panturrilha: 6 + j };
+    var r2 = JSON.parse(JSON.stringify(r1)); r2.data = formDemoData(3); r2.massa = +(m[0] + 1.4).toFixed(1); r2.per_coxa_d += .6; r2.per_coxa_e += 1.5; r2.per_pant_d += .3; r2.per_pant_e += .4; r2.per_torax += 1;
+    ['dc_peitoral', 'dc_abdominal', 'dc_coxa', 'dc_triceps', 'dc_subescapular'].forEach(function (c) { r2[c] = +(r1[c] - 1).toFixed(1); });
+    var ant = all[p.id] || { registros: [] }; ant.demo = true; ant.demoAntes = all[p.id] ? JSON.stringify(all[p.id]) : null; ant.antropo = [r1, r2]; all[p.id] = ant;
+  });
+  matSaveAll(all);
+  try { var sel = document.getElementById('antro-player-sel'), prim = elenco[0] && elenco[0].id; if (sel && prim != null) sel.value = prim; } catch (e) {}
+  formDemoArea(); csToast('Exemplo carregado: bem-estar, esforço e antropometria');
+  try { var ativa = document.querySelector('.form-tab.active'); if (ativa) ativa.click(); } catch (e) {}
+  try { renderDashAlerts(); } catch (e) {}
+}
+function formDemoRemover(silencioso) {
+  CSStore.save('srpe', CSStore.all('srpe').filter(function (r) { return !r.demo; }));
+  CSStore.save('bemestar', CSStore.all('bemestar').filter(function (r) { return !r.demo; }));
+  var all = matAll(); Object.keys(all).forEach(function (k) { var m = all[k]; if (m && m.demo) { if (m.demoAntes) all[k] = JSON.parse(m.demoAntes); else delete all[k]; } }); matSaveAll(all);
+  if (silencioso === true) return;
+  formDemoArea(); csToast('Dados de exemplo removidos');
+  try { var ativa = document.querySelector('.form-tab.active'); if (ativa) ativa.click(); } catch (e) {}
+  try { renderDashAlerts(); } catch (e) {}
+}
+
 function csClubPlayers() {
   var u = getCurrentUser(); var c = u ? resolveClube(u.clube) : null;
   return Object.values(PLAYERS).filter(function (p) { return !c || p.clube === c; }).sort(function (a, b) { return a.nome.localeCompare(b.nome); });
@@ -13650,6 +13708,7 @@ function goTo(screenId, navEl) {
   if (screenId === 'simulador')    simInit();
   if (screenId === 'scout')        scInit();
   if (screenId === 'video')        vaRender();
+  if (screenId === 'formacao')     { try { formDemoArea(); } catch (e) {} }
   if (screenId === 'atleta')       renderAtleta();
   if (screenId === 'jogadores')    renderVitrineJogadores();
   setTimeout(function () { try { applyMetricChips(); } catch (e) {} }, 250);
