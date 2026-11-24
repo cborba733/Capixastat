@@ -146,4 +146,4 @@ o serviço em Python e a prova de conceito de visão computacional fazem parte d
 
 ---
 
-Vídeo de demonstração (versão anterior): https://youtu.be/AtuLAsqaVMQ
+Vídeo de apresentação: https://youtu.be/qr0UMUFSi3o
